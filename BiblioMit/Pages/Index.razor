@@ -1,0 +1,238 @@
+﻿@page "/bz/"
+
+@using BlazorDateRangePicker
+@using LoreSoft.Blazor.Controls
+@using BiblioMit.Blazor
+@using BiblioMit.Extensions
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using System.Globalization
+@inject IEnvironmental service
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-4">
+            <div class="row">
+                <DateRangePicker class="form-control actual_range"
+                                 Culture="@CultureInfo.CurrentUICulture"
+                                 @bind-StartDate="form.Start" @bind-EndDate="form.End" />
+            </div>
+            <div class="row">
+                <Typeahead SearchMethod="@SearchVariablesAsync"
+                           Items="form.Variables"
+                           @bind-Values="@SelectedVariables"
+                           Placeholder="Variables">
+                    <SelectedTemplate Context="variable">
+                        @variable.GetAttrNameAsync().Result
+                    </SelectedTemplate>
+                    <ResultTemplate Context="variable">
+                        @variable.GetAttrNameAsync().Result
+                    </ResultTemplate>
+                </Typeahead>
+            </div>
+            <div class="row">
+                <Typeahead SearchMethod="@SearchOrdersAsync"
+                           Items="form.Orders"
+                           @bind-Values="@SelectedOrders"
+                           Placeholder="Órdenes fitoplancton">
+                    <SelectedTemplate Context="order">
+                        @order.Text
+                    </SelectedTemplate>
+                    <ResultTemplate Context="order">
+                        @order.Text
+                    </ResultTemplate>
+                </Typeahead>
+            </div>
+            <div class="row">
+                <Typeahead SearchMethod="@SearchGenusAsync"
+                           Items="form.Genus"
+                           @bind-Values="@SelectedGenus"
+                           Placeholder="Generos fitoplancton">
+                    <SelectedTemplate Context="genus">
+                        @genus.Text
+                    </SelectedTemplate>
+                    <ResultTemplate Context="genus">
+                        @genus.Text
+                    </ResultTemplate>
+                </Typeahead>
+            </div>
+            <div class="row">
+                <Typeahead SearchMethod="@SearchSpAsync"
+                           Items="form.Sp"
+                           @bind-Values="@SelectedSp"
+                           Placeholder="Especies fitoplancton">
+                    <SelectedTemplate Context="sp">
+                        @sp.Text
+                    </SelectedTemplate>
+                    <ResultTemplate Context="sp">
+                        @sp.Text
+                    </ResultTemplate>
+                </Typeahead>
+            </div>
+            <div class="row">
+                <Typeahead SearchMethod="@SearchCommunesAsync"
+                           Items="form.Communes"
+                           @bind-Values="@SelectedCommunes"
+                           Placeholder="Comunas">
+                    <SelectedTemplate Context="commune">
+                        @commune.Text
+                    </SelectedTemplate>
+                    <ResultTemplate Context="commune">
+                        @commune.Text
+                    </ResultTemplate>
+                </Typeahead>
+            </div>
+            <div class="row">
+                <Typeahead SearchMethod="@SearchPsmbsAsync"
+                           Items="form.Psmbs"
+                           @bind-Values="@SelectedPsmbs"
+                           Placeholder="Áreas PSMB">
+                    <SelectedTemplate Context="psmb">
+                        @psmb.Text
+                    </SelectedTemplate>
+                    <ResultTemplate Context="psmb">
+                        @psmb.Text
+                    </ResultTemplate>
+                </Typeahead>
+            </div>
+            @*<div id="semaforo" class="row @(User.Identity.IsAuthenticated ? "" : "d-none")">
+            <div class="container-fluid">
+                <div class="row">
+                    <select class="form-control" id="tl" multiple></select>
+                </div>
+                <div class="row">
+                    <a id="info" href="#" data-toogle="popover" data-placement="right" title="Requerimientos variables semáforo">
+                        <i class="fas fa-question-circle fa-tw"> tabla de ayuda semáforo</i>
+                    </a>
+                </div>
+            </div>
+        </div>*@
+        </div>
+        <div class="col-8">
+            <div class="w-100" id="map" style="height:275px;"></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="chartdiv w-100" style="height:300px;"></div>
+    </div>
+</div>
+
+<div id="infotable" class="d-none" style="float:right;">
+    <table class="small table-striped text-center w-100">
+        <tr>
+            <th>Análisis</th>
+            <th>PSMB</th>
+            <th>Especie</th>
+            <th>Talla</th>
+            <th>Larva</th>
+            <th>Est.Repr.</th>
+            <th>Sexo</th>
+        </tr>
+        <tr>
+            <th class="text-left">Captura por Especie</th>
+            <td>&#x2713;</td>
+            <td>&#x2713;</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <th class="text-left">% Especie</th>
+            <td>&#x2713;</td>
+            <td>&#x2713;</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <th class="text-left">% Talla por Especie</th>
+            <td>&#x2713;</td>
+            <td>&#x2713;</td>
+            <td>&#x2713;</td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <th class="text-left">Prom Larvas por Especie</th>
+            <td>&#x2713;</td>
+            <td>&#x2713;</td>
+            <td></td>
+            <td>&#x2713;</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <th class="text-left">IG Reproductores</th>
+            <td>&#x2713;</td>
+            <td>&#x2713;</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>&#x2713;</td>
+        </tr>
+        <tr>
+            <th class="text-left">% Est.Repr.</th>
+            <td>&#x2713;</td>
+            <td>&#x2713;</td>
+            <td></td>
+            <td></td>
+            <td>&#x2713;</td>
+            <td></td>
+        </tr>
+        <tr>
+            <th class="text-left">% Sexo</th>
+            <td>&#x2713;</td>
+            <td>&#x2713;</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>&#x2713;</td>
+        </tr>
+    </table>
+</div>
+
+@code {
+    private EnvironmentalForm form = new EnvironmentalForm();
+
+    protected override void OnInitialized()
+    {
+        form.Start = service.GetMinDate();
+        form.End = service.GetMaxDate();
+        form.Orders = service.GetPhytoplanktonOrders().ToList();
+        form.Genus = service.GetPhytoplanktonGenus().ToList();
+        form.Sp = service.GetPhytoplanktonSp().ToList();
+        form.Communes = service.GetCommunes().ToList();
+        form.Psmbs = service.GetPsmbs().ToList();
+    }
+    public IList<Variable> SelectedVariables;
+    public async Task<IEnumerable<Variable>> SearchVariablesAsync(string searchText) =>
+        await Task.FromResult<IEnumerable<Variable>>(form.Variables.Where(x =>
+            x.GetAttrNameAsync().Result.Contains(searchText, StringComparison.OrdinalIgnoreCase)));
+
+    public IList<SelectListItem> SelectedOrders;
+    public async Task<IEnumerable<SelectListItem>> SearchOrdersAsync(string searchText) =>
+        await Task.FromResult<IEnumerable<SelectListItem>>(form.Orders.Where(x =>
+            x.Text.Contains(searchText, StringComparison.OrdinalIgnoreCase)));
+
+    public IList<SelectListItem> SelectedGenus;
+    public async Task<IEnumerable<SelectListItem>> SearchGenusAsync(string searchText) =>
+        await Task.FromResult<IEnumerable<SelectListItem>>(form.Genus.Where(x =>
+            x.Text.Contains(searchText, StringComparison.OrdinalIgnoreCase)));
+
+    public IList<SelectListItem> SelectedSp;
+    public async Task<IEnumerable<SelectListItem>> SearchSpAsync(string searchText) =>
+        await Task.FromResult<IEnumerable<SelectListItem>>(form.Sp.Where(x =>
+            x.Text.Contains(searchText, StringComparison.OrdinalIgnoreCase)));
+
+    public IList<SelectListItem> SelectedCommunes;
+    public async Task<IEnumerable<SelectListItem>> SearchCommunesAsync(string searchText) =>
+        await Task.FromResult<IEnumerable<SelectListItem>>(form.Communes.Where(x =>
+            x.Text.Contains(searchText, StringComparison.OrdinalIgnoreCase)));
+
+    public IList<SelectListItem> SelectedPsmbs;
+    public async Task<IEnumerable<SelectListItem>> SearchPsmbsAsync(string searchText) =>
+        await Task.FromResult<IEnumerable<SelectListItem>>(form.Psmbs.Where(x =>
+            x.Text.Contains(searchText, StringComparison.OrdinalIgnoreCase)));
+}

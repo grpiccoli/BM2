@@ -1,0 +1,172 @@
+[
+  {
+    "outputFileName": "wwwroot/css/site.min.css",
+    "inputFiles": [ "styles/site.css" ]
+  },
+  {
+    "outputFileName": "wwwroot/css/samplings.min.css",
+    "inputFiles": [ "styles/samplings.css" ]
+  },
+  {
+    "outputFileName": "wwwroot/css/graph.min.css",
+    "inputFiles": [
+      "styles/chart.css",
+      "styles/graph.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/graph.min.js",
+    "inputFiles": [
+      "wwwroot/js/graph.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/tablePopover.min.js",
+    "inputFiles": [
+      "scripts/tablePopover.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/chat.min.css",
+    "inputFiles": [ "styles/chat.css" ]
+  },
+  {
+    "outputFileName": "wwwroot/css/icomoon.min.css",
+    "inputFiles": [ "styles/icomoon/style.css" ]
+  },
+  {
+    "outputFileName": "wwwroot/js/bibliomit.min.js",
+    "inputFiles": [ "wwwroot/js/bibliomit.js" ]
+  },
+  {
+    "outputFileName": "wwwroot/css/background.min.css",
+    "inputFiles": [ "styles/background.css" ]
+  },
+  {
+    "outputFileName": "wwwroot/css/chart.min.css",
+    "inputFiles": [ "styles/chart.css" ]
+  },
+  {
+    "outputFileName": "wwwroot/css/boletin.min.css",
+    "inputFiles": [
+      "styles/boletin1.css",
+      "styles/chart.css",
+      "styles/dinamicTableBoletin.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/bibico.min.css",
+    "inputFiles": [ "styles/bibico/style.css" ]
+  },
+  {
+    "outputFileName": "wwwroot/css/bibmono.min.css",
+    "inputFiles": [ "styles/bibmono/style.css" ]
+  },
+  {
+    "outputFileName": "wwwroot/css/dinamicTable.min.css",
+    "inputFiles": [ "styles/dinamicTable.css" ]
+  },
+  {
+    "outputFileName": "wwwroot/css/dragndrop.min.css",
+    "inputFiles": [ "styles/dragndrop.css" ]
+  },
+  {
+    "outputFileName": "wwwroot/css/dropzone.min.css",
+    "inputFiles": [ "styles/dropzone.css" ]
+  },
+  {
+    "outputFileName": "wwwroot/css/fonts.min.css",
+    "inputFiles": [ "styles/fonts.css" ]
+  },
+  {
+    "outputFileName": "wwwroot/css/gridPlanilla.min.css",
+    "inputFiles": [ "styles/gridPlanilla.css" ]
+  },
+  {
+    "outputFileName": "wwwroot/css/home.min.css",
+    "inputFiles": [ "styles/home.css" ]
+  },
+  {
+    "outputFileName": "wwwroot/css/prueba.min.css",
+    "inputFiles": [ "styles/prueba.css" ]
+  },
+  {
+    "outputFileName": "wwwroot/css/bibliomit.min.css",
+    "inputFiles": [ "styles/bibliomit.css" ]
+  },
+  {
+    "outputFileName": "wwwroot/js/charts.min.js",
+    "inputFiles": [ "wwwroot/js/charts.js" ]
+  },
+  {
+    "outputFileName": "wwwroot/js/chat.min.js",
+    "inputFiles": [ "wwwroot/js/chat.js" ]
+  },
+  {
+    "outputFileName": "wwwroot/js/dashboard.min.js",
+    "inputFiles": [ "wwwroot/js/dashboard.js" ]
+  },
+  {
+    "outputFileName": "wwwroot/css/columnas.min.css",
+    "inputFiles": [
+      "styles/dinamicTable.css",
+      "styles/gridPlanilla.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/dinamicTable.min.js",
+    "inputFiles": [ "wwwroot/js/dinamicTable.js" ]
+  },
+  {
+    "outputFileName": "wwwroot/js/dontSendFormOnEnter.min.js",
+    "inputFiles": [ "wwwroot/js/dontSendFormOnEnter.js" ]
+  },
+  {
+    "outputFileName": "wwwroot/js/dragndrop.min.js",
+    "inputFiles": [ "wwwroot/js/dragndrop.js" ]
+  },
+  {
+    "outputFileName": "wwwroot/js/entry.min.js",
+    "inputFiles": [ "wwwroot/js/entry.js" ]
+  },
+  {
+    "outputFileName": "wwwroot/js/format-phone.min.js",
+    "inputFiles": [ "wwwroot/js/format-phone.js" ]
+  },
+  {
+    "outputFileName": "wwwroot/js/get-sii-rut-data.min.js",
+    "inputFiles": [ "wwwroot/js/get-sii-rut-data.js" ]
+  },
+  {
+    "outputFileName": "wwwroot/js/gmaps-address-autocomplete.min.js",
+    "inputFiles": [ "wwwroot/js/gmaps-address-autocomplete.js" ]
+  },
+  {
+    "outputFileName": "wwwroot/js/modal-action.min.js",
+    "inputFiles": [ "wwwroot/js/modal-action.js" ]
+  },
+  {
+    "outputFileName": "wwwroot/js/parseNumber.min.js",
+    "inputFiles": [ "wwwroot/js/parseNumber.js" ]
+  },
+  {
+    "outputFileName": "wwwroot/js/piechart.min.js",
+    "inputFiles": [ "wwwroot/js/piechart.js" ]
+  },
+  {
+    "outputFileName": "wwwroot/js/progress.min.js",
+    "inputFiles": [ "wwwroot/js/progress.js" ]
+  },
+  {
+    "outputFileName": "wwwroot/js/sendDisabledSelects.min.js",
+    "inputFiles": [ "wwwroot/js/sendDisabledSelects.js" ]
+  },
+  {
+    "outputFileName": "wwwroot/js/translate.min.js",
+    "inputFiles": [ "wwwroot/js/translate.js" ]
+  },
+  {
+    "outputFileName": "wwwroot/js/validation.min.js",
+    "inputFiles": [ "wwwroot/js/validate-localization.js" ]
+  }
+]

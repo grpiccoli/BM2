@@ -1,0 +1,36 @@
+﻿@model BiblioMit.Models.SernapescaEntry
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Detalles</h2>
+
+<div>
+    <h4>Entry</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.IP)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.IP)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DeclarationType)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DeclarationType)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ApplicationUser)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ApplicationUserId)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a clas="btn btn-info"  asp-action="Edit" asp-route-id="@Model.Id"><i class="fas fa-edit"></i>Editar</a> |
+    <a class="btn btn-group-md btn-default" asp-action="Index"><i class="fas fa-arrow-left fa-fw"></i>Volver atrás</a>
+</div>
