@@ -115,8 +115,8 @@ namespace BiblioMit.Controllers
         }
 
         [HttpPost]
-        //[Produces("application/json")]
-        //[ValidateAntiForgeryToken]
+        [Produces("application/json")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateFito(IFormFile qqfile)
         {
             if (qqfile == null) return Json(new { success = false, error = "error file null" });

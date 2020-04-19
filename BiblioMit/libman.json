@@ -101,7 +101,7 @@
       ]
     },
     {
-      "library": "choices.js@9.0.1",
+      "library": "choices.js@6.0.3",
       "destination": "wwwroot/lib/choices.js",
       "files": [
         "public/assets/styles/choices.min.css",

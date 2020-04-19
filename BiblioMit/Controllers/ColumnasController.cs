@@ -8,6 +8,7 @@ using BiblioMit.Data;
 using BiblioMit.Models;
 using BiblioMit.Extensions;
 using Microsoft.AspNetCore.Authorization;
+using BiblioMit.Models.Entities.Digest;
 
 namespace BiblioMit.Controllers
 {
@@ -32,40 +33,64 @@ namespace BiblioMit.Controllers
             if (string.IsNullOrEmpty(srt)) srt = "ExcelId";
             if (asc == null) asc = true;
 
-            bool _asc = asc.Value;
+            //bool _asc = asc.Value;
 
             var pre = _context.Registries.Pre();
-            var sort = _context.Registries.FilterSort(srt);
+            //var sort = _context.Registries.FilterSort(srt);
             ViewData = _context.Registries.ViewData(pre, pg, rpp, srt, asc, val);
-            var Filters = ViewData["Filters"] as IDictionary<string, List<string>>;
-
-            var applicationDbContext = _asc ?
-                pre
-                .OrderBy(x => sort.GetValue(x))
-                //.Skip((pg.Value - 1) * rpp.Value).Take(rpp.Value)
-                .Include(c => c.InputFile) :
-                pre
-                .OrderByDescending(x => sort.GetValue(x))
-                //.Skip((pg.Value - 1) * rpp.Value).Take(rpp.Value)
-                .Include(c => c.InputFile);
-
             ViewData["ExcelId"] = new MultiSelectList(
                 from InputFile e in _context.InputFiles
                 select new
-                { e.Id, e.ClassName }, "Id", "ClassName", Filters.ContainsKey("ExcelId") ?
+                { e.Id, e.ClassName }, "Id", "ClassName",
+                ViewData["Filters"] is IDictionary<string, List<string>> Filters && Filters.ContainsKey("ExcelId") ?
                 Filters["ExcelId"] : null);
 
-            return View(await applicationDbContext.ToListAsync().ConfigureAwait(false));
+            //var applicationDbContext = _asc ?
+            //    pre
+            //    .OrderBy(x => sort.GetValue(x))
+            //    //.Skip((pg.Value - 1) * rpp.Value).Take(rpp.Value)
+            //    .Include(c => c.InputFile) :
+            //    pre
+            //    .OrderByDescending(x => sort.GetValue(x))
+            //    //.Skip((pg.Value - 1) * rpp.Value).Take(rpp.Value)
+            //    .Include(c => c.InputFile);
+
+            var regs = _context.Registries.Include(r => r.InputFile).Include(r => r.Headers);
+
+            var two2five = User.Claims.Any(c => c.Value == "per" || c.Value == "sernapesca");
+            var one = User.Claims.Any(c => c.Value == "intemit");
+
+            if(one && two2five)
+            {
+                return View(await regs.Where(r => r.InputFileId < 6).ToListAsync().ConfigureAwait(false));
+            }
+            else if(two2five)
+            {
+                return View(await regs.Where(r => r.InputFileId > 1 && r.InputFileId < 6).ToListAsync().ConfigureAwait(false));
+            }
+            else if (one)
+            {
+                return View(await regs.Where(r => r.InputFileId == 1).ToListAsync().ConfigureAwait(false));
+            }
+            return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<JsonResult> Editar(string planilla, string atributo, string columna, string conversion)
+        public async Task<JsonResult> Editar(int id, string description, string headers, string conversion)
         {
             var model = await _context.Registries
-                .SingleOrDefaultAsync(c => c.InputFile.ClassName == planilla && c.NormalizedAttribute == atributo.ToUpperInvariant()).ConfigureAwait(false);
-            model.Description = string.IsNullOrWhiteSpace(columna) ? null : columna;
+                .FindAsync(id).ConfigureAwait(false);
+            var heads = _context.Headers.Where(h => h.RegistryId == id);
+            model.Description = string.IsNullOrWhiteSpace(description) ? null : description;
             model.Operation = string.IsNullOrWhiteSpace(conversion) ? null : conversion;
+            var all = headers?.Split(";;");
+            if (all.Any())
+            {
+                var newh = all.Select(a => { var h = new Header(); h.SetName(a); return h; });
+                _context.Headers.RemoveRange(heads);
+                _context.Headers.AddRange(newh);
+            }
             _context.Registries.Update(model);
             var result = await _context.SaveChangesAsync().ConfigureAwait(false);
 

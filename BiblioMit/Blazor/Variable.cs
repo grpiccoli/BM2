@@ -15,4 +15,22 @@ namespace BiblioMit.Blazor
         [Display(Name = "Total Phytoplankton")]
         phy = 4
     }
+    public enum LocationType
+    {
+        [Display(Name = "Cuenca")]
+        Cuenca = 0,
+        [Display(Name = "Comuna")]
+        Commune = 1,
+        [Display(Name = "Psmb")]
+        Psmb = 2
+    }
+    public enum SelectType
+    {
+        Variables,
+        Orders,
+        Genus,
+        Species,
+        Communes,
+        Psmbs
+    }
 }

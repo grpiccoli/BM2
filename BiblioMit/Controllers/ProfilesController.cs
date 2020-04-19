@@ -68,6 +68,7 @@ namespace BiblioMit.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult UploadProfileImage(
             //IFormFile file
             )

@@ -118,10 +118,7 @@ namespace BiblioMit.Controllers
 
             var areasList = await _context.Communes
                 .Include(c => c.CatchmentArea)
-                //.Include(c => c.Polygons)
-                //.Include(c => c.Centres)
-                //    .ThenInclude(c => c.EnsayoFitos)
-                //.Where(c => c.Polygons.Any() && c.Centres.Any(e => e.EnsayoFitos.Any()))
+                .Where(c => c.CatchmentAreaId.HasValue)
                 .ToListAsync().ConfigureAwait(false);
 
             areas.AddRange(areasList
@@ -140,13 +137,11 @@ namespace BiblioMit.Controllers
 
             if (User.Identity.IsAuthenticated)
             {
-                var psmbsList = await _context.PsmbAreas
+                var psmbs = _context.PsmbAreas
                     .Include(p => p.Commune)
                         .ThenInclude(c => c.CatchmentArea)
-                    //.Include(p => p.Coordinates)
-                    //.Include(p => p.Centres)
-                    //    .ThenInclude(c => c.EnsayoFitos)
-                    //.Where(c => c.Coordinates.Any() && c.Centres.Any(e => e.EnsayoFitos.Any()))
+                    .Where(c => c.PolygonId.HasValue && c.Commune.CatchmentAreaId.HasValue);
+                var psmbsList = await psmbs
                 .ToListAsync().ConfigureAwait(false);
 
                 areas.AddRange(psmbsList
@@ -615,59 +610,72 @@ namespace BiblioMit.Controllers
         // GET: Arrivals
         public IActionResult MapData()
         {
-            var psmb = _context.PsmbAreas
-                .Include(p => p.Farms)
-                .Include(p => p.Polygon)
+            var cuencas = _context.CatchmentAreas
+                .Include(c => c.Polygon)
                     .ThenInclude(p => p.Vertices)
-                .Where(c => c.PolygonId.HasValue && (c.PlanktonAssays.Any() || c.Farms.Any(e => e.PlanktonAssays.Any())))
-                .Select(c => new
+                .Select(c => 
+                new GMapPolygon
                 {
-                    position = c.Polygon.Vertices.OrderBy(o => o.Order).Select(o => new
+                    Position = c.Polygon.Vertices.OrderBy(o => o.Order).Select(o =>
+                    new GMapCoordinate
                     {
-                        lat = o.Latitude,
-                        lng = o.Longitude
+                        Lat = o.Latitude,
+                        Lng = o.Longitude
                     }),
-                    id = c.Id * 100,
-                    name = "PSMB " + c.Name,
-                    comuna = c.Commune.Name,
-                    provincia = c.Commune.Province.Name,
-                    region = c.Commune.Province.Region.Name
+                    Id = c.Id,
+                    Name = "Cuenca " + c.Name,
+                    Region = "Los Lagos"
                 });
 
             var comuna = _context.Communes
-                .Where(c => c.Polygons.Any() 
-                && c.Psmbs.Any(e => e.PlanktonAssays.Any()))
-                .Select(c => new
-                {
-                    position = c.Polygons.Select(p => p.Vertices.OrderBy(o => o.Order).Select(o => new
-                    {
-                        lat = o.Latitude,
-                        lng = o.Longitude
-                    })),
-                    c.Id,
-                    name = "Comuna " + c.Name,
-                    provincia = c.Province.Name,
-                    region = c.Province.Region.Name
-                });
+                .Include(c => c.Province)
+                .Include(c => c.Polygons)
+                    .ThenInclude(c => c.Vertices)
+                    .Where(c => c.CatchmentAreaId.HasValue && c.Polygons.Any()).ToList();
 
-            var cuencas = _context.CatchmentAreas
-                .Select(c => new
+            var com = comuna.Select(c => new GMapPolygon
+            {
+                Position = c.Polygons.SelectMany(p => p.Vertices.OrderBy(o => o.Order).Select(o =>
+                new GMapCoordinate
                 {
-                    position = c.Polygon.Vertices.OrderBy(o => o.Order).Select(o => new
-                    {
-                        lat = o.Latitude,
-                        lng = o.Longitude
-                    }),
-                    c.Id,
-                    name = "Cuenca " + c.Name,
-                    region = "Los Lagos"
-                });
+                    Lat = o.Latitude,
+                    Lng = o.Longitude
+                })),
+                Id = c.Id,
+                Name = "Comuna " + c.Name,
+                Provincia = c.Province.Name,
+                Region = "Los Lagos"
+            }).ToList();
 
-            var map = new List<object>();
+            var map = new List<GMapPolygon>();
             map.AddRange(cuencas);
-            map.AddRange(comuna);
-            if (User.Identity.IsAuthenticated) 
-            map.AddRange(psmb);
+            map.AddRange(com);
+            if (User.Identity.IsAuthenticated)
+            {
+                var psmb = _context.PsmbAreas
+                    .Include(p => p.Commune)
+                        .ThenInclude(p => p.Province)
+                    .Include(p => p.Polygon)
+                        .ThenInclude(p => p.Vertices)
+                    .Where(c => c.PolygonId.HasValue && c.Commune.CatchmentAreaId.HasValue)
+                    .Select(c => 
+                    new GMapPolygon
+                    {
+                        Position = c.Polygon
+                        .Vertices.OrderBy(o => o.Order).Select(o =>
+                        new GMapCoordinate
+                        {
+                            Lat = o.Latitude,
+                            Lng = o.Longitude
+                        }),
+                        Id = c.Id * 100,
+                        Name = "PSMB " + c.Name,
+                        Comuna = c.Commune.Name,
+                        Provincia = c.Commune.Province.Name,
+                        Region = "Los Lagos"
+                    });
+                //map.AddRange(psmb);
+            }
 
             return Json(map);
         }
@@ -757,7 +765,7 @@ namespace BiblioMit.Controllers
         //[ValidateAntiForgeryToken]
         //[ProducesResponseType(StatusCodes.Status404NotFound)]
         //[ProducesResponseType(typeof(JsonResult), StatusCodes.Status200OK)]
-        public IActionResult GraphData(int psmb, string var, string start, string end)
+        public IActionResult GraphData(int area, string var, string start, string end)
         {
             var i = Convert.ToDateTime(start, CultureInfo.InvariantCulture);
             var f = Convert.ToDateTime(end, CultureInfo.InvariantCulture);
@@ -765,31 +773,31 @@ namespace BiblioMit.Controllers
                 .Select(offset => new PlanktonAssay { SamplingDate = i.AddDays(offset) });
             var index = new Dictionary<string, string>
             {
-                { "t", "Temperatura" },
+                { "t", "Temperature" },
                 { "ph", "Ph" },
-                { "sal", "Salinidad" },
-                { "o2", "Oxigeno" }
+                { "sal", "Salinity" },
+                { "o2", "Oxigen" }
             };
             var ensayos = new List<PlanktonAssay>();
-            if (psmb < 100) // Cuenca
+            if (area < 100) // Cuenca
             {
                 ensayos = _context.PlanktonAssays
-                        .Where(e => e.Psmb.Commune.CatchmentAreaId == psmb 
+                        .Where(e => e.Psmb.Commune.CatchmentAreaId == area 
                         //&& e.SamplingDate.HasValue
                         && e.SamplingDate >= i && e.SamplingDate <= f)
                         .ToList();
             }
-            else if (psmb < 20_000) //Comuna
+            else if (area < 20_000) //Comuna
             {
                 ensayos = _context.PlanktonAssays
-                        .Where(e => e.Psmb.CommuneId == psmb
+                        .Where(e => e.Psmb.CommuneId == area
                         //&& e.SamplingDate.HasValue
                         && e.SamplingDate >= i && e.SamplingDate <= f)
                         .ToList();
             }
             else //PSMB * 100
             {
-                var psmbs = psmb / 100;
+                var psmbs = area / 100;
                 ensayos = _context.PlanktonAssays
                         .Where(e => e.PsmbId == psmbs
                         //&& e.SamplingDate.HasValue
@@ -806,7 +814,8 @@ namespace BiblioMit.Controllers
                 dynamic expando = new ExpandoObject();
                 expando.date = g.Key.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
                 ((IDictionary<string, object>)expando)
-                .Add($"{var}_{psmb}", g.Any(m => m[index[var]] != null) ? (double?)Math.Round(g.Average(m => (double?)m[index[var]]).Value, 2) : null);
+                .Add($"{var}_{area}", g.Any(m => m[index[var]] != null) ?
+                (double?)Math.Round(g.Average(m => (double?)m[index[var]]).Value, 2) : null);
                 return (ExpandoObject)expando;
             }).ToList();
             
@@ -854,5 +863,19 @@ namespace BiblioMit.Controllers
                 .ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
             return View();
         }
+    }
+    public class GMapCoordinate
+    {
+        public double Lat { get; set; }
+        public double Lng { get; set; }
+    }
+    public class GMapPolygon
+    {
+        public IEnumerable<GMapCoordinate> Position { get; set; }
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Comuna { get; set; }
+        public string Provincia { get; set; }
+        public string Region { get; set; }
     }
 }

@@ -2,7 +2,18 @@
     ViewData["Title"] = "Plataforma Ambiental";
 }
 
-<partial name="_LibsPg" model='new HashSet<string> { "choices.js", "bootstrap-datepicker" }' />
+@section Styles{
+    <link rel="stylesheet" href="~/lib/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/choices.js/public/assets/styles/choices.min.css" asp-append-version="true" />
+}
+
+@section Scripts{
+    <script src="~/lib/jquery/dist/jquery.min.js" type="text/javascript" language="javascript" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js" type="text/javascript" language="javascript" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js" type="text/javascript" language="javascript" asp-append-version="true"></script>
+    <script src="~/lib/choices.js/public/assets/scripts/choices.min.js" type="text/javascript" language="javascript" asp-append-version="true"></script>
+    <script src="~/files/graph.js" type="text/javascript" language="javascript" asp-append-version="true"></script>
+}
 
 <div class="container-fluid">
     <div class="row">
@@ -19,20 +30,28 @@
                 </div>
             </div>
             <div class="row">
-                <select class="form-control" id="variable" multiple></select>
+                <div class="col">
+                    <select class="form-control" id="variable" multiple></select>
+                </div>
             </div>
             <div class="row">
-                <select class="form-control" id="psmb" multiple></select>
+                <div class="col">
+                    <select class="form-control" id="psmb" multiple></select>
+                </div>
             </div>
             <div id="semaforo" class="row @(User.Identity.IsAuthenticated ? "" : "d-none")">
-                <div class="container-fluid">
-                    <div class="row">
-                        <select class="form-control" id="tl" multiple></select>
-                    </div>
-                    <div class="row">
-                        <a id="info" href="#" data-toogle="popover" data-placement="right" title="Requerimientos variables semáforo">
-                            <i class="fas fa-question-circle fa-tw"> tabla de ayuda semáforo</i>
-                        </a>
+                <div class="col">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col">
+                                <select class="form-control" id="tl" multiple></select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <a id="info" href="#" data-toogle="popover" data-placement="right" title="Requerimientos variables semáforo">
+                                <i class="fas fa-question-circle fa-tw"> tabla de ayuda semáforo</i>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -48,7 +67,7 @@
 
 <div id="infotable" class="d-none" style="float:right;">
     <table class="small table-striped text-center w-100">
-        <tr>            
+        <tr>
             <th>Análisis</th>
             <th>PSMB</th>
             <th>Especie</th>
@@ -128,8 +147,8 @@
 @section ScripTop{
     <script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCkBD_nY7LaeVohfyIt-M2a2BuIhuy-51c&language=es&region=CL"></script>
-    <script src="https://www.amcharts.com/lib/version/4.9.11/core.js"></script>
-    <script src="https://www.amcharts.com/lib/version/4.9.11/charts.js"></script>
-    <script src="https://www.amcharts.com/lib/version/4.9.11/themes/kelly.js"></script>
-    <script src="https://www.amcharts.com/lib/version/4.9.11/lang/es_ES.js"></script>
+    <script src="https://www.amcharts.com/lib/version/4.1.6/core.js"></script>
+    <script src="https://www.amcharts.com/lib/version/4.1.6/charts.js"></script>
+    <script src="https://www.amcharts.com/lib/version/4.1.6/themes/kelly.js"></script>
+    <script src="https://www.amcharts.com/lib/version/4.1.6/lang/es_ES.js"></script>
 }

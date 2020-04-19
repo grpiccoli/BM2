@@ -5,11 +5,14 @@
     Layout = "/Views/Shared/_Layout.cshtml";
 }
 
-<partial name="_LibsPg" model='new HashSet<string> { "choices.js", "bootstrap-datepicker", "@amcharts/amcharts4" }' />
-
 @section Styles{
     <link rel="stylesheet" href="_content/BlazorDateRangePicker/daterangepicker.min.css" asp-append-version="true" />
     <link rel="stylesheet" href="_content/LoreSoft.Blazor.Controls/BlazorControls.css" asp-append-version="true" />
+    <!-- Some styling -->
+    <link rel="stylesheet" href="_content/ChartJs.Blazor/ChartJSBlazor.css" asp-append-version="true" />
+    <link rel="stylesheet" href="_content/Radzen.Blazor/css/default-base.css" asp-append-version="true" />
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCkBD_nY7LaeVohfyIt-M2a2BuIhuy-51c&v=3&language=es&region=CL"></script>
+    <script src="_content/BlazorGoogleMaps/objectManager.js"></script>
 }
 
 <app>
@@ -28,9 +31,16 @@
     </div>*@
 
 @section Scripts{
-    <script src="_framework/blazor.server.js" asp-append-version="true"></script>
-    <script src="_content/BlazorDateRangePicker/clickAndPositionHandler.js" asp-append-version="true"></script>
-    <script src="_content/LoreSoft.Blazor.Controls/BlazorControls.js" asp-append-version="true"></script>
+    <script src="_framework/blazor.server.js" type="text/javascript" language="javascript" asp-append-version="true"></script>
+    <script src="_content/BlazorDateRangePicker/clickAndPositionHandler.js" type="text/javascript" language="javascript" asp-append-version="true"></script>
+    <script src="_content/LoreSoft.Blazor.Controls/BlazorControls.js" type="text/javascript" language="javascript" asp-append-version="true"></script>
+    <!-- Reference the included moment.js javascript file. -->
+    <script src="_content/ChartJs.Blazor/moment-with-locales.min.js" type="text/javascript" language="javascript" asp-append-version="true"></script>
+    <!-- Reference the included ChartJs javascript file. -->
+    <script src="_content/ChartJs.Blazor/Chart.min.js" type="text/javascript" language="javascript" asp-append-version="true"></script>
+    <!-- This is the glue between the C# code and the ChartJs charts -->
+    <script src="_content/ChartJs.Blazor/ChartJsBlazorInterop.js" type="text/javascript" language="javascript" asp-append-version="true"></script>
+    <script src="_content/Radzen.Blazor/Radzen.Blazor.js" type="text/javascript" language="javascript" asp-append-version="true"></script>
 }
 
 <partial name="_ValidationScriptsPartial" />

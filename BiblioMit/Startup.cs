@@ -60,6 +60,12 @@ namespace BiblioMit
             services.AddScoped<IImport, ImportService>();
             services.AddScoped<ITableToExcel, TableToExcelService>();
 
+            services.AddAntiforgery(options =>
+            {
+                options.FormFieldName = "__RequestVerificationToken";
+                options.HeaderName = "X-CSRF-TOKEN";
+            });
+
             services.AddTransient<IEmailSender, EmailSender>();
 
             services.AddScoped<IForum, ForumService>();

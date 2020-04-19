@@ -73,6 +73,7 @@ namespace BiblioMit.Controllers
 
         [HttpPost]
         [Authorize]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddPost(NewPostModel model)
         {
             if (model == null) return NotFound();

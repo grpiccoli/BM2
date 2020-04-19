@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BiblioMit.Extensions
 {
@@ -11,6 +12,12 @@ namespace BiblioMit.Extensions
         {
             list?.Clear();
             listToAdd.ForEach(x => list.Add(x));
+        }
+        public static IEnumerable<TKey> ExceptNull<TKey>(this IEnumerable<TKey> list, IEnumerable<TKey> listExcept)
+        {
+            if (list == null) return listExcept;
+            if (listExcept == null) return list;
+            return list.Except(listExcept);
         }
         public static void AddRangeOverride<TKey>(this IList<TKey> list, IList<TKey> listToAdd)
         {

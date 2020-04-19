@@ -272,6 +272,7 @@ namespace BiblioMit.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Administrador")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteUser(string id, IFormCollection form)
         {
             if (!string.IsNullOrEmpty(id) && form != null)

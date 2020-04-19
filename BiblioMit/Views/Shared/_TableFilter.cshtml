@@ -3,7 +3,7 @@
 
 @{
     Model.Srt = (string)ViewData["srt"];
-    Model.Asc = (bool)ViewData["asc"];
+    //Model.Asc = (bool)ViewData["asc"];
     Model.Val = ((IDictionary<string, List<string>>)ViewData["Filters"]).ContainsKey("FechaIngreso") ?
         ((IDictionary<string, List<string>>)ViewData["Filters"])["FechaIngreso"].First() :
         "Fecha";

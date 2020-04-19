@@ -87,16 +87,17 @@
 <div id="fine-uploader-manual-trigger"></div>
 @this.Block(
 @<script>
+    $(document).ready(function () {
         var token = $('input:hidden[name="__RequestVerificationToken"]').val();
         var manualUploader = new qq.FineUploader({
             element: document.getElementById('fine-uploader-manual-trigger'),
             template: 'qq-template-manual-trigger',
             request: {
                 endpoint: '@Url.Action("CreateFito","Entries")',
-                //customHeaders: {
-                //    'X-CSRF-TOKEN': token,
+                customHeaders: {
+                    'X-CSRF-TOKEN': token
                 //    'X-CSRFToken': token
-                //},  // for token validation
+                },  // for token validation
                 params: {
                     pid: 1,
                     aid: 1
@@ -120,7 +121,7 @@
                 sizeLimit: 20971520
             },
             failedUploadTextDisplay: {
-                mode: 'custom' 
+                mode: 'custom'
             },
             text: {
                 // localize text, for example - RUSSIAN (comment this for english)
@@ -148,7 +149,8 @@
             }
         });
 
-    qq(document.getElementById("trigger-upload")).attach("click", function () {
-        manualUploader.uploadStoredFiles();
+        qq(document.getElementById("trigger-upload")).attach("click", function () {
+            manualUploader.uploadStoredFiles();
+        });
     });
 </script>, "Scripts")

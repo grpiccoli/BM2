@@ -204,7 +204,7 @@ namespace BiblioMit.Extensions
                           ?.Name
                           ?? e.ToString()
             };
-        public static string GetDisplayName(this Enum e, string lang)
+        public static string GetDisplayName(this Enum e, string lang = null)
         {
             if (e == null)
             {

@@ -1,98 +1,124 @@
 ﻿@page "/bz/"
 
-@using BlazorDateRangePicker
-@using LoreSoft.Blazor.Controls
-@using BiblioMit.Blazor
-@using BiblioMit.Extensions
-@using Microsoft.AspNetCore.Mvc.Rendering
-@using System.Globalization
+@using GoogleMapsComponents
+@using GoogleMapsComponents.Maps
+
 @inject IEnvironmental service
 
 <div class="container-fluid">
     <div class="row">
         <div class="col-4">
             <div class="row">
-                <DateRangePicker class="form-control actual_range"
-                                 Culture="@CultureInfo.CurrentUICulture"
-                                 @bind-StartDate="form.Start" @bind-EndDate="form.End" />
+                <div class="col">
+                    <DateRangePicker class="form-control actual_range" OnRangeSelect="OnRangeSelect"
+                                     Culture="@CultureInfo.CurrentUICulture"
+                                     @bind-StartDate="form.Start" @bind-EndDate="form.End" />
+                </div>
             </div>
             <div class="row">
-                <Typeahead SearchMethod="@SearchVariablesAsync"
-                           Items="form.Variables"
-                           @bind-Values="@SelectedVariables"
-                           Placeholder="Variables">
-                    <SelectedTemplate Context="variable">
-                        @variable.GetAttrNameAsync().Result
-                    </SelectedTemplate>
-                    <ResultTemplate Context="variable">
-                        @variable.GetAttrNameAsync().Result
-                    </ResultTemplate>
-                </Typeahead>
+                <div class="col">
+                    <Typeahead SearchMethod="@SearchVariablesAsync"
+                               Items="form.Variables"
+                               @bind-Values="@SelectedVariables"
+                               Placeholder="Variables">
+                        <SelectedTemplate Context="variable">
+                            @variable.GetAttrNameAsync().Result
+                        </SelectedTemplate>
+                        <ResultTemplate Context="variable">
+                            @variable.GetAttrNameAsync().Result
+                        </ResultTemplate>
+                    </Typeahead>
+                </div>
             </div>
             <div class="row">
-                <Typeahead SearchMethod="@SearchOrdersAsync"
-                           Items="form.Orders"
-                           @bind-Values="@SelectedOrders"
-                           Placeholder="Órdenes fitoplancton">
-                    <SelectedTemplate Context="order">
-                        @order.Text
-                    </SelectedTemplate>
-                    <ResultTemplate Context="order">
-                        @order.Text
-                    </ResultTemplate>
-                </Typeahead>
+                <div class="col">
+                    <Typeahead SearchMethod="@SearchOrdersAsync"
+                               Items="form.Orders"
+                               @bind-Values="@SelectedOrders"
+                               Placeholder="Órdenes fitoplancton">
+                        <SelectedTemplate Context="order">
+                            @order.Text
+                        </SelectedTemplate>
+                        <ResultTemplate Context="order">
+                            @order.Text
+                        </ResultTemplate>
+                    </Typeahead>
+                </div>
             </div>
             <div class="row">
-                <Typeahead SearchMethod="@SearchGenusAsync"
-                           Items="form.Genus"
-                           @bind-Values="@SelectedGenus"
-                           Placeholder="Generos fitoplancton">
-                    <SelectedTemplate Context="genus">
-                        @genus.Text
-                    </SelectedTemplate>
-                    <ResultTemplate Context="genus">
-                        @genus.Text
-                    </ResultTemplate>
-                </Typeahead>
+                <div class="col">
+                    <Typeahead SearchMethod="@SearchGenusAsync"
+                               Items="form.Genus"
+                               @bind-Values="@SelectedGenus"
+                               Placeholder="Generos fitoplancton">
+                        <SelectedTemplate Context="genus">
+                            @genus.Text
+                        </SelectedTemplate>
+                        <ResultTemplate Context="genus">
+                            @genus.Text
+                        </ResultTemplate>
+                    </Typeahead>
+                </div>
             </div>
             <div class="row">
-                <Typeahead SearchMethod="@SearchSpAsync"
-                           Items="form.Sp"
-                           @bind-Values="@SelectedSp"
-                           Placeholder="Especies fitoplancton">
-                    <SelectedTemplate Context="sp">
-                        @sp.Text
-                    </SelectedTemplate>
-                    <ResultTemplate Context="sp">
-                        @sp.Text
-                    </ResultTemplate>
-                </Typeahead>
+                <div class="col">
+                    <Typeahead SearchMethod="@SearchSpAsync"
+                               Items="form.Sp"
+                               @bind-Values="@SelectedSp"
+                               Placeholder="Especies fitoplancton">
+                        <SelectedTemplate Context="sp">
+                            @sp.Text
+                        </SelectedTemplate>
+                        <ResultTemplate Context="sp">
+                            @sp.Text
+                        </ResultTemplate>
+                    </Typeahead>
+                </div>
             </div>
             <div class="row">
-                <Typeahead SearchMethod="@SearchCommunesAsync"
-                           Items="form.Communes"
-                           @bind-Values="@SelectedCommunes"
-                           Placeholder="Comunas">
-                    <SelectedTemplate Context="commune">
-                        @commune.Text
-                    </SelectedTemplate>
-                    <ResultTemplate Context="commune">
-                        @commune.Text
-                    </ResultTemplate>
-                </Typeahead>
+                <div class="col">
+                    <Typeahead SearchMethod="@SearchCatchmentsAsync"
+                               Items="form.Catchments"
+                               @bind-Values="@SelectedCatchments"
+                               Placeholder="Cuencas">
+                        <SelectedTemplate Context="catchment">
+                            @catchment.Text
+                        </SelectedTemplate>
+                        <ResultTemplate Context="catchment">
+                            @catchment.Text
+                        </ResultTemplate>
+                    </Typeahead>
+                </div>
             </div>
             <div class="row">
-                <Typeahead SearchMethod="@SearchPsmbsAsync"
-                           Items="form.Psmbs"
-                           @bind-Values="@SelectedPsmbs"
-                           Placeholder="Áreas PSMB">
-                    <SelectedTemplate Context="psmb">
-                        @psmb.Text
-                    </SelectedTemplate>
-                    <ResultTemplate Context="psmb">
-                        @psmb.Text
-                    </ResultTemplate>
-                </Typeahead>
+                <div class="col">
+                    <Typeahead SearchMethod="@SearchCommunesAsync"
+                               Items="form.Communes"
+                               @bind-Values="@SelectedCommunes"
+                               Placeholder="Comunas">
+                        <SelectedTemplate Context="commune">
+                            @commune.Text
+                        </SelectedTemplate>
+                        <ResultTemplate Context="commune">
+                            @commune.Text
+                        </ResultTemplate>
+                    </Typeahead>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <Typeahead SearchMethod="@SearchPsmbsAsync"
+                               Items="form.Psmbs"
+                               @bind-Values="@SelectedPsmbs"
+                               Placeholder="Áreas PSMB">
+                        <SelectedTemplate Context="psmb">
+                            @psmb.Text
+                        </SelectedTemplate>
+                        <ResultTemplate Context="psmb">
+                            @psmb.Text
+                        </ResultTemplate>
+                    </Typeahead>
+                </div>
             </div>
             @*<div id="semaforo" class="row @(User.Identity.IsAuthenticated ? "" : "d-none")">
             <div class="container-fluid">
@@ -108,11 +134,25 @@
         </div>*@
         </div>
         <div class="col-8">
-            <div class="w-100" id="map" style="height:275px;"></div>
+            <GoogleMap @ref="@map1" Id="map1" Options="@mapOptions"></GoogleMap>
         </div>
     </div>
     <div class="row">
-        <div class="chartdiv w-100" style="height:300px;"></div>
+        <div class="chartdiv w-100" style="height:400px;">
+            <RadzenChart>
+                @foreach (var data in form.Datas)
+                {
+                    <RadzenLineSeries Smooth="false" Data="@data.Dots.ToArray()" CategoryProperty="Date" Title="@data.Title" LineType="LineType.Solid" ValueProperty="Y">
+                        <RadzenMarkers MarkerType="MarkerType.None" />
+                    </RadzenLineSeries>
+                }
+                <RadzenCategoryAxis Padding="20" FormatString="{0:MMM YY}" />
+                <RadzenValueAxis Formatter="@FormatY">
+                    <RadzenGridLines Visible="true" />
+                    <RadzenAxisTitle Text="Valor" />
+                </RadzenValueAxis>
+            </RadzenChart>
+        </div>
     </div>
 </div>
 
@@ -194,44 +234,151 @@
 </div>
 
 @code {
+    //map
+    private GoogleMap map1;
+    private MapOptions mapOptions;
+    //chart
+    string FormatY(object value)
+    {
+        return ((double)value).ToString(CultureInfo.InvariantCulture);
+    }
+    //init
     private EnvironmentalForm form = new EnvironmentalForm();
-
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         form.Start = service.GetMinDate();
         form.End = service.GetMaxDate();
-        form.Orders = service.GetPhytoplanktonOrders().ToList();
-        form.Genus = service.GetPhytoplanktonGenus().ToList();
-        form.Sp = service.GetPhytoplanktonSp().ToList();
-        form.Communes = service.GetCommunes().ToList();
-        form.Psmbs = service.GetPsmbs().ToList();
+        form.Orders = await service.GetPhytoplanktonOrders().ConfigureAwait(false);
+        form.Genus = await service.GetPhytoplanktonGenus().ConfigureAwait(false);
+        form.Sp = await service.GetPhytoplanktonSp().ConfigureAwait(false);
+        form.Communes = await service.GetCommunes().ConfigureAwait(false);
+        form.Catchments = await service.GetCatchments().ConfigureAwait(false);
+        form.Psmbs = await service.GetPsmbs().ConfigureAwait(false);
+        form.Datas.Add(await service.GetData(
+                            form.Start.Value,
+                            form.End.Value,
+                            LocationType.Cuenca,
+                            1,
+                            "Cuenca Norte",
+                            Variable.t).ConfigureAwait(false));
+        mapOptions = new MapOptions()
+        {
+            Zoom = 8,
+            Center = new LatLngLiteral()
+            {
+                //Chulín
+                Lat = -42.6220283,
+                Lng = -73.0419269
+            },
+            MapTypeId = MapTypeId.Terrain
+        };
     }
-    public IList<Variable> SelectedVariables;
-    public async Task<IEnumerable<Variable>> SearchVariablesAsync(string searchText) =>
-        await Task.FromResult<IEnumerable<Variable>>(form.Variables.Where(x =>
-            x.GetAttrNameAsync().Result.Contains(searchText, StringComparison.OrdinalIgnoreCase)));
 
-    public IList<SelectListItem> SelectedOrders;
+    public void OnRangeSelect(DateRange range)
+    {
+        //Use range.Start and range.End here
+        //form.Datas.Clear();
+    }
+
+    public IList<SelectListItem> SelectedOrders { get; set; }
+    public IList<SelectListItem> SelectedGenus { get; set; }
+    public IList<SelectListItem> SelectedSp { get; set; }
+    public IList<SelectListItem> SelectedCommunes { get; set; }
+    public IList<SelectListItem> SelectedPsmbs { get; set; }
+
+    private IList<SelectListItem> selectedCatchments;
+
+    public IList<SelectListItem> SelectedCatchments
+    {
+        get
+        {
+            return selectedCatchments;
+        }
+        set
+        {
+            selectedCatchments = CatchChange(selectedCatchments, value);
+        }
+    }
+    private IList<SelectListItem> CatchChange(IList<SelectListItem> oldVars, IList<SelectListItem> newVars)
+    {
+        if (form.Start.HasValue && form.End.HasValue)
+        {
+            var oldNotNew = oldVars.ExceptNull(newVars).ToList();
+            var newNotOld = newVars.ExceptNull(oldVars).ToList();
+        }
+        return newVars;
+    }
+
+    private IList<Variable> selectedVariables;
+
+    public IList<Variable> SelectedVariables
+    {
+        get
+        {
+            return selectedVariables;
+        }
+        set
+        {
+            selectedVariables = VarChangeAsync(selectedVariables, value).Result;
+        }
+    }
+
+    private async Task<IList<Variable>> VarChangeAsync(IList<Variable> oldVars, IList<Variable> newVars)
+    {
+        if (form.Start.HasValue && form.End.HasValue)
+        {
+            var oldNotNew = oldVars.ExceptNull(newVars).ToList();
+            var newNotOld = newVars.ExceptNull(oldVars).ToList();
+
+            //variable removed
+            if (oldNotNew.Any())
+            {
+
+            }
+            //variable added
+            if (newNotOld.Any())
+            {
+                foreach (var catchment in SelectedCatchments)
+                {
+                    var id = catchment.Value.ParseInt();
+                    if (id.HasValue)
+                        form.Datas.Add(await service.GetData(
+                            form.Start.Value,
+                            form.End.Value,
+                            LocationType.Cuenca,
+                            id.Value,
+                            catchment.Text,
+                            newNotOld[0]).ConfigureAwait(false));
+                }
+            }
+        }
+        return newVars;
+    }
+
+    public async Task<IEnumerable<Variable>> SearchVariablesAsync(string searchText) =>
+    await Task.FromResult<IEnumerable<Variable>>(form.Variables.Where(x =>
+    x.GetAttrNameAsync().Result.Contains(searchText, StringComparison.OrdinalIgnoreCase)));
+
     public async Task<IEnumerable<SelectListItem>> SearchOrdersAsync(string searchText) =>
         await Task.FromResult<IEnumerable<SelectListItem>>(form.Orders.Where(x =>
             x.Text.Contains(searchText, StringComparison.OrdinalIgnoreCase)));
 
-    public IList<SelectListItem> SelectedGenus;
     public async Task<IEnumerable<SelectListItem>> SearchGenusAsync(string searchText) =>
         await Task.FromResult<IEnumerable<SelectListItem>>(form.Genus.Where(x =>
             x.Text.Contains(searchText, StringComparison.OrdinalIgnoreCase)));
 
-    public IList<SelectListItem> SelectedSp;
     public async Task<IEnumerable<SelectListItem>> SearchSpAsync(string searchText) =>
         await Task.FromResult<IEnumerable<SelectListItem>>(form.Sp.Where(x =>
             x.Text.Contains(searchText, StringComparison.OrdinalIgnoreCase)));
 
-    public IList<SelectListItem> SelectedCommunes;
-    public async Task<IEnumerable<SelectListItem>> SearchCommunesAsync(string searchText) =>
-        await Task.FromResult<IEnumerable<SelectListItem>>(form.Communes.Where(x =>
-            x.Text.Contains(searchText, StringComparison.OrdinalIgnoreCase)));
+    public async Task<IEnumerable<SelectListItem>> SearchCatchmentsAsync(string searchText) =>
+    await Task.FromResult<IEnumerable<SelectListItem>>(form.Catchments.Where(x =>
+        x.Text.Contains(searchText, StringComparison.OrdinalIgnoreCase)));
 
-    public IList<SelectListItem> SelectedPsmbs;
+    public async Task<IEnumerable<SelectListItem>> SearchCommunesAsync(string searchText) =>
+    await Task.FromResult<IEnumerable<SelectListItem>>(form.Communes.Where(x =>
+        x.Text.Contains(searchText, StringComparison.OrdinalIgnoreCase)));
+
     public async Task<IEnumerable<SelectListItem>> SearchPsmbsAsync(string searchText) =>
         await Task.FromResult<IEnumerable<SelectListItem>>(form.Psmbs.Where(x =>
             x.Text.Contains(searchText, StringComparison.OrdinalIgnoreCase)));

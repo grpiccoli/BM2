@@ -11,7 +11,7 @@
 <div class="grid">
     <h1 class="titulo">Columnas de datos</h1>
     <img height="100" class="logo" align="right"
-         src="~/images/ico/mejillondechile.svg" />
+         src="~/images/ico/mejillondechile.min.png" />
     <div class="clear">
         <partial name="_ClearFilters" model="@Url.RouteUrl(this.ViewContext.RouteData.Values)" />
     </div>
@@ -22,8 +22,8 @@
                     <th>
                         <partial name="_TableFilter" view-data="@ViewData" model='new TableFilterVM
                    {
-                       Id = "InputFileId",
-                       Name = Html.DisplayNameFor(model => model.InputFileId),
+                       Id = "ClassName",
+                       Name = Html.DisplayNameFor(model => model.InputFile.ClassName),
                        Type = FilterType.select
                    }' />
                     </th>
@@ -44,7 +44,7 @@
                     <th>
                         <partial name="_TableFilter" view-data="@ViewData" model='new TableFilterVM
                    {
-                       Id = "Header",
+                       Id = "Headers",
                        Name = Html.DisplayNameFor(model => model.Headers),
                        Type = FilterType.select
                    }' />
@@ -61,9 +61,9 @@
             <tbody>
                 @foreach (var item in Model)
                 {
-                <tr>
+                <tr id="@item.Id">
                     <td>
-                        @Html.DisplayFor(modelItem => item.InputFile.ClassName)
+                        @item.InputFile.ClassName
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Attribute)
@@ -72,7 +72,10 @@
                         @Html.DisplayFor(modelItem => item.Description)
                     </td>
                     <td contenteditable="true">
-                        @Html.DisplayFor(modelItem => string.Join(" ;; ", item.Headers.Select(h => h.Name)))
+                        @if (item.Headers.Any())
+                        {
+                            @Html.Raw(string.Join(";;", item.Headers.Select(h => h.Name)));
+                        }
                     </td>
                     <td contenteditable="true">
                         @Html.DisplayFor(modelItem => item.Operation)
@@ -92,18 +95,19 @@
         }).blur(function () {
             if ($(this).data("initialText") !== $(this).html()) {
                 var $cell = $(this).parent();
+                var id = $cell.attr('id');
                 var values = [];
                 $cell.children('td').each(function () {
                     values.push($(this).html().replace(/^\s*/, '').replace(/\s*$/, ''));
                 });
                 var url = '@Html.Raw(Url.Action("Editar",(string)ViewData["controller"],
                           new {
-                              planilla = "P0",
-                              atributo = "A1",
-                              columna = "C2",
+                              id = "P0",
+                              decription = "A1",
+                              headers = "C2",
                               conversion = "C3"
                           }))';
-                url = url.replace("P0", values[0]).replace("A1", values[1]).replace("C2", values[3]).replace("C3", values[4]);
+                url = url.replace("P0", id).replace("A1", values[2]).replace("C2", values[3]).replace("C3", values[4]);
                 alert(url);
                 $.post(url, { "__RequestVerificationToken": $("input[name='__RequestVerificationToken']").val() }, function (r) {
                     alert('cambios guardados en la base de datos. Presione Ctrl+Z para deshacer');

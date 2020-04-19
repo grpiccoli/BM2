@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
 namespace BiblioMit.Models
 {
     public class Polygon
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
         public int? LocalityId { get; set; }
         public virtual Locality Locality { get; set; }

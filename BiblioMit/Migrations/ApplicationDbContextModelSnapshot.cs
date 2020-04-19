@@ -863,7 +863,9 @@ namespace BiblioMit.Migrations
             modelBuilder.Entity("BiblioMit.Models.Polygon", b =>
                 {
                     b.Property<int>("Id")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int?>("CatchmentAreaId")
                         .HasColumnType("int");
