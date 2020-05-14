@@ -29,7 +29,7 @@ AmCharts.addInitHandler((chart: any) => {
 /**
  * Create the chart
  */
-var chart = AmCharts.makeChart("chartdiv", {
+var chart:any = AmCharts.makeChart("chartdiv", {
     "type": "pie",
     "theme": "light",
     "labelsEnabled": false,

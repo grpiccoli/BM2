@@ -1,7 +1,6 @@
 ﻿using BiblioMit.Data;
 using BiblioMit.Extensions;
 using BiblioMit.Models;
-using Microsoft.AspNetCore.SignalR;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
@@ -25,15 +24,19 @@ using BiblioMit.Models.Entities.Digest;
 using BiblioMit.Models.Entities.Centres;
 using System.Linq.Expressions;
 using BiblioMit.Models.Entities.Environmental;
+using BiblioMit.Services.Hubs;
+using Microsoft.AspNetCore.Identity;
 
 namespace BiblioMit.Services
 {
     public class ImportService : IImport
     {
         private string Declaration { get; set; }
+        private List<string> Headers { get; set; }
         private Registry PhytoStart { get; set; }
         private Registry PhytoEnd { get; set; }
         private int StartRow { get; set; } = 0;
+        private Tdata PhytoTData { get; set; }
         private Dictionary<string, Dictionary<string, int>> InSet { get; set; } = new Dictionary<string, Dictionary<string, int>>();
         private MethodInfo FirstOrDefaultAsyncMethod { get; set; }
         private InputFile InputFile { get; set; }
@@ -41,17 +44,24 @@ namespace BiblioMit.Services
         [SuppressMessage("Performance", "CA1802:Use literals where appropriate", Justification = "includes circular definition")]
         private static readonly BindingFlags BindingFlags = BindingFlags.Instance | BindingFlags.Public;
         private List<PropertyInfo> FieldInfos { get; } = new List<PropertyInfo>();
+        private List<Commune> Communes { get; set; }
         //private const string encoding = "Windows-1252";
         private readonly ApplicationDbContext _context;
-        private readonly IHubContext<EntryHub> _hubContext;
+        private readonly IEntryHub _hubContext;
         private readonly IStringLocalizer<ImportService> _localizer;
         private readonly ITableToExcel _tableToExcel;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IHttpContextAccessor _httpContext;
         public ImportService(ApplicationDbContext context,
-            IHubContext<EntryHub> hubContext,
+            IEntryHub hubContext,
+            IHttpContextAccessor httpContext,
+            UserManager<ApplicationUser> userManager,
             ITableToExcel tableToExcel,
             IStringLocalizer<ImportService> localizer)
         {
+            _httpContext = httpContext;
             _tableToExcel = tableToExcel;
+            _userManager = userManager;
             _localizer = localizer;
             _hubContext = hubContext;
             _context = context;
@@ -62,19 +72,9 @@ namespace BiblioMit.Services
             var resultInit = await Init<PlanktonAssay>().ConfigureAwait(false);
             if (resultInit.IsCompletedSuccessfully)
             {
-                if(!Directory.Exists(pwd))
-                    throw new DirectoryNotFoundException(_localizer[$"directory {pwd} not found"]);
-                var logs = Path.Combine(pwd, "LOGS");
-                if (Directory.Exists(logs))
-                {
-                    var di = new DirectoryInfo(logs);
-                    foreach (var file in di.GetFiles("*log"))
-                        file.Delete();
-                }
-                Directory.CreateDirectory(logs);
                 foreach (var file in files)
                 {
-                    await AddEntryAsync(file, pwd, logs).ConfigureAwait(false);
+                    await AddEntryAsync(file, pwd).ConfigureAwait(false);
                 }
                 return Task.CompletedTask;
             }
@@ -97,296 +97,259 @@ namespace BiblioMit.Services
             }
             throw new ArgumentException(_localizer[$"Unknown Error"]);
         }
-        public async Task<Task> ReadAsync(ExcelPackage package, SernapescaEntry entry, DeclarationType tipo)
+        public async Task<Task> AddFilesAsync(string pwd)
+        {
+            if (!Directory.Exists(pwd))
+                throw new DirectoryNotFoundException(_localizer[$"directory {pwd} not found"]);
+            var logs = Path.Combine(pwd, "LOGS");
+            if (Directory.Exists(logs))
+            {
+                var di = new DirectoryInfo(logs);
+                foreach (var file in di.GetFiles("*log"))
+                    file.Delete();
+            }
+            Directory.CreateDirectory(logs);
+            string filesPath = Path.Combine(pwd, "plankton");
+            if (!Directory.Exists(filesPath))
+                throw new DirectoryNotFoundException(_localizer[$"directory {filesPath} not found"]);
+            IEnumerable<string> files = Directory.GetDirectories(filesPath).SelectMany(d => Directory.GetFiles(d));
+            if (files.Any())
+            {
+                Task response1 = await AddRangeAsync(pwd, files).ConfigureAwait(false);
+                if (!response1.IsCompletedSuccessfully) throw new Exception(_localizer["Error when adding Plankton records"]);
+            }
+            var context = _httpContext.HttpContext;
+            var userId = string.Empty;
+            if (context != null)
+            {
+                var contextUser = context.User;
+                var user = await _userManager.GetUserAsync(contextUser).ConfigureAwait(false);
+                userId = user.Id;
+            }
+            else
+            {
+                var user = await _context.ApplicationUsers.FirstOrDefaultAsync(u => u.UserName == "WebMaster").ConfigureAwait(false);
+                userId = user.Id;
+            }
+            for (var i = 1; i < 5; i++)
+            {
+                string dt = ((DeclarationType)i).ToString();
+                string dir = Path.Combine(pwd, "declaration", dt);
+                if (!Directory.Exists(dir)) continue;
+                IEnumerable<string> ds = Directory.GetFiles(dir);
+                foreach(var d in ds)
+                {
+                    var logFile = Path.Combine(logs, $"{dt}_{Path.GetFileNameWithoutExtension(d)}.log");
+                    using var log = new StreamWriter(logFile);
+                    var entry = new SernapescaEntry
+                    {
+                        ApplicationUserId = userId,
+                        FileName = Path.GetFileNameWithoutExtension(d),
+                        Date = DateTime.Now,
+                        Success = false,
+                        DeclarationType = (DeclarationType)i
+                    };
+                    await _context.Entries.AddAsync(entry).ConfigureAwait(false);
+                    await _context.SaveChangesAsync()
+                        .ConfigureAwait(false);
+                    var fs = File.OpenRead(d);
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    using ExcelPackage package = new ExcelPackage(fs);
+                    try 
+                    {
+                        var result = i switch
+                        {
+                            1 => await ReadAsync<SeedDeclaration>(package, entry).ConfigureAwait(false),
+                            2 => await ReadAsync<HarvestDeclaration>(package, entry).ConfigureAwait(false),
+                            3 => await ReadAsync<SupplyDeclaration>(package, entry).ConfigureAwait(false),
+                            _ => await ReadAsync<ProductionDeclaration>(package, entry).ConfigureAwait(false)
+                        };
+                    }
+                    catch (ArgumentException de)
+                    {
+                        log.WriteLine($"File: {d}");
+                        log.WriteLine($"DNE: {de}");
+                    }
+                    catch (Exception e)
+                    {
+                        log.WriteLine($"File: {d}");
+                        log.WriteLine($"E: {e}");
+                    }
+                }
+            }
+            return Task.CompletedTask;
+        }
+        public async Task<Task> ReadAsync<T>(ExcelPackage package, SernapescaEntry entry)
+            where T : SernapescaDeclaration
         {
             if (entry == null || package == null)
                 throw new ArgumentNullException($"Arguments Entry {entry} and package {package} cannot be null");
+
+            Task resultInit = await Init<T>().ConfigureAwait(false);
+            if (!resultInit.IsCompletedSuccessfully) throw new ArgumentException(_localizer[$"Unknown Error"]);
             double pgr = 0;
-            Declaration = entry.DeclarationType.ToString();
-            var planillas = new List<SernapescaDeclaration>();
-
-            var msg = string.Empty;
-
-            var resultInit = await Init<SernapescaDeclaration>().ConfigureAwait(false);
-
-            var pgrTotal = 100;
-
-            pgr += 4;
-
-            var pgrReadWrite = (pgrTotal - pgr) / 6;
-
-            var pgrRow = pgrReadWrite / package.Workbook.Worksheets.Where(w => w.Dimension != null).Sum(w => w.Dimension.Rows);
-
-            var status = "info";
-
-            foreach (var worksheet in package.Workbook.Worksheets.Where(w => w.Dimension != null))
+            IEnumerable<ExcelWorksheet> worksheets = package.Workbook.Worksheets.Where(w => w.Dimension != null);
+            double rows = worksheets.Sum(w => w.Dimension.Rows);
+            double pgrRow = 100 / rows;
+            string msg = string.Empty;
+            HttpContext context = _httpContext.HttpContext;
+            List<int> datesIds = new List<int>();
+            string userId = string.Empty;
+            if (context != null)
             {
-                if (worksheet == null) break;
+                userId = context.User.Identity.Name;
+            }
+            else
+            {
+                userId = "nofeed";
+            }
+            foreach (ExcelWorksheet worksheet in worksheets)
+            {
+                if (worksheet == null) continue;
                 int rowCount = worksheet.Dimension.Rows;
-
+                ExcelRange headers = worksheet.Cells["1:1"];
+                Headers = headers.Select(s => s.Value.ToString().CleanCell()).ToList();
                 for (int row = 2; row <= rowCount; row++)
                 {
                     if (worksheet.Cells[row, 1].Value == null)
                     {
                         msg = $">W: Fila '{row}' en hoja '{worksheet.Name}' Está vacía.";
-
                         entry.OutPut += msg;
-
-                        await _hubContext
-                            .Clients.All
-                            .SendAsync("Update", "log", msg)
+                        await _hubContext.SendLog(userId, msg)
                             .ConfigureAwait(false);
-
-                        status = "warning";
-                        await _hubContext
-                            .Clients.All
-                            .SendAsync("Update", "status", status)
+                        await _hubContext.SendStatusWarning(userId)
                             .ConfigureAwait(false);
-
                         continue;
                     }
-                    var item = Activator.CreateInstance<SernapescaDeclaration>();
-
-                    item.Row = row;
-
-                    item.Sheet = worksheet.Name;
-
-                    foreach (var d in Tdatas)
+                    int last = Tdatas.Count - 1;
+                    T item = Activator.CreateInstance<T>();
+                    item.EntryId = entry.Id;
+                    for (int d = 0; d < last; d++)
                     {
-                        MethodInfo method = typeof(ImportService).GetMethod("GetFromExcel")
-                            //.MakeGenericMethod(d.FieldType);
-                            .MakeGenericMethod(typeof(ImportService));
-                        object value = null;
-                        value = method.Invoke(value, new object[] { worksheet, d.Q, null });
+                        object value = await GetValue(worksheet, d, row, item).ConfigureAwait(false);
                         if (value == null)
                         {
-                            status = "danger";
-
+                            if (Tdatas[d].Name == nameof(SeedDeclaration.Origin)) continue;
                             msg =
-                                $">ERROR: Columna '{d.Q}' no encontrada en hoja '{worksheet.Name}'. Verificar archivo.\n0 registros procesados.";
-
+                                $">ERROR: Columna '{string.Join(",", Tdatas[d].Q)}' no encontrada en hoja '{worksheet.Name}'. Verificar archivo.\n0 registros procesados.";
                             entry.OutPut += msg;
-
                             _context.Update(entry);
                             await _context.SaveChangesAsync()
                                 .ConfigureAwait(false);
-
-                            await _hubContext
-                            .Clients.All
-                            .SendAsync("Update", "log", msg)
+                            await _hubContext.SendLog(userId, msg)
                             .ConfigureAwait(false);
-
-                            await _hubContext
-                                .Clients.All
-                                .SendAsync("Update", "status", status)
+                            await _hubContext.SendStatusDanger(userId)
                                 .ConfigureAwait(false);
-
                             return Task.CompletedTask;
                         }
-                        if (d.Operation != null)
+                        else
                         {
-                            NCalc.Expression e = new NCalc.Expression((value + d.Operation).Replace(",", ".", StringComparison.InvariantCultureIgnoreCase));
-                            item[d.Name] = e.Evaluate();
+                            item[Tdatas[d].Name] = value;
+                            Debug.WriteLine($"column:{Tdatas[d].Name}");
+                        }
+                    }
+                    //Psmb
+                    object psmb = await GetValue(worksheet, last, row, item).ConfigureAwait(false);
+                    //Discriminator
+                    item.Discriminator = entry.DeclarationType;
+                    var dbSet = _context.Set<T>();
+                    T find = await dbSet
+                        .FirstOrDefaultAsync(t => t.DeclarationNumber == item.DeclarationNumber).ConfigureAwait(false);
+                    if (find == null)
+                    {
+                        await dbSet.AddAsync(item).ConfigureAwait(false);
+                        await _context.SaveChangesAsync().ConfigureAwait(false);
+                        entry.Added++;
+                    }
+                    else
+                    {
+                        item.Id = find.Id;
+                        if (find != item)
+                        {
+                            find.AddChanges(item);
+                            dbSet.Update(find);
+                            await _context.SaveChangesAsync().ConfigureAwait(false);
+                            entry.Updated++;
+                        }
+                    }
+                    if (item.Discriminator == DeclarationType.Production)
+                    {
+                        var rawMaterial = item[nameof(ProductionDeclaration.RawOrProd)].ToString()
+                            .ToUpperInvariant().Contains("M", StringComparison.Ordinal);
+                        var date = await _context.DeclarationDates
+                            .FirstOrDefaultAsync(t => t.SernapescaDeclarationId == item.Id
+                            && t.Date == item.Date
+                            && t.RawMaterial == rawMaterial
+                            && t.ProductionType == (ProductionType)item[nameof(ProductionDeclaration.ProductionType)]
+                            && t.ItemType == (Item)item[nameof(ProductionDeclaration.ItemType)]).ConfigureAwait(false);
+                        if(date == null)
+                        {
+                            date = new DeclarationDate
+                            {
+                                SernapescaDeclarationId = item.Id,
+                                Date = item.Date,
+                                Weight = item.Weight,
+                                RawMaterial = item[nameof(ProductionDeclaration.RawOrProd)].ToString()
+                                .ToUpperInvariant().Contains("M", StringComparison.Ordinal),
+                                ProductionType = (ProductionType)item[nameof(ProductionDeclaration.ProductionType)],
+                                ItemType = (Item)item[nameof(ProductionDeclaration.ItemType)]
+                            };
+                            await _context.DeclarationDates.AddAsync(date).ConfigureAwait(false);
                         }
                         else
-                            item[d.Name] = value;
-                        Debug.WriteLine($"column:{d.Name}");
-                    }
-
-                    //EXTRA STEPS
-                    if (item.Date == DateTime.MinValue)
-                        item.Date = new DateTime(item.Year, item.Month, 1);
-
-                    var test = (item.Date).ToString("MMyyyy", new CultureInfo("es-CL"));
-
-                    var n = item.DeclarationNumber;
-
-                    item.Discriminator = entry.DeclarationType.ToString();
-
-                    var dt = (int)entry.DeclarationType;
-
-                    var test2 = string.Format(new CultureInfo("es-CL"), "{0}{1}{2}",
-                        n, dt, test);
-
-                    item.Id = Convert.ToInt64(test2, new CultureInfo("es-CL"));
-
-                    planillas.Add(item);
-
-                    pgr += pgrRow;
-
-                    await _hubContext
-                        .Clients.All
-                        .SendAsync("Update", "progress", pgr)
-                        .ConfigureAwait(false);
-                    await _hubContext
-                        .Clients.All
-                        .SendAsync("Update", "status", status)
-                        .ConfigureAwait(false);
-
-                    Debug.WriteLine($"row:{item.Row} sheet:{item.Sheet}");
-                }
-            }
-
-            entry.Min = planillas.Min(p => p.Date);
-            entry.Max = planillas.Max(p => p.Date);
-
-            var registros = planillas.GroupBy(p => p.Id);
-
-            var pgrP = pgrReadWrite * 5 / registros.Count();
-
-            var datos = new List<SernapescaDeclaration>();
-            var origenes = new List<Origin>();
-            var centros = new List<Psmb>();
-            var updates = new List<SernapescaDeclaration>();
-
-            foreach (var r in registros)
-            {
-                var dato = r.First();
-                dato.Discriminator = string.IsNullOrEmpty(dato.Discriminator) ? dato.Discriminator : entry.DeclarationType.ToString();
-                dato.Weight = r.Sum(p => p.Weight);
-                dato.Row = r.Sum(p => p.Row);
-
-                var find = await _context.SernapescaDeclarations.FindAsync(dato.Id).ConfigureAwait(false);
-
-                if (find == null)
-                {
-                    if (dato.Discriminator == "SeedDeclaration" && !origenes.Any(o => o.Id == dato.OriginId))
-                    {
-                        var orig = await _context.Origins.FindAsync(dato.OriginId).ConfigureAwait(false);
-
-                        if (orig == null)
                         {
-                            if (dato.OriginId.HasValue && dato.Origen != null)
+                            date.Weight += item.Weight;
+                            _context.DeclarationDates.Update(date);
+                        }
+                    }
+                    else
+                    {
+                        var date = await _context.DeclarationDates
+                            .FirstOrDefaultAsync(d => d.SernapescaDeclarationId == item.Id && d.Date == item.Date)
+                            .ConfigureAwait(false);
+                        if(date == null)
+                        {
+                            date = new DeclarationDate
                             {
-                                var origen = new Origin
-                                {
-                                    Id = dato.OriginId.Value,
-                                    Name = dato.Origen
-                                };
-
-                                origenes.Add(origen);
+                                SernapescaDeclarationId = item.Id,
+                                Date = item.Date,
+                                Weight = item.Weight
+                            };
+                            await _context.DeclarationDates.AddAsync(date).ConfigureAwait(false);
+                        }
+                        else
+                        {
+                            if (!datesIds.Contains(date.Id))
+                            {
+                                date.Weight = item.Weight;
                             }
                             else
                             {
-                                msg = $">W: Origen no existe en archivo." +
-                                    $">Declaración de {dato.Discriminator} N°{dato.Id}, con fecha {dato.Date}, " +
-                                    $"en hoja {dato.Sheet}, filas {dato.Rows} no pudieron ser procesadas.\n" +
-                                    $">Verificar archivo.";
-
-                                entry.OutPut += msg;
-                                entry.Observations++;
-
-                                await _hubContext
-                                .Clients.All
-                                .SendAsync("Update", "log", msg)
-                                .ConfigureAwait(false);
-
-                                status = "warning";
-                                await _hubContext
-                                    .Clients.All
-                                    .SendAsync("Update", "status", status)
-                                    .ConfigureAwait(false);
-                                continue;
+                                date.Weight += item.Weight;
                             }
+                            _context.DeclarationDates.Update(date);
                         }
+                        datesIds.Add(date.Id);
                     }
-
-                    //if (!centros.Any(o => o.Id == dato.ConsessionId))
-                    //{
-                    //    var parents = _context.Psmbs.Where(p => p.Id == dato.ConsessionId);
-
-                    //    if (parents.Any())
-                    //    {
-                    //        var comuna = _context.Communes.FirstOrDefault(c =>
-                    //        c.Name == dato.CommuneName);
-                    //        if (comuna != null)
-                    //        {
-                    //            var centre = new Craft
-                    //            {
-                    //                Id = dato.ConsessionId,
-                    //                CommuneId = comuna.Id,
-                    //                WaterBody = WaterBody.Ocean
-                    //            };
-                    //            centros.Add(centre);
-                    //        }
-                    //        else
-                    //        {
-                    //            msg = $">W: Comuna {dato.CommuneName} no existe en base de datos." +
-                    //                $">Declaración de {dato.Discriminator} N°{dato.Id}, con fecha {dato.Date}, " +
-                    //                $"en hoja {dato.Sheet}, filas {dato.Rows} no pudieron ser procesadas.\n" +
-                    //                $">Verificar archivo.";
-
-                    //            entry.OutPut += msg;
-                    //            entry.Observations++;
-
-                    //            await _hubContext
-                    //            .Clients.All
-                    //            .SendAsync("Update", "log", msg)
-                    //            .ConfigureAwait(false);
-
-                    //            status = "warning";
-                    //            await _hubContext
-                    //                .Clients.All
-                    //                .SendAsync("Update", "status", status)
-                    //                .ConfigureAwait(false);
-
-                    //            continue;
-                    //        }
-                    //    }
-                    //}
-
-                    datos.Add(dato);
-                    entry.Added++;
-                    await _hubContext
-                        .Clients.All
-                        .SendAsync("Update", "agregada", entry.Added)
+                    await _context.SaveChangesAsync().ConfigureAwait(false);
+                    if (entry.Min > item.Date) entry.Min = item.Date;
+                    if (entry.Max < item.Date) entry.Max = item.Date;
+                    pgr += pgrRow;
+                    await _hubContext.SendProgress(userId, pgr)
                         .ConfigureAwait(false);
+                    await _hubContext.SendStatusInfo(userId)
+                        .ConfigureAwait(false);
+                    Debug.WriteLine($"row:{row} sheet:{worksheet.Name}");
                 }
-                else
-                {
-                    //var updated = find.AddChanges(dato);
-                    //if (updated != find)
-                    //{
-                    //    updates.Add(updated);
-                    //    entry.Updated++;
-                    //    await _hubContext
-                    //        .Clients.All
-                    //        .SendAsync("Update", "agregada", entry.Added)
-                    //        .ConfigureAwait(false);
-                    //}
-                }
-
-                pgr += pgrP;
-
-                await _hubContext.Clients.All
-                    .SendAsync("Update", "progress", pgr)
-                    .ConfigureAwait(false);
-                await _hubContext.Clients.All
-                    .SendAsync("Update", "status", status)
-                    .ConfigureAwait(false);
             }
-            await _context.Psmbs.AddRangeAsync(centros).ConfigureAwait(false);
-            await _context.Origins.AddRangeAsync(origenes).ConfigureAwait(false);
-            await _context.SernapescaDeclarations.AddRangeAsync(datos).ConfigureAwait(false);
-            _context.SernapescaDeclarations.UpdateRange(updates);
-            status = "success";
-
-            await _hubContext.Clients.All
-                .SendAsync("Update", "progress", 100)
-                .ConfigureAwait(false);
-            await _hubContext.Clients.All
-                .SendAsync("Update", "status", status)
-                .ConfigureAwait(false);
-
             msg = $">{entry.Added} añadidos" + (entry.Updated != 0 ? $"y {entry.Updated} registros actualizados " : " ") + "exitosamente.";
             entry.OutPut += msg;
             entry.Success = true;
-            await _hubContext.Clients.All.SendAsync("Update", "log", msg)
-                .ConfigureAwait(false);
-
+            await _hubContext.SendLog(userId, msg).ConfigureAwait(false);
             _context.SernapescaEntries.Update(entry);
-
             await _context.SaveChangesAsync().ConfigureAwait(false);
+            await _hubContext.SendProgress(userId, 100).ConfigureAwait(false);
+            await _hubContext.SendStatusSuccess(userId).ConfigureAwait(false);
 
             return Task.CompletedTask;
         }
@@ -398,40 +361,20 @@ namespace BiblioMit.Services
                 .FirstOrDefaultAsync(e => e.ClassName == Declaration).ConfigureAwait(false);
             if (InputFile == null)
                 throw new MissingFieldException(_localizer?[$"ExcelFile {Declaration} not present in DataBase"]);
-            if(type == typeof(PlanktonAssay))
-            {
-                PhytoStart = await _context.Registries
-                    .Include(r => r.Headers)
-                    .FirstOrDefaultAsync(r => r.NormalizedAttribute == nameof(PhytoStart).ToUpperInvariant())
-                    .ConfigureAwait(false);
-                PhytoEnd = await _context.Registries
-                    .Include(r => r.Headers)
-                    .FirstOrDefaultAsync(r => r.NormalizedAttribute == nameof(PhytoEnd).ToUpperInvariant())
-                    .ConfigureAwait(false);
-                if (PhytoStart == null || PhytoEnd == null)
-                    throw new MissingFieldException(_localizer?[$"Columna Inicio or Fin not defined in DataBase"]);
-                InSet[nameof(Email)] = new Dictionary<string, int>();
-                InSet[nameof(SpeciesPhytoplankton)] = new Dictionary<string, int>();
-                InSet[nameof(GenusPhytoplankton)] = new Dictionary<string, int>();
-                InSet[nameof(PhylogeneticGroup)] = new Dictionary<string, int>();
-                InSet[nameof(Psmb)] = new Dictionary<string, int>();
-            }
             FieldInfos.AddRangeOverride(type.GetProperties(BindingFlags)
                 .Where(f =>
-                f.GetCustomAttribute<ParseSkipAttribute>() == null 
-                //&& (!tipo.HasValue 
-                //|| (tipo.Value == DeclarationType.Seed && f.GetCustomAttribute<SemillaSkipAttribute>() == null)
-                //|| f.GetCustomAttribute<ProduccionSkipAttribute>() == null)
-                ));
+                f.GetCustomAttribute<ParseSkipAttribute>() == null));
+            var registries = _context.Registries
+                .Include(r => r.Headers)
+                .Where(c => c.InputFileId == InputFile.Id);
             Tdatas = FieldInfos.Select(async dt =>
             {
-                var var = await _context.Registries
-                .Include(r => r.Headers)
-                .FirstOrDefaultAsync(c => c.InputFileId == InputFile.Id 
-                && c.NormalizedAttribute == dt.Name.ToUpperInvariant()).ConfigureAwait(false);
-                if (var == null)
+                var r = await registries
+                .FirstOrDefaultAsync(c => c.NormalizedAttribute == dt.Name.ToUpperInvariant())
+                .ConfigureAwait(false);
+                if (r == null)
                     throw new EvaluationException(dt.Name);
-                if (string.IsNullOrWhiteSpace(var.Description))
+                if (string.IsNullOrWhiteSpace(r.Description))
                     return null;
                 var t = dt.PropertyType;
                 if (t.IsClass)
@@ -454,12 +397,12 @@ namespace BiblioMit.Services
                 {
                     FieldName = t.Name,
                     Name = dt.Name,
-                    Operation = var.Operation,
-                    DecimalPlaces = var.DecimalPlaces,
-                    DecimalSeparator = var.DecimalSeparator,
-                    DeleteAfter2ndNegative = var.DeleteAfter2ndNegative
+                    Operation = r.Operation,
+                    DecimalPlaces = r.DecimalPlaces,
+                    DecimalSeparator = r.DecimalSeparator,
+                    DeleteAfter2ndNegative = r.DeleteAfter2ndNegative
                 };
-                data.Q.AddRangeOverride(var.Headers.Select(h => h.NormalizedName));
+                data.Q.AddRangeOverride(r.Headers.Select(h => h.NormalizedName));
                 return data;
             }).Select(t => t.Result).Where(t => t != null).ToList();
             FirstOrDefaultAsyncMethod = typeof(EntityFrameworkQueryableExtensions).GetMethods(BindingFlags.Static | BindingFlags.Public)
@@ -468,14 +411,44 @@ namespace BiblioMit.Services
             {
                 throw new Exception(_localizer[$"Cannot find \"System.Linq.FirstOrDefault\" method."]);
             }
+            if (type == typeof(PlanktonAssay))
+            {
+                PhytoStart = await _context.Registries
+                    .Include(r => r.Headers)
+                    .FirstOrDefaultAsync(r => r.NormalizedAttribute == nameof(PhytoStart).ToUpperInvariant())
+                    .ConfigureAwait(false);
+                PhytoEnd = await _context.Registries
+                    .Include(r => r.Headers)
+                    .FirstOrDefaultAsync(r => r.NormalizedAttribute == nameof(PhytoEnd).ToUpperInvariant())
+                    .ConfigureAwait(false);
+                if (PhytoStart == null || PhytoEnd == null)
+                    throw new MissingFieldException(_localizer?[$"Columna Inicio or Fin not defined in DataBase"]);
+                InSet[nameof(Email)] = new Dictionary<string, int>();
+                InSet[nameof(SpeciesPhytoplankton)] = new Dictionary<string, int>();
+                InSet[nameof(GenusPhytoplankton)] = new Dictionary<string, int>();
+                InSet[nameof(PhylogeneticGroup)] = new Dictionary<string, int>();
+                InSet[nameof(Psmb)] = new Dictionary<string, int>();
+                var regsp = await _context.Registries.FirstOrDefaultAsync(r => r.Attribute == nameof(Phytoplankton)).ConfigureAwait(false);
+                PhytoTData = new Tdata
+                {
+                    Operation = regsp.Operation,
+                    DecimalPlaces = regsp.DecimalPlaces,
+                    DecimalSeparator = regsp.DecimalSeparator,
+                    DeleteAfter2ndNegative = regsp.DeleteAfter2ndNegative
+                };
+            }
+            //else
+            //{
+            //    Tdatas.MoveLast(d => d.Name == nameof(SernapescaDeclaration.OriginPsmb));
+            //}
             return Task.CompletedTask;
         }
         [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "<Pending>")]
-        private async Task<Task> AddEntryAsync(string file, string pwd, string logsd)
+        private async Task<Task> AddEntryAsync(string file, string pwd)
         {
             var dest = "ERROR";
             var dir = Path.GetFileName(Path.GetDirectoryName(file));
-            var logFile = Path.Combine(logsd, $"{dir}_{Path.GetFileName(file)}.log");
+            var logFile = Path.Combine(pwd, "LOGS", $"{dir}_{Path.GetFileName(file)}.log");
             using var log = new StreamWriter(logFile);
             try
             {
@@ -517,7 +490,9 @@ namespace BiblioMit.Services
         private async Task<Psmb> ParsePsmb(PlanktonAssay item)
         {
             Farm newFarm = new Farm();
+            if(item.Name != null)
             item.Name = Regex.Replace(item.Name, @"[^A-Z0-9 ]", "");
+            if(item.Acronym != null)
             item.Acronym = Regex.Replace(item.Acronym, @"[^A-Z]", "");
             if (item.FarmCode.HasValue)
             {
@@ -590,6 +565,20 @@ namespace BiblioMit.Services
                     }
                     InSet[nameof(Psmb)].Add(item.Acronym, tmp.Id);
                     item.PsmbId = tmp.Id;
+                    return null;
+                }
+                var tma = await _context.PsmbAreas
+                    .FirstOrDefaultAsync(f => f.Acronym == item.Acronym).ConfigureAwait(false);
+                if(tma != null)
+                {
+                    if (!string.IsNullOrWhiteSpace(item.Name) && tma.Name != item.Name)
+                    {
+                        tma.SetName(item.Name);
+                        _context.PsmbAreas.Update(tma);
+                        await _context.SaveChangesAsync().ConfigureAwait(false);
+                    }
+                    InSet[nameof(Psmb)].Add(item.Acronym, tma.Id);
+                    item.PsmbId = tma.Id;
                     return null;
                 }
                 newFarm.SetAcronym(item.Acronym);
@@ -707,6 +696,15 @@ namespace BiblioMit.Services
                     item.PsmbId = tmp.Id;
                     return null;
                 }
+            }
+            if (item.AreaCode.HasValue || item.FarmCode.HasValue)
+            {
+                var pareaId = await ParseArea(item).ConfigureAwait(false);
+                if (pareaId.HasValue)
+                {
+                    item.PsmbId = pareaId.Value;
+                    return null;
+                }
                 newFarm.Code = item.AreaCode.Value;
             }
             if (newFarm.Code != 0)
@@ -717,11 +715,6 @@ namespace BiblioMit.Services
                     newFarm.PsmbAreaId = areaId.Value;
                 }
                 return newFarm;
-            }
-            var pareaId = await ParseArea(item).ConfigureAwait(false);
-            if (pareaId.HasValue)
-            {
-                item.PsmbId = pareaId.Value;
             }
             return null;
         }
@@ -821,10 +814,9 @@ namespace BiblioMit.Services
                 if (value != null) item[Tdatas[d].Name] = value;
             }
             //check db for centre || psmb
-            var psmb = await ParsePsmb(item).ConfigureAwait(false);
-            if (item.PsmbId == 0 && psmb == null)
-                throw new Exception($"No se pudo encontrar un Psmb o Centro válido para la declaración {item.Id} con fecha {item.SamplingDate}");
             item.Psmb = await ParsePsmb(item).ConfigureAwait(false);
+            if (item.PsmbId == 0 && item.Psmb == null)
+                throw new Exception($"No se pudo encontrar un Psmb o Centro válido para la declaración {item.Id} con fecha {item.SamplingDate}");
             //Get Phytos
             int groupId = 0;
             var speciesInFile = new HashSet<string>();
@@ -836,7 +828,10 @@ namespace BiblioMit.Services
                 var fullName = val.CleanScientificName();
                 if (string.IsNullOrWhiteSpace(fullName)) continue;
                 List<string> genusSp = fullName.SplitSpaces().ToList();
-                double? ce = matrix.GetValue(3, row).ParseDouble();
+                double? ce = matrix.GetValue(3, row)
+                    .ParseDouble(
+                    PhytoTData.DecimalPlaces, PhytoTData.DecimalSeparator, 
+                    PhytoTData.DeleteAfter2ndNegative, PhytoTData.Operation);
                 if (ce.HasValue)
                 {
                     if (ce == 0) continue;
@@ -870,7 +865,8 @@ namespace BiblioMit.Services
                             {
                                 GenusId = genusId
                             };
-                            specie.SetName(genusSp[1]);
+                            if(genusSp[1] != null)
+                                specie.SetName(genusSp[1]);
                             sp = specie;
                         }
                         else
@@ -966,6 +962,7 @@ namespace BiblioMit.Services
             }
             else if (ensayoFito != item)
             {
+                item.Id = ensayoFito.Id;
                 ////get ids from entities
                 ensayoFito.AddChanges(item);
                 if (fitos.Any())
@@ -1005,7 +1002,7 @@ namespace BiblioMit.Services
             if (!InSet[name].ContainsKey(GetKey(entity, key)) && id.HasValue)
                 InSet[name].Add(GetKey(entity, key), id.Value);
         }
-        private string GetKey<T>(T item, string key) where T : IHasBasicIndexer => item[key] as string;
+        private static string GetKey<T>(T item, string key) where T : IHasBasicIndexer => item[key] as string;
         private async Task<TEntity> FindParsedAsync<TEntity>(Indexed item, string attribute, string normalized) where TEntity : class, IHasBasicIndexer
         {
             //return null if arguments null
@@ -1050,7 +1047,7 @@ namespace BiblioMit.Services
                 return null;
             }
         }
-        private async Task<Station> ParseEstacion(string text, PlanktonAssay item)
+        private async Task<Station> ParseEstacion(string text, Indexed item)
         {
             if (text == null) return null;
             text = Regex.Replace(text, @"[^A-Z0-9 ]|ESTA?C?I?O?N? *", "");
@@ -1059,19 +1056,41 @@ namespace BiblioMit.Services
             text = Regex.Replace(text, @"\s{,2}", " ").Trim();
             return await FindParsedAsync<Station>(item, nameof(Station.NormalizedName), text).ConfigureAwait(false);
         }
-        private async Task<SamplingEntity> ParseEntidadMuestreadora(string text, PlanktonAssay item)
+        private async Task<Origin> ParseOrigin(string text, Indexed item)
+        {
+            if (text == null) return null;
+            int id = (int)item[nameof(SeedDeclaration.OriginId)];
+            string name = nameof(Origin);
+            if (InSet[name].ContainsKey(text))
+            {
+                item[$"{name}Id"] = InSet[name][text];
+                return null;
+            }
+            Origin origin = await _context.Origins
+                .FindAsync(id).ConfigureAwait(false);
+            if(origin == null)
+            {
+                return new Origin
+                {
+                    Id = id,
+                    Name = text
+                };
+            }
+            return null;
+        }
+        private async Task<SamplingEntity> ParseEntidadMuestreadora(string text, Indexed item)
         {
             if (text == null) return null;
             text = Regex.Replace(text, @"[^A-Z\s]", "");
             return await FindParsedAsync<SamplingEntity>(item, nameof(SamplingEntity.NormalizedName), text).ConfigureAwait(false);
         }
-        private async Task<Laboratory> ParseLaboratorio(string text, PlanktonAssay item)
+        private async Task<Laboratory> ParseLaboratorio(string text, Indexed item)
         {
             if (text == null) return null;
             text = Regex.Replace(text, @"[^A-Z\s]", "");
             return await FindParsedAsync<Laboratory>(item, nameof(Laboratory.NormalizedName), text).ConfigureAwait(false);
         }
-        private async Task<Analist> ParseAnalista(string text, PlanktonAssay item)
+        private async Task<Analist> ParseAnalista(string text, Indexed item)
         {
             if (text == null) return null;
             text = Regex.Replace(text, @"[^A-Z\s]|\b[\w']{1,3}\b", "");
@@ -1086,18 +1105,71 @@ namespace BiblioMit.Services
             {
                 text = $"{names[0]} {names.TakeLast(2).First()}";
             }
-            return await FindParsedAsync<Analist>(item, nameof(Analist.NormalizedName), text).ConfigureAwait(false);
+            return await FindParsedAsync<Analist>(item, nameof(Analist.NormalizedName), text)
+                .ConfigureAwait(false);
         }
-        private async Task<Phone> ParseTelefono(string text, PlanktonAssay item)
+        private async Task<Psmb> ParseOriginPsmb(string text, SernapescaDeclaration item)
+        {
+            var id = text.ParseInt();
+            if (id.HasValue)
+            {
+                var psmb = await _context.Psmbs.FirstOrDefaultAsync(p => p.Code == id)
+                    .ConfigureAwait(false);
+                if(psmb != null)
+                {
+                    item.OriginPsmbId = psmb.Id;
+                    return null;
+                }
+                var newpsmb = new Craft
+                {
+                    Code = id.Value
+                };
+                if ((int)item.Discriminator < 2)
+                {
+                    psmb = await _context.Psmbs.FirstOrDefaultAsync(p => p.NormalizedName == text)
+                        .ConfigureAwait(false);
+                    if(psmb != null)
+                    {
+                        item.OriginPsmbId = psmb.Id;
+                        return null;
+                    }
+                    newpsmb.SetName(text);
+                }
+                newpsmb.WaterBody = WaterBody.Ocean;
+                if (item.CommuneName == "METROPOLITANA")
+                {
+                    newpsmb.CommuneId = 113;
+                    await _context.Psmbs.AddAsync(newpsmb).ConfigureAwait(false);
+                    await _context.SaveChangesAsync().ConfigureAwait(false);
+                    item.OriginPsmbId = newpsmb.Id;
+                }
+                else
+                {
+                    var comuna = _context.Communes.FirstOrDefault(c =>
+                    c.NormalizedName == item.CommuneName);
+                    if (comuna != null)
+                    {
+                        newpsmb.CommuneId = comuna.Id;
+                        await _context.Psmbs.AddAsync(newpsmb).ConfigureAwait(false);
+                        await _context.SaveChangesAsync().ConfigureAwait(false);
+                        item.OriginPsmbId = newpsmb.Id;
+                    }
+                }
+            }
+            return null;
+        }
+        private async Task<Phone> ParseTelefono(string text, Indexed item)
         {
             if (text == null) return null;
             text = Regex.Replace(text, @"[^0-9\-\/\(\)\s]", "");
             text = Regex.Replace(text, @"\(\)", "");
             return await FindParsedAsync<Phone>(item, nameof(Phone.Number), text).ConfigureAwait(false);
         }
-        private async Task<List<PlanktonAssayEmail>> ParseEmails(string text, int? id)
+        private async Task<List<PlanktonAssayEmail>> ParseEmails(string text, Indexed item)
         {
             var results = new List<PlanktonAssayEmail>();
+            var i = item[nameof(PlanktonAssay.Id)];
+            var id = i as int?;
             if (text == null || !id.HasValue) return null;
             var normalizedList = Regex.Replace(text, @"[^A-Z0-9_\-\.\@;]", "")
                 .Split(";");
@@ -1112,6 +1184,23 @@ namespace BiblioMit.Services
                 results.Add(emailensayo);
             }
             return results;
+        }
+        private async Task<object> GetValue(ExcelWorksheet worksheet, int d, int row, Indexed item = null)
+        {
+            var data = Tdatas[d];
+            if (worksheet == null || !data.Q.Any()) return null;
+            if (data.LastColumn == -1 || Headers.Count <= data.LastColumn + 1 || !data.Q.Contains(Headers[data.LastColumn]))
+            {
+                data.LastColumn = Headers.GetColumnByNames(data.Q);
+            }
+            ExcelRange vl = worksheet.Cells[row, data.LastColumn + 1];
+            if (vl != null && vl.Value != null)
+            {
+                string value = vl.Value.ToString().CleanCell();
+                return await GetValue(value, data, item)
+                    .ConfigureAwait(false);
+            }
+            return null;
         }
         private async Task<object> GetValue(Dictionary<(int, int), string> matrix, int d, PlanktonAssay item = null)
         {
@@ -1137,7 +1226,7 @@ namespace BiblioMit.Services
             }
             return null;
         }
-        private async Task<object> GetValue(string val, Tdata data, PlanktonAssay item)
+        private async Task<object> GetValue(string val, Tdata data, Indexed item)
         {
             if (data.FieldName == null) return null;
             return data.FieldName switch
@@ -1149,15 +1238,15 @@ namespace BiblioMit.Services
                 nameof(DateTime) => val.ParseDateTime(),
                 nameof(ProductionType) => val.ParseProductionType(),
                 nameof(Item) => val.ParseItem(),
-                nameof(DeclarationType) => val.ParseTipo(),
-                nameof(Enum) => Enum.Parse(DataTableExtensions
-                        .GetEnumType(data.FieldName), val),
+                nameof(Enum) => Enum.Parse(DataTableExtensions.GetEnumType(data.FieldName), val),
                 nameof(Station) => await ParseEstacion(val, item).ConfigureAwait(false),
-                nameof(SamplingEntity) => await ParseEntidadMuestreadora(val, item).ConfigureAwait(false),
                 nameof(Laboratory) => await ParseLaboratorio(val, item).ConfigureAwait(false),
-                nameof(PlanktonAssayEmail) => await ParseEmails(val, item.Id).ConfigureAwait(false),
+                nameof(SamplingEntity) => await ParseEntidadMuestreadora(val, item).ConfigureAwait(false),
+                nameof(PlanktonAssayEmail) => await ParseEmails(val, item).ConfigureAwait(false),
                 nameof(Analist) => await ParseAnalista(val, item).ConfigureAwait(false),
                 nameof(Phone) => await ParseTelefono(val, item).ConfigureAwait(false),
+                nameof(Origin) => await ParseOrigin(val, item).ConfigureAwait(false),
+                nameof(Psmb) => await ParseOriginPsmb(val, (SernapescaDeclaration)item).ConfigureAwait(false),
                 _ => val
             };
         }
@@ -1172,5 +1261,6 @@ namespace BiblioMit.Services
         public char? DecimalSeparator { get; set; }
         public bool? DeleteAfter2ndNegative { get; set; }
         public (int, int) LastPosition { get; set; } = (0, 0);
+        public int LastColumn { get; set; } = -1;
     }
 }

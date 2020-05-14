@@ -9,7 +9,7 @@
         "Fecha";
 }
 
-<partial name="_LibsPg" model='new HashSet<string> { "bootstrap-select" }' />
+<partial name="_Libs0" model='new HashSet<string> { "bootstrap-select" }' />
 
 @switch (Model.Type)
 {
@@ -32,7 +32,7 @@
                                onchange="filter(this)"
                                aria-describedby="btn@(Model.Id)" />
                     </div>
-                    @this.Block(
+                    @this.Block("Scripts",
                         @<script>
                             $(function () {
                                 var availableDate = [@Html.Raw((string)ViewData[Model.Id])];
@@ -55,7 +55,7 @@
                                     }
                                 });
                             });
-                        </script>, "Scripts")
+                        </script>)
                 }
                 else
                 {

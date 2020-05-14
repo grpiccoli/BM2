@@ -1,6 +1,4 @@
-﻿using BiblioMit.Data;
-using BiblioMit.Models;
-using BiblioMit.Models.Entities.Digest;
+﻿using BiblioMit.Models;
 using Microsoft.AspNetCore.Http;
 using OfficeOpenXml;
 using System.Collections.Generic;
@@ -15,6 +13,8 @@ namespace BiblioMit.Services
         Task<Task> AddAsync(IFormFile file);
         Task<Task> AddAsync(string file);
         Task<Task> AddAsync(Stream file);
-        Task<Task> ReadAsync(ExcelPackage package, SernapescaEntry entry, DeclarationType tipo);
+        Task<Task> AddFilesAsync(string pwd);
+        Task<Task> ReadAsync<T>(ExcelPackage package, SernapescaEntry entry)
+            where T : SernapescaDeclaration;
     }
 }

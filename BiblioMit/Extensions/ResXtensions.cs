@@ -1,12 +1,9 @@
 ﻿using AngleSharp.Xml.Parser;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Resources;
 using System.Threading.Tasks;
-using System.Xml;
 
 namespace BiblioMit.Extensions
 {

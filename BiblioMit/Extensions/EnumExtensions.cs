@@ -114,6 +114,9 @@ namespace BiblioMit.Extensions
         public static IEnumerable<TEnum> Enum2List<TEnum>(this TEnum @enum)
             where TEnum : struct, IConvertible, IFormattable => ((TEnum[])Enum.GetValues(typeof(TEnum)))
                 .Select(t => t);
+        public static IEnumerable<string> Enum2ListNames<TEnum>(this TEnum @enum)
+            where TEnum : struct, IConvertible, IFormattable => ((TEnum[])Enum.GetValues(typeof(TEnum)))
+        .Select(t => t.ToString());
         #endregion
         //Get Enum Attributes
         #region EnumAttributes
@@ -138,6 +141,12 @@ namespace BiblioMit.Extensions
               ?.GetCustomAttribute<DisplayAttribute>(false)
               ?.Name
               ?? e.ToString()).ConfigureAwait(false);
+        public static IEnumerable<string> GetNamesList<TEnum>(this TEnum e) =>
+            e.GetType()
+                .GetMembers(BindingFlags.Public | BindingFlags.Static)
+              .Select(m => m
+              .GetCustomAttribute<DisplayAttribute>(false)
+              ?.Name ?? m.ToString());
         public static async Task<string> GetAttrGroupNameAsync<TEnum>(this TEnum e) =>
             await e.LocalizeStringAsync(e.GetType()
                 .GetMember(e.ToString())

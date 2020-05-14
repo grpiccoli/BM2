@@ -3,6 +3,7 @@ using System;
 using BiblioMit.Data;
 using BiblioMit.Models;
 using BiblioMit.Models.Entities.Centres;
+using BiblioMit.Models.Entities.Digest;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -373,6 +374,40 @@ namespace BiblioMit.Migrations
                     b.ToTable("Emails");
                 });
 
+            modelBuilder.Entity("BiblioMit.Models.Entities.Digest.DeclarationDate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ItemType")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ProductionType")
+                        .HasColumnType("int");
+
+                    b.Property<bool?>("RawMaterial")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("SernapescaDeclarationId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Weight")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SernapescaDeclarationId", "Date", "RawMaterial", "ProductionType", "ItemType")
+                        .IsUnique()
+                        .HasFilter("[RawMaterial] IS NOT NULL AND [ProductionType] IS NOT NULL AND [ItemType] IS NOT NULL");
+
+                    b.ToTable("DeclarationDates");
+                });
+
             modelBuilder.Entity("BiblioMit.Models.Entities.Digest.Header", b =>
                 {
                     b.Property<int>("Id")
@@ -407,6 +442,7 @@ namespace BiblioMit.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedName")
@@ -559,13 +595,13 @@ namespace BiblioMit.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("NormalizedName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasFilter("[NormalizedName] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("Laboratories");
                 });
@@ -627,9 +663,11 @@ namespace BiblioMit.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -642,9 +680,7 @@ namespace BiblioMit.Migrations
             modelBuilder.Entity("BiblioMit.Models.Origin", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -662,13 +698,13 @@ namespace BiblioMit.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Number")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Number")
-                        .IsUnique()
-                        .HasFilter("[Number] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("Phones");
                 });
@@ -720,23 +756,24 @@ namespace BiblioMit.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasFilter("[NormalizedName] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("PhylogeneticGroups");
                 });
 
             modelBuilder.Entity("BiblioMit.Models.Phytoplankton", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<int>("PlanktonAssayId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SpeciesId")
+                        .HasColumnType("int");
 
                     b.Property<double>("C")
                         .HasColumnType("float");
@@ -744,18 +781,9 @@ namespace BiblioMit.Migrations
                     b.Property<int?>("EAR")
                         .HasColumnType("int");
 
-                    b.Property<int>("PlanktonAssayId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SpeciesId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
+                    b.HasKey("PlanktonAssayId", "SpeciesId");
 
                     b.HasIndex("SpeciesId");
-
-                    b.HasIndex("PlanktonAssayId", "SpeciesId")
-                        .IsUnique();
 
                     b.ToTable("Phytoplanktons");
                 });
@@ -1009,8 +1037,9 @@ namespace BiblioMit.Migrations
                         .IsUnique()
                         .HasFilter("[PolygonId] IS NOT NULL");
 
-                    b.HasIndex("Code", "Discriminator")
-                        .IsUnique();
+                    b.HasIndex("Code", "CommuneId")
+                        .IsUnique()
+                        .HasFilter("[CommuneId] IS NOT NULL");
 
                     b.ToTable("Psmbs");
 
@@ -1113,13 +1142,13 @@ namespace BiblioMit.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("NormalizedName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasFilter("[NormalizedName] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("SamplingEntities");
                 });
@@ -1149,44 +1178,35 @@ namespace BiblioMit.Migrations
 
             modelBuilder.Entity("BiblioMit.Models.SernapescaDeclaration", b =>
                 {
-                    b.Property<long>("Id")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("CentreId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Dato")
-                        .HasColumnType("int");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("DeclarationNumber")
                         .HasColumnType("int");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ItemType")
+                    b.Property<int>("Discriminator")
                         .HasColumnType("int");
 
-                    b.Property<int?>("OriginId")
+                    b.Property<int>("EntryId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ProductionType")
+                    b.Property<int>("OriginPsmbId")
                         .HasColumnType("int");
-
-                    b.Property<double>("Weight")
-                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CentreId");
+                    b.HasIndex("EntryId");
+
+                    b.HasIndex("OriginPsmbId");
+
+                    b.HasIndex("Discriminator", "DeclarationNumber")
+                        .IsUnique();
 
                     b.ToTable("SernapescaDeclarations");
 
-                    b.HasDiscriminator<string>("Discriminator").HasValue("SernapescaDeclaration");
+                    b.HasDiscriminator<int>("Discriminator");
                 });
 
             modelBuilder.Entity("BiblioMit.Models.Soft", b =>
@@ -1310,13 +1330,13 @@ namespace BiblioMit.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("GenusId", "NormalizedName")
-                        .IsUnique()
-                        .HasFilter("[NormalizedName] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("SpeciesPhytoplanktons");
                 });
@@ -1611,53 +1631,33 @@ namespace BiblioMit.Migrations
                 {
                     b.HasBaseType("BiblioMit.Models.SernapescaDeclaration");
 
-                    b.HasIndex("OriginId");
-
-                    b.HasDiscriminator().HasValue("HarvestDeclaration");
+                    b.HasDiscriminator().HasValue(2);
                 });
 
             modelBuilder.Entity("BiblioMit.Models.ProductionDeclaration", b =>
                 {
                     b.HasBaseType("BiblioMit.Models.SernapescaDeclaration");
 
-                    b.Property<int?>("PlantId")
-                        .HasColumnType("int");
-
-                    b.HasIndex("OriginId");
-
-                    b.HasIndex("PlantId");
-
-                    b.HasDiscriminator().HasValue("ProductionDeclaration");
+                    b.HasDiscriminator().HasValue(4);
                 });
 
             modelBuilder.Entity("BiblioMit.Models.SeedDeclaration", b =>
                 {
                     b.HasBaseType("BiblioMit.Models.SernapescaDeclaration");
 
-                    b.HasIndex("OriginId")
-                        .HasName("IX_SernapescaDeclarations_OriginId1");
+                    b.Property<int>("OriginId")
+                        .HasColumnType("int");
 
-                    b.HasDiscriminator().HasValue("SeedDeclaration");
+                    b.HasIndex("OriginId");
+
+                    b.HasDiscriminator().HasValue(1);
                 });
 
             modelBuilder.Entity("BiblioMit.Models.SupplyDeclaration", b =>
                 {
                     b.HasBaseType("BiblioMit.Models.SernapescaDeclaration");
 
-                    b.Property<int?>("CraftId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("PlantId")
-                        .HasColumnName("SupplyDeclaration_PlantId")
-                        .HasColumnType("int");
-
-                    b.HasIndex("CraftId");
-
-                    b.HasIndex("OriginId");
-
-                    b.HasIndex("PlantId");
-
-                    b.HasDiscriminator().HasValue("SupplyDeclaration");
+                    b.HasDiscriminator().HasValue(3);
                 });
 
             modelBuilder.Entity("BiblioMit.Models.ApplicationUserRole", b =>
@@ -1728,6 +1728,15 @@ namespace BiblioMit.Migrations
                     b.HasOne("BiblioMit.Models.Polygon", "Polygon")
                         .WithMany("Vertices")
                         .HasForeignKey("PolygonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("BiblioMit.Models.Entities.Digest.DeclarationDate", b =>
+                {
+                    b.HasOne("BiblioMit.Models.SernapescaDeclaration", "SernapescaDeclaration")
+                        .WithMany("DeclarationDates")
+                        .HasForeignKey("SernapescaDeclarationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -1966,9 +1975,15 @@ namespace BiblioMit.Migrations
 
             modelBuilder.Entity("BiblioMit.Models.SernapescaDeclaration", b =>
                 {
-                    b.HasOne("BiblioMit.Models.Psmb", "Centre")
+                    b.HasOne("BiblioMit.Models.SernapescaEntry", "Entry")
+                        .WithMany("SernapescaDeclarations")
+                        .HasForeignKey("EntryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BiblioMit.Models.Psmb", "OriginPsmb")
                         .WithMany("Declarations")
-                        .HasForeignKey("CentreId")
+                        .HasForeignKey("OriginPsmbId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -2117,45 +2132,13 @@ namespace BiblioMit.Migrations
                         .HasForeignKey("PsmbAreaId");
                 });
 
-            modelBuilder.Entity("BiblioMit.Models.HarvestDeclaration", b =>
-                {
-                    b.HasOne("BiblioMit.Models.Origin", "Origin")
-                        .WithMany()
-                        .HasForeignKey("OriginId");
-                });
-
-            modelBuilder.Entity("BiblioMit.Models.ProductionDeclaration", b =>
-                {
-                    b.HasOne("BiblioMit.Models.Origin", "Origin")
-                        .WithMany()
-                        .HasForeignKey("OriginId");
-
-                    b.HasOne("BiblioMit.Models.Entities.Centres.Plant", null)
-                        .WithMany("ProductionDeclarations")
-                        .HasForeignKey("PlantId");
-                });
-
             modelBuilder.Entity("BiblioMit.Models.SeedDeclaration", b =>
                 {
                     b.HasOne("BiblioMit.Models.Origin", "Origin")
                         .WithMany("Seeds")
                         .HasForeignKey("OriginId")
-                        .HasConstraintName("FK_SernapescaDeclarations_Origins_OriginId1");
-                });
-
-            modelBuilder.Entity("BiblioMit.Models.SupplyDeclaration", b =>
-                {
-                    b.HasOne("BiblioMit.Models.Entities.Centres.Craft", null)
-                        .WithMany("SupplyDeclarations")
-                        .HasForeignKey("CraftId");
-
-                    b.HasOne("BiblioMit.Models.Origin", "Origin")
-                        .WithMany()
-                        .HasForeignKey("OriginId");
-
-                    b.HasOne("BiblioMit.Models.Entities.Centres.Plant", null)
-                        .WithMany("SupplyDeclarations")
-                        .HasForeignKey("PlantId");
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

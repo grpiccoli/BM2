@@ -1,8 +1,5 @@
-﻿@this.Block(@<script src="https://www.amcharts.com/lib/3/amcharts.js"></script>, "Scripts")
-@this.Block(@<script src="https://www.amcharts.com/lib/3/pie.js"></script>, "Scripts")
-@this.Block(@<script src="https://www.amcharts.com/lib/3/gauge.js"></script>, "Scripts")
-@this.Block(@<script src="https://www.amcharts.com/lib/3/plugins/export/export.js"></script>, "Scripts")
-@this.Block(@<script>
+﻿<partial name="_AmCharts" model="3" />
+@this.Block("Scripts", @<script>
     var chart;
 
     var chartData = @Html.Raw(ViewData["chartData"]);
@@ -45,4 +42,4 @@
         chart.validateData();
         $("#chartdiv tspan").html(titles[i]);
     }
-                    </script>, "Scripts")
+                    </script>)

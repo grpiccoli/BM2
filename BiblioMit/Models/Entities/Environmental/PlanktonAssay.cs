@@ -40,9 +40,13 @@ namespace BiblioMit.Models
         [ParseSkip]
         public int? AnalistId { get; set; }
         public virtual Analist Analist { get; set; }
+        [Range(-2, 40)]
         public double? Temperature { get; set; }
+        [Range(0, 100)]
         public double? Oxigen { get; set; }
+        [Range(5, 13)]
         public double? Ph { get; set; }
+        [Range(0, 100)]
         public double? Salinity { get; set; }
         [NotMapped]
         public string Name { get; set; }
@@ -62,24 +66,23 @@ namespace BiblioMit.Models
             if (this as object is null) return obj is null;
             if (ReferenceEquals(this, obj)) return true;
             return obj is PlanktonAssay q
-            && q.Id == Id
-            && q.StationId == StationId
-            && q.SamplingEntityId == SamplingEntityId
-            && q.SamplingDate == SamplingDate
-            && q.AssayStart == AssayStart
-            && q.ReceptionDate == ReceptionDate
-            && q.AssayEnd == AssayEnd
-            && q.LaboratoryId == LaboratoryId
-            && q.PhoneId == PhoneId
-            //&& q.CentreId == CentreId
-            && q.PsmbId == PsmbId
-            && q.NoSamples == NoSamples
-            && q.DepartureDate == DepartureDate
-            && q.AnalistId == AnalistId
-            && q.Temperature == Temperature
-            && q.Oxigen == Oxigen
-            && q.Ph == Ph
-            && q.Salinity == Salinity;
+            && Id == q.Id
+            && StationId == q.StationId
+            && SamplingEntityId == q.SamplingEntityId
+            && SamplingDate == q.SamplingDate
+            && AssayStart == q.AssayStart
+            && ReceptionDate == q.ReceptionDate
+            && AssayEnd == q.AssayEnd
+            && LaboratoryId == q.LaboratoryId
+            && PhoneId == q.PhoneId
+            && PsmbId == q.PsmbId
+            && NoSamples == q.NoSamples
+            && DepartureDate == q.DepartureDate
+            && AnalistId == q.AnalistId
+            && Temperature == q.Temperature
+            && Oxigen == q.Oxigen
+            && Ph == q.Ph
+            && Salinity == q.Salinity;
         }
         [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Tests for nullity")]
         public static bool operator ==(PlanktonAssay x, PlanktonAssay y)

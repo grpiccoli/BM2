@@ -9,7 +9,7 @@
     Model.Val.AddRange((string[])ViewData["val"]);
 }
 
-@this.Block(@<script>
+@this.Block("Scripts", @<script>
     function filter(v) {
         var tag = v.tagName;
         var val = "@string.Join(",",Model.Val)"
@@ -57,4 +57,4 @@
         }
         window.location.href = url;
     }
-</script>, "Scripts")
+</script>)

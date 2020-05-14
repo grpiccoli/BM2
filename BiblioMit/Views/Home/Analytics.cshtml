@@ -8,7 +8,7 @@
 
 <div class="chartdiv w-100" style="height:500px;"></div>
 
-@this.Block(@<script>
+@this.Block("Scripts", @<script>
     var start = $("#start").val();
     var end = $("#end").val();
     //am4core.useTheme(am4themes_kelly);
@@ -33,11 +33,6 @@
     chart.scrollbarY = new am4core.Scrollbar();
     chart.scrollbarX = new am4core.Scrollbar();
     chart.exporting.menu = new am4core.ExportMenu();
-    </script>,"Scripts")
+    </script>)
 
-@section ScripTop{
-    <script src="https://www.amcharts.com/lib/4/core.js"></script>
-    <script src="https://www.amcharts.com/lib/4/charts.js"></script>
-    <script src="https://www.amcharts.com/lib/4/themes/kelly.js"></script>
-    <script src="https://www.amcharts.com/lib/4/lang/es_ES.js"></script>
-}
+<partial name="_AmCharts" />

@@ -923,7 +923,8 @@ Uri url, string NoResultsSelect, int NoResultsPos, string nodeSelect, string qur
                 //try
                 //{
                     var co = GetCo(acronym);
-                using var doc = await GetDoc(url).ConfigureAwait(false);
+                IHtmlDocument doc = await GetDoc(url).ConfigureAwait(false);
+                if (doc == null) return (null, acronym, 0);
                 return (
 from n in doc.QuerySelectorAll(nodeSelect)
 let m = n.QuerySelector(quriSelect)

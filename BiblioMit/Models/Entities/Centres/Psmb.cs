@@ -11,9 +11,9 @@ namespace BiblioMit.Models
     {
         //COMMON ATTRIBUTES
         #region Common attributes
-        [Display(Name = "Id")]
-        [DisplayFormat(DataFormatString = "{0,7:N0}")]
         public int Id { get; set; }
+        [Display(Name = "Code")]
+        [DisplayFormat(DataFormatString = "{0,7:N0}")]
         public int Code { get; set; }
         [Range(101101, 116305)]
         public int? CommuneId { get; set; }

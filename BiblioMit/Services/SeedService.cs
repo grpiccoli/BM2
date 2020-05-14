@@ -116,24 +116,29 @@ namespace BiblioMit.Services
                     await Insert<Photo>(tsvPath).ConfigureAwait(false);
                 
                 tsvPath = Path
-                    .Combine(_environment.ContentRootPath, "Data", "Digest");
+                    .Combine(_environment.ContentRootPath, "Data", "FileUploading");
                 if (!_context.InputFiles.Any())
                     await Insert<InputFile>(tsvPath).ConfigureAwait(false);
                 if (!_context.Registries.Any())
                     await Insert<Registry>(tsvPath).ConfigureAwait(false);
                 if (!_context.Headers.Any())
                     await Insert<Header>(tsvPath).ConfigureAwait(false);
+
+                tsvPath = Path
+                    .Combine(_environment.ContentRootPath, "Data", "Digest");
                 if (!_context.Origins.Any())
                     await Insert<Origin>(tsvPath).ConfigureAwait(false);
-                //if (!_context.SernapescaDeclarations.Any())
-                //    await Insert<SernapescaDeclaration>(tsvPath).ConfigureAwait(false);
-                //if (!_context.SernapescaEntries.Any())
-                //{
-                //    await Insert<SernapescaEntry>(tsvPath).ConfigureAwait(false);
-                //    //Products
-                //    await _context.SernapescaEntries.ForEachAsync(p => p.ApplicationUserId = adminId).ConfigureAwait(false);
-                //    await _context.SaveChangesAsync().ConfigureAwait(false);
-                //}
+                if (!_context.SernapescaDeclarations.Any())
+                    await Insert<SernapescaDeclaration>(tsvPath).ConfigureAwait(false);
+                if (!_context.DeclarationDates.Any())
+                    await Insert<DeclarationDate>(tsvPath).ConfigureAwait(false);
+                if (!_context.Entries.Any())
+                {
+                    await Insert<Entry>(tsvPath).ConfigureAwait(false);
+                    //Products
+                    await _context.Entries.ForEachAsync(p => p.ApplicationUserId = adminId).ConfigureAwait(false);
+                    await _context.SaveChangesAsync().ConfigureAwait(false);
+                }
 
                 tsvPath = Path
                     .Combine(_environment.ContentRootPath, "Data", "Environmental");
@@ -374,13 +379,9 @@ END";
         }
         public async Task<Task> AddBulkFiles()
         {
-            var basePathInfo = Directory.GetParent(_environment.ContentRootPath).Parent;
-            var pwd = Path.Combine(basePathInfo.FullName, "UNSYNC/bibliomit/DB");
-            var filesPath = Path.Combine(pwd, "plankton");
-            if (!Directory.Exists(filesPath))
-                throw new DirectoryNotFoundException(_localizer[$"directory {filesPath} not found"]);
-            var files = Directory.GetDirectories(filesPath).SelectMany(d => Directory.GetFiles(d));
-            return await _import.AddRangeAsync(pwd, files).ConfigureAwait(false);
+            DirectoryInfo basePathInfo = Directory.GetParent(_environment.ContentRootPath).Parent;
+            string pwd = Path.Combine(basePathInfo.FullName, "UNSYNC/bibliomit/DB");
+            return await _import.AddFilesAsync(pwd).ConfigureAwait(false);
         }
     }
 }

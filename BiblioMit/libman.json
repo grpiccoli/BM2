@@ -1,5 +1,4 @@
 {
-  "version": "1.0",
   "defaultProvider": "unpkg",
   "libraries": [
     {
@@ -8,7 +7,7 @@
       "files": [ "dist/browser/signalr.min.js" ]
     },
     {
-      "library": "@fortawesome/fontawesome-free@5.12.1",
+      "library": "@fortawesome/fontawesome-free@5.13.0",
       "destination": "wwwroot/lib/@fortawesome/fontawesome-free",
       "files": [
         "css/all.min.css",
@@ -21,12 +20,18 @@
       ]
     },
     {
-      "library": "ckeditor5@17.0.0",
+      "provider": "cdnjs",
+      "library": "moment.js@2.25.3",
+      "destination": "wwwroot/lib/moment",
+      "files": [ "locale/es.js", "moment.min.js" ]
+    },
+    {
+      "library": "ckeditor5@19.0.0",
       "destination": "wwwroot/lib/ckeditor5",
       "files": [ "package.json" ]
     },
     {
-      "library": "@amcharts/amcharts4@4.9.11",
+      "library": "@amcharts/amcharts4@4.9.21",
       "destination": "wwwroot/lib/@amcharts/amcharts4",
       "files": [
         "core.js",
@@ -37,10 +42,17 @@
     },
     //Google Maps Utilities
     {
-      "library": "@google/markerclusterer@2.0.0",
+      "library": "@google/markerclusterer@2.0.8",
       "destination": "wwwroot/lib/@google/markerclusterer",
       "files": [
         "src/markerclusterer.js"
+      ]
+    },
+    {
+      "library": "@google/markerclustererplus@5.0.3",
+      "destination": "wwwroot/lib/@google/markerclustererplus",
+      "files": [
+        "dist/markerclustererplus.min.js"
       ]
     },
     {
@@ -49,7 +61,7 @@
       "files": [ "dist/fabric.min.js" ]
     },
     {
-      "library": "alasql@0.5.5",
+      "library": "alasql@0.6.0",
       "destination": "wwwroot/lib/alasql",
       "files": [ "dist/alasql.min.js" ]
     },
@@ -75,7 +87,7 @@
       ]
     },
     {
-      "library": "bootstrap@4.4.1",
+      "library": "bootstrap@4.5.0",
       "destination": "wwwroot/lib/bootstrap",
       "files": [
         "dist/css/bootstrap.min.css",
@@ -92,7 +104,7 @@
       ]
     },
     {
-      "library": "bootstrap-select@1.13.12",
+      "library": "bootstrap-select@1.13.17",
       "destination": "wwwroot/lib/bootstrap-select",
       "files": [
         "dist/css/bootstrap-select.min.css",
@@ -101,7 +113,7 @@
       ]
     },
     {
-      "library": "choices.js@6.0.3",
+      "library": "choices.js@9.0.1",
       "destination": "wwwroot/lib/choices.js",
       "files": [
         "public/assets/styles/choices.min.css",
@@ -154,7 +166,7 @@
       "files": [ "dist/flatpickr.min.css", "dist/flatpickr.min.js", "dist/l10n/es.js" ]
     },
     {
-      "library": "globalize@1.4.2",
+      "library": "globalize@1.5.0",
       "destination": "wwwroot/lib/globalize",
       "files": [
         "dist/globalize.js",
@@ -183,7 +195,7 @@
       "files": [ "dist/css/tableexport.min.css", "dist/js/tableexport.min.js" ]
     },
     {
-      "library": "jquery@3.4.1",
+      "library": "jquery@3.5.1",
       "destination": "wwwroot/lib/jquery",
       "files": [ "dist/jquery.min.js" ]
     },
@@ -223,9 +235,14 @@
       ]
     },
     {
-      "library": "popper.js@1.16.1",
-      "destination": "wwwroot/lib/popper.js",
+      "library": "@popperjs/core@2.4.0",
+      "destination": "wwwroot/lib/@popperjs/core",
       "files": [ "dist/umd/popper.min.js" ]
+    },
+    {
+      "library": "tippy.js@6.2.3",
+      "destination": "wwwroot/lib/tippy.js",
+      "files": [ "dist/tippy-bundle.umd.js" ]
     },
     {
       "library": "qrcodejs@1.0.0",
@@ -246,9 +263,10 @@
       "files": [ "dist/umd/tooltip.min.js" ]
     },
     {
-      "library": "xlsx@0.15.6",
+      "library": "xlsx@0.16.0",
       "destination": "wwwroot/lib/xlsx",
       "files": [ "dist/xlsx.core.min.js" ]
     }
-  ]
+  ],
+  "version": "1.0"
 }

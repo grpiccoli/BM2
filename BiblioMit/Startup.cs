@@ -4,9 +4,9 @@ using BiblioMit.Blazor;
 using BiblioMit.Data;
 using BiblioMit.Models;
 using BiblioMit.Services;
+using BiblioMit.Services.Hubs;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Blazor;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -19,7 +19,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Schema.NET;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -57,6 +56,7 @@ namespace BiblioMit
             services.AddHostedService<SeedBackground>();
             services.AddScoped<ISeed, SeedService>();
             services.AddScoped<INodeService, NodeService>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<IImport, ImportService>();
             services.AddScoped<ITableToExcel, TableToExcelService>();
 
@@ -69,6 +69,7 @@ namespace BiblioMit
             services.AddTransient<IEmailSender, EmailSender>();
 
             services.AddScoped<IForum, ForumService>();
+            services.AddScoped<IEntryHub, EntryHub>();
             services.AddScoped<IPost, PostService>();
             services.AddScoped<IApplicationUser, ApplicationUserService>();
 

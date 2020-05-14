@@ -1,7 +1,7 @@
 ﻿<partial name="_LibsPg" model='new HashSet<string> { "angular", "angular-flip-clock" }' />
 
 <environment include="Development">
-    @this.Block(@<script>
+    @this.Block("Scripts",@<script>
             angular
                 .module('myApp', ['dyFlipClock'])
                 .run(function ($rootScope, $interval) {
@@ -10,10 +10,10 @@
                         $rootScope.time += @((int)ViewData["interval"]);
                     }, 1, 500);
                 });
-    </script>,"Scripts")
+    </script>)
 </environment>
 <environment exclude="Development">
-    @this.Block(@<script>angular.module('myApp', ['dyFlipClock']).run(function ($rootScope, $interval) {$rootScope.time = 0;$interval(function () {$rootScope.time += @((int)ViewData["interval"]);}, 1, 500);});</script>, "Scripts")
+    @this.Block("Scripts", @<script>angular.module('myApp', ['dyFlipClock']).run(function ($rootScope, $interval) {$rootScope.time = 0;$interval(function () {$rootScope.time += @((int)ViewData["interval"]);}, 1, 500);});</script>)
 </environment>
 
 <div class="myApp" ng-app="myApp">

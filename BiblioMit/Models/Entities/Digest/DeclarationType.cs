@@ -4,9 +4,8 @@ namespace BiblioMit.Models.Entities.Digest
 {
     public enum DeclarationType
     {
-        [Display(GroupName = "Plants", Name = "Raw Material", Prompt = "Tons")]
-        RawMaterial = 0,
-
+        //[Display(GroupName = "Plants", Name = "Raw Material", Prompt = "Tons")]
+        //RawMaterial = 0,
         [Display(Description = "Action whose purpose is the fixation of invertebrate larvae through the arrangement of collectors.",
             GroupName = "Farm",
             Name = "Seed Uptake",
@@ -41,6 +40,6 @@ namespace BiblioMit.Models.Entities.Digest
             GroupName = "Environmental",
             Name = "Salinity",
             Prompt = "PSU - Practical Salinity Units")]
-        Salinity = 6,
+        Salinity = 6
     }
 }

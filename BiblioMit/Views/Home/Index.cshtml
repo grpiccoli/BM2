@@ -4,7 +4,7 @@
     ViewData["Title"] = "BiblioMit";
 }
 @* "signalr", "/chat.min"*@
-<partial name="_LibsPg" model='new HashSet<string> { "home" }' />
+<partial name="_Libs0" model='new HashSet<string> { "home" }' />
 
 <div class="container-fluid">
     <div class="row">
@@ -186,9 +186,9 @@
     </div>
 </div>
 
-@this.Block(
+@this.Block("Scripts",
 @<script>
     $(document).ready(function () {
         $("#counter").load("/home/getanalyticsdata?freq=all");
     });
-</script>,"Scripts")
+</script>)

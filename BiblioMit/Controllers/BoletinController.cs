@@ -2,10 +2,7 @@
 using BiblioMit.Extensions;
 using BiblioMit.Models;
 using BiblioMit.Models.Entities.Digest;
-using BiblioMit.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace BiblioMit.Views
 {
@@ -49,20 +47,79 @@ namespace BiblioMit.Views
                 return Redirect(url);
             else return RedirectToAction("Index", "Home");
         }
-
-        [AllowAnonymous]
-        public JsonResult GetXlsx(int year, int start, int end)
+        private IQueryable<DeclarationDate> GetDates(DeclarationType tp, int reg)
         {
-            var reg = 10;
-            var yr_1 = year - 1;
-            var feature = HttpContext.Features.Get<IRequestCultureFeature>();
-            var lang = feature.RequestCulture.Culture.TwoLetterISOLanguageName.ToUpperInvariant();
+            var dates = _context.DeclarationDates
+                .Include(c => c.SernapescaDeclaration)
+                .ThenInclude(d => d.OriginPsmb)
+                .ThenInclude(o => o.Commune)
+                    .ThenInclude(c => c.Province)
+                .Where(a =>
+                a.SernapescaDeclaration.Discriminator == tp
+                && a.SernapescaDeclaration.OriginPsmb.Commune.Province.RegionId == reg);
+            if (tp == DeclarationType.Seed)
+            {
+                dates = dates.Where(a => ((SeedDeclaration)a.SernapescaDeclaration).OriginId == 1);
+            }
+            else if (tp == DeclarationType.Production)
+            {
+                dates = dates.Where(a =>
+                a.ProductionType != ProductionType.Unknown
+                && a.ItemType != Item.Product);
+            }
+            return dates;
+        }
+        private async Task<List<DeclarationDate>> GetDates(DeclarationType tp, Config conf)
+        {
+            return conf.Before ?
+                await GetDates(tp, conf.Reg, conf.Start, conf.End, conf.StartBefore(), conf.EndBefore()).ConfigureAwait(false) :
+                await GetDates(tp, conf.Reg, conf.Start, conf.End).ConfigureAwait(false);
+        }
+        private async Task<List<DeclarationDate>> GetDates(DeclarationType tp, int reg, DateTime start_dt, DateTime end_dt)
+        {
+            var dates = GetDates(tp, reg);
+            dates = dates.Where(a => a.Date >= start_dt && a.Date <= end_dt);
+            return await dates.ToListAsync().ConfigureAwait(false);
+        }
+        private async Task<List<DeclarationDate>> GetDates(DeclarationType tp, int reg, DateTime start_dt, DateTime end_dt, DateTime start_dt_1, DateTime end_dt_1)
+        {
+            var dates = GetDates(tp, reg);
+            dates = dates.Where(a => (a.Date >= start_dt && a.Date <= end_dt)
+                || (a.Date >= start_dt_1 && a.Date <= end_dt_1));
+            return await dates.ToListAsync().ConfigureAwait(false);
+        }
+        private async Task<List<PlanktonAssay>> GetAssays(Config config)
+        {
+            var planktons = _context.PlanktonAssays
+                .Include(c => c.Psmb.Commune)
+                    .ThenInclude(c => c.Province)
+                .Where(a =>
+                a.Psmb.Commune.Province.RegionId == config.Reg);
+            planktons = config.Before ? planktons.Where(a =>
+                (a.SamplingDate >= config.Start && a.SamplingDate <= config.End)
+                || (a.SamplingDate >= config.StartBefore() && a.SamplingDate <= config.EndBefore())) :
+                planktons.Where(a =>
+                a.SamplingDate >= config.Start && a.SamplingDate <= config.End);
+            return await planktons.ToListAsync().ConfigureAwait(false);
+        }
+        private static Config GetConfig(int year, int start, int end)
+        {
             DateTime.TryParseExact($"{start} {year}", "M yyyy", CultureInfo.GetCultureInfo("en-GB"), DateTimeStyles.None, out var start_dt);
             DateTime.TryParseExact($"{DateTime.DaysInMonth(year, end)} {end} {year}", "d M yyyy", CultureInfo.GetCultureInfo("en-GB"), DateTimeStyles.None, out var end_dt);
-            DateTime.TryParseExact($"{start} {yr_1}", "M yyyy", CultureInfo.GetCultureInfo("en-GB"), DateTimeStyles.None, out var start_dt_1);
-            DateTime.TryParseExact($"{DateTime.DaysInMonth(yr_1, end)} {end} {yr_1}", "d M yyyy", CultureInfo.GetCultureInfo("en-GB"), DateTimeStyles.None, out var end_dt_1);
-
-            var pre = $"Total {start_dt.ToString("MMM", CultureInfo.InvariantCulture)}-{end_dt.ToString("MMM", CultureInfo.InvariantCulture)}";
+            return new Config
+            {
+                Reg = 10,
+                Year = year,
+                Start = start_dt,
+                End = end_dt
+            };
+        }
+        [AllowAnonymous]
+        public async Task<JsonResult> GetXlsx(int year, int start, int end)
+        {
+            var config = GetConfig(year, start, end);
+            config.Before = true;
+            var pre = $"Total {config.Start.ToString("MMM", CultureInfo.InvariantCulture)}-{config.End.ToString("MMM", CultureInfo.InvariantCulture)}";
             var co = "Comuna";
             var pro = "Provincia";
 
@@ -75,42 +132,27 @@ namespace BiblioMit.Views
                 var tmp = new List<object>();
                 var tp = (DeclarationType)tipo;
 
-                var comuns = _context.SernapescaDeclarations
-                    .Include(c => c.Centre)
-                    .ThenInclude(c => c.Commune)
-                    .ThenInclude(c => c.Province)
-                    .Where(a =>
-                    a.Dato == tp && a.OriginId == 1
-                    && a.Centre.Commune.Province.RegionId == reg
-                    && ((a.Date >= start_dt && a.Date <= end_dt)
-                    || (a.Date >= start_dt_1 && a.Date <= end_dt_1)))
-                    .ToList()
-                    .GroupBy(c => c.Centre.Commune).OrderBy(o => o.Key.Name);
+                var dateslst = await GetDates(tp, config).ConfigureAwait(false);
+                var comuns = dateslst
+                    .GroupBy(c => c.SernapescaDeclaration.OriginPsmb.Commune).OrderBy(o => o.Key.Name);
 
                 foreach (var comuna in comuns)
                 {
                     var cyr = (int)Math.Round(comuna.Where(a => a.Date.Year == year).Sum(a => a.Weight));
-                    var cyr_1 = (int)Math.Round(comuna.Where(a => a.Date.Year == yr_1).Sum(a => a.Weight));
+                    var cyr_1 = (int)Math.Round(comuna.Where(a => a.Date.Year == config.YearBefore()).Sum(a => a.Weight));
                     tmp.Add(new Dictionary<string, object>
                     {
                         { co, comuna.Key.Name },
                         { pro, comuna.Key.Province.Name },
-                        { $"{pre} {yr_1}", cyr_1 },
+                        { $"{pre} {config.YearBefore()}", cyr_1 },
                         { $"{pre} {year}", cyr }
                     });
                 }
                 graphs.Add(tmp);
             }
 
-            var comunas = _context.PlanktonAssays
-                    .Include(c => c.Psmb.Commune.Province)
-                    .Where(a =>
-                    a.Psmb.Commune.Province.RegionId == reg
-                    //&& a.SamplingDate.HasValue 
-                    && ((a.SamplingDate >= start_dt && a.SamplingDate <= end_dt)
-                    || (a.SamplingDate >= start_dt_1 && a.SamplingDate <= end_dt_1)))
-                    .ToList()
-                    .GroupBy(c => c.Psmb.Commune).OrderBy(o => o.Key.Name);
+            var planktonslst = await GetAssays(config).ConfigureAwait(false);
+            var comunas = planktonslst.GroupBy(c => c.Psmb.Commune).OrderBy(o => o.Key.Name);
 
             foreach (var comuna in comunas)
             {
@@ -131,16 +173,16 @@ namespace BiblioMit.Views
                         .Average(a => a.Salinity.Value), 2);
                     }
                 }
-                if (comuna.Any(c => c.SamplingDate.Year == yr_1))
+                if (comuna.Any(c => c.SamplingDate.Year == config.YearBefore()))
                 {
                     if (comuna.Any(c => c.Temperature.HasValue))
                     {
-                        scyr_1 = Math.Round(comuna.Where(a => a.SamplingDate.Year == yr_1 && a.Salinity.HasValue)
+                        scyr_1 = Math.Round(comuna.Where(a => a.SamplingDate.Year == config.YearBefore() && a.Salinity.HasValue)
                         .Average(a => a.Salinity.Value), 2);
                     }
                     if (comuna.Any(c => c.Salinity.HasValue))
                     {
-                        cyr_1 = Math.Round(comuna.Where(a => a.SamplingDate.Year == yr_1 && a.Temperature.HasValue)
+                        cyr_1 = Math.Round(comuna.Where(a => a.SamplingDate.Year == config.YearBefore() && a.Temperature.HasValue)
                         .Average(a => a.Temperature.Value), 2);
                     }
                 }
@@ -148,14 +190,14 @@ namespace BiblioMit.Views
                 {
                     { co, comuna.Key.Name },
                     { pro, comuna.Key.Province.Name },
-                    { $"{pre} {yr_1}", cyr_1 },
+                    { $"{pre} {config.YearBefore()}", cyr_1 },
                     { $"{pre} {year}", cyr }
                 });
                 sal.Add(new Dictionary<string, object>
                 {
                     { co, comuna.Key.Name },
                     { pro, comuna.Key.Province.Name },
-                    { $"{pre} {yr_1}", scyr_1 },
+                    { $"{pre} {config.YearBefore()}", scyr_1 },
                     { $"{pre} {year}", scyr }
                 });
             }
@@ -163,302 +205,35 @@ namespace BiblioMit.Views
             graphs.Add(sal);
             return Json(graphs);
         }
-
         [AllowAnonymous]
-        public JsonResult GetComunas(int tipo, int year, int start, int end, bool? tb)
+        public async Task<JsonResult> GetProvincias(int tipo, int year, int start, int end)
         {
-            if (!tb.HasValue) tb = false;
-            var reg = 10;
-            var yr_1 = year - 1;
-            var feature = HttpContext.Features.Get<IRequestCultureFeature>();
-            var lang = feature.RequestCulture.Culture.TwoLetterISOLanguageName.ToUpperInvariant();
-            DateTime.TryParseExact($"{start} {year}", "M yyyy", CultureInfo.GetCultureInfo("en-GB"), DateTimeStyles.None, out var start_dt);
-            DateTime.TryParseExact($"{DateTime.DaysInMonth(year, end)} {end} {year}", "d M yyyy", CultureInfo.GetCultureInfo("en-GB"), DateTimeStyles.None, out var end_dt);
-            DateTime.TryParseExact($"{start} {yr_1}", "M yyyy", CultureInfo.GetCultureInfo("en-GB"), DateTimeStyles.None, out var start_dt_1);
-            DateTime.TryParseExact($"{DateTime.DaysInMonth(yr_1, end)} {end} {yr_1}", "d M yyyy", CultureInfo.GetCultureInfo("en-GB"), DateTimeStyles.None, out var end_dt_1);
+            var config = GetConfig(year, start, end);
 
             var graphs = new List<object>();
 
             if (tipo > (int)DeclarationType.Production)
             {
-                var ambientales = _context.PlanktonAssays
-                    .Include(c => c.Psmb.Commune.Province)
-                    .Where(a =>
-                    a.Psmb.Commune.Province.RegionId == reg
-                    //&& a.SamplingDate.HasValue
-                    && ((a.SamplingDate >= start_dt && a.SamplingDate <= end_dt)
-                    || (a.SamplingDate >= start_dt_1 && a.SamplingDate <= end_dt_1)));
-
                 var temp = tipo == (int)DeclarationType.Temperature;
 
-                IQueryable<IGrouping<Commune, PlanktonAssay>> comunas;
+                var ambientaleslst = await GetAssays(config).ConfigureAwait(false);
 
-                comunas = ambientales.GroupBy(c => c.Psmb.Commune).OrderBy(o => o.Key.Name);
+                var provincias = ambientaleslst.GroupBy(c => c.Psmb.Commune.Province).OrderBy(o => o.Key.Name);
 
-                foreach (var comuna in comunas)
+                foreach (var provincia in provincias)
                 {
-                    if (!comuna.Any(c => temp ? c.Temperature.HasValue : c.Salinity.HasValue)) { continue; }
-                    double? cyr = null;
-                    double? cyr_1 = null;
-                    if (temp)
-                    {
-                        if (comuna.Any(c => c.SamplingDate.Year == year && c.Temperature.HasValue))
-                        {
-                            cyr = Math.Round(comuna.Where(a => a.SamplingDate.Year == year && a.Temperature.HasValue)
-                                .Average(a => a.Temperature.Value), 2);
-                        }
-                        if (comuna.Any(c => c.SamplingDate.Year == yr_1 && c.Temperature.HasValue))
-                        {
-                            cyr_1 = Math.Round(comuna.Where(a => a.SamplingDate.Year == yr_1 && a.Temperature.HasValue)
-                            .Average(a => a.Temperature.Value), 2);
-                        }
-                    }
-                    else
-                    {
-                        if (comuna.Any(c => c.SamplingDate.Year == year && c.Salinity.HasValue))
-                        {
-                            cyr = Math.Round(comuna.Where(a => a.SamplingDate.Year == year && a.Salinity.HasValue)
-                            .Average(a => a.Salinity.Value), 2);
-                        }
-                        if (comuna.Any(c => c.SamplingDate.Year == yr_1 && c.Salinity.HasValue))
-                        {
-                            cyr_1 = Math.Round(comuna.Where(a => a.SamplingDate.Year == yr_1 && a.Salinity.HasValue)
-                            .Average(a => a.Salinity.Value), 2);
-                        }
-                    }
-                    graphs.Add(new { comuna = comuna.Key.Name, lastyr = cyr_1, year = cyr });
-                }
-            }
-            else if (tipo == (int)DeclarationType.Production && !tb.Value)
-            {
-                var tp = (DeclarationType)tipo;
-
-                var planilla = _context.SernapescaDeclarations
-                .Include(c => c.Centre.Commune.Province)
-                .Where(a =>
-                a.Dato == tp
-                && a.ProductionType != ProductionType.Unknown
-                && a.ItemType != Item.Product
-                && a.Centre.Commune.Province.RegionId == reg
-                && ((a.Date >= start_dt && a.Date <= end_dt)
-                    || (a.Date >= start_dt_1 && a.Date <= end_dt_1)));
-
-                IQueryable<IGrouping<Commune, SernapescaDeclaration>> comunas;
-
-                comunas = planilla.GroupBy(c => c.Centre.Commune).OrderBy(o => o.Key.Name);
-
-                foreach (var comuna in comunas)
-                {
-                    var cyr = comuna.Where(a => a.Date.Year == year);
-                    var cyr_1 = comuna.Where(a => a.Date.Year == yr_1);
-                    var aa_congelado = (int)Math.Round(cyr.Where(a => a.ProductionType == ProductionType.Frozen).Sum(a => a.Weight));
-                    var ba_congelado = (int)Math.Round(cyr_1.Where(a => a.ProductionType == ProductionType.Frozen).Sum(a => a.Weight));
-                    var ab_conserva = (int)Math.Round(cyr.Where(a => a.ProductionType == ProductionType.Preserved).Sum(a => a.Weight));
-                    var bb_conserva = (int)Math.Round(cyr_1.Where(a => a.ProductionType == ProductionType.Preserved).Sum(a => a.Weight));
-                    var ac_refrigerado = (int)Math.Round(cyr.Where(a => a.ProductionType == ProductionType.Refrigerated).Sum(a => a.Weight));
-                    var bc_refrigerado = (int)Math.Round(cyr_1.Where(a => a.ProductionType == ProductionType.Refrigerated).Sum(a => a.Weight));
-                    //var ad_desconicido = (int)Math.Round(cyr.Where(a => a.TipoProduccion == ProductionType.Desconocido).Sum(a => a.Peso));
-                    //var bd_desconocido = (int)Math.Round(cyr_1.Where(a => a.TipoProduccion == ProductionType.Desconocido).Sum(a => a.Peso));
-                    graphs.Add(new
-                    {
-                        comuna = comuna.Key.Name,
-                        aa_congelado,
-                        ab_conserva,
-                        ac_refrigerado,
-                        ba_congelado,
-                        bb_conserva,
-                        bc_refrigerado
-                    });
-                }
-
-            }
-            else
-            {
-                var tp = (DeclarationType)tipo;
-
-                var planilla = tipo == (int)DeclarationType.Seed ?
-                    _context.SernapescaDeclarations
-                    .Include(c => c.Centre.Commune.Province)
-                    .Where(a =>
-                    a.Dato == tp && a.OriginId == 1
-                    && a.Centre.Commune.Province.RegionId == reg
-                    && ((a.Date >= start_dt && a.Date <= end_dt)
-                    || (a.Date >= start_dt_1 && a.Date <= end_dt_1))) :
-                    _context.SernapescaDeclarations
-                    .Include(c => c.Centre.Commune.Province)
-                    .Where(a =>
-                    a.Dato == tp
-                    && a.Centre.Commune.Province.RegionId == reg
-                    && ((a.Date >= start_dt && a.Date <= end_dt)
-                    || (a.Date >= start_dt_1 && a.Date <= end_dt_1)));
-
-                IQueryable<IGrouping<Commune, SernapescaDeclaration>> comunas;
-
-                comunas = planilla.GroupBy(c => c.Centre.Commune).OrderBy(o => o.Key.Name);
-
-                foreach (var comuna in comunas)
-                {
-                    var cyr = (int)Math.Round(comuna.Where(a => a.Date.Year == year).Sum(a => a.Weight));
-                    var cyr_1 = (int)Math.Round(comuna.Where(a => a.Date.Year == yr_1).Sum(a => a.Weight));
-                    graphs.Add(new { comuna = comuna.Key.Name, year = cyr, lastyr = cyr_1 });
-                }
-            }
-            return Json(graphs);
-        }
-
-        [AllowAnonymous]
-        public JsonResult GetMeses(int tipo, int year, int start, int end)
-        {
-            var reg = 10;
-            var feature = HttpContext.Features.Get<IRequestCultureFeature>();
-            var lang = feature.RequestCulture.Culture.TwoLetterISOLanguageName.ToUpperInvariant();
-            DateTime.TryParseExact($"{start} {year}", "M yyyy", CultureInfo.GetCultureInfo("en-GB"), DateTimeStyles.None, out var start_dt);
-            DateTime.TryParseExact($"{DateTime.DaysInMonth(year, end)} {end} {year}", "d M yyyy", CultureInfo.GetCultureInfo("en-GB"), DateTimeStyles.None, out var end_dt);
-
-            var graphs = new List<object>();
-
-            if (tipo > (int)DeclarationType.Production)
-            {
-                var ambientales = _context.PlanktonAssays
-                    .Include(c => c.Psmb.Commune.Province)
-                    .Where(a =>
-                    a.Psmb.Commune.Province.RegionId == reg
-                    //&& a.SamplingDate.HasValue
-                    && a.SamplingDate >= start_dt
-                    && a.SamplingDate <= end_dt);
-
-                var temp = tipo == (int)DeclarationType.Temperature;
-
-                IQueryable<IGrouping<int, PlanktonAssay>> meses;
-
-                meses = ambientales.GroupBy(c => c.SamplingDate.Month).OrderBy(o => o.Key);
-
-                foreach (var month in meses)
-                {
-                    var value = Math.Round(month.Where(a => temp ? a.Temperature.HasValue : a.Salinity.HasValue)
+                    var cyr = Math.Round(provincia.Where(a => temp ? a.Temperature.HasValue : a.Salinity.HasValue)
                         .Average(a => temp ? a.Temperature.Value : a.Salinity.Value), 2);
-                    graphs.Add(new { date = $"{year}-{month.Key}", value });
+                    graphs.Add(new { provincia = provincia.Key.Name, ton = cyr });
                 }
             }
             else if (tipo == (int)DeclarationType.Production)
             {
                 var tp = (DeclarationType)tipo;
 
-                var planilla = _context.SernapescaDeclarations
-                    .Include(c => c.Centre.Commune.Province)
-                    .Where(a =>
-                    a.Dato == tp
-                    && a.ProductionType != ProductionType.Unknown
-                    && a.ItemType != Item.Product
-                    && a.Centre.Commune.Province.RegionId == reg
-                    && a.Date >= start_dt
-                    && a.Date <= end_dt);
+                var planilla = await GetDates(tp, config).ConfigureAwait(false);
 
-                IQueryable<IGrouping<int, SernapescaDeclaration>> meses;
-
-                meses = planilla.GroupBy(c => c.Date.Month).OrderBy(o => o.Key);
-
-                foreach (var month in meses)
-                {
-                    var congelado = (int)Math.Round(month.Where(a => a.ProductionType == ProductionType.Frozen).Sum(a => a.Weight));
-                    var conserva = (int)Math.Round(month.Where(a => a.ProductionType == ProductionType.Preserved).Sum(a => a.Weight));
-                    var refrigerado = (int)Math.Round(month.Where(a => a.ProductionType == ProductionType.Refrigerated).Sum(a => a.Weight));
-                    //var desconocido = (int)Math.Round(month.Where(a => a.TipoProduccion == ProductionType.Desconocido).Sum(a => a.Peso));
-                    graphs.Add(new
-                    {
-                        date = $"{year}-{month.Key}",
-                        congelado,
-                        conserva,
-                        refrigerado
-                        //, desconocido
-                    });
-                }
-            }
-            else
-            {
-                var tp = (DeclarationType)tipo;
-
-                var planilla = tipo == (int)DeclarationType.Seed ?
-                    _context.SernapescaDeclarations
-                    .Include(c => c.Centre.Commune.Province)
-                    .Where(a =>
-                    a.Dato == tp && a.OriginId == 1
-                    && a.Centre.Commune.Province.RegionId == reg
-                    && a.Date >= start_dt
-                    && a.Date <= end_dt) :
-                    _context.SernapescaDeclarations
-                    .Include(c => c.Centre.Commune.Province)
-                    .Where(a =>
-                    a.Dato == tp
-                    && a.Centre.Commune.Province.RegionId == reg
-                    && a.Date >= start_dt
-                    && a.Date <= end_dt);
-
-                IQueryable<IGrouping<int, SernapescaDeclaration>> meses;
-
-                meses = planilla.GroupBy(c => c.Date.Month).OrderBy(o => o.Key);
-
-                foreach (var month in meses)
-                {
-                    var cyr = (int)Math.Round(month.Sum(a => a.Weight));
-                    graphs.Add(new { date = $"{year}-{month.Key}", value = cyr });
-                }
-            }
-            return Json(graphs);
-        }
-
-        [AllowAnonymous]
-        public JsonResult GetProvincias(int tipo, int year, int start, int end)
-        {
-            var reg = 10;
-            var feature = HttpContext.Features.Get<IRequestCultureFeature>();
-            var lang = feature.RequestCulture.Culture.TwoLetterISOLanguageName.ToUpperInvariant();
-            DateTime.TryParseExact($"{start} {year}", "M yyyy", CultureInfo.GetCultureInfo("en-GB"), DateTimeStyles.None, out var start_dt);
-            DateTime.TryParseExact($"{DateTime.DaysInMonth(year, end)} {end} {year}", "d M yyyy",
-                CultureInfo.GetCultureInfo("en-GB"), DateTimeStyles.None, out var end_dt);
-
-            var graphs = new List<object>();
-
-            //if (tipo > (int)Tipo.Producción)
-            //{
-            //    var ambientales = _context.EnsayoFitos
-            //        .Include(c => c.Centre.Comuna.Provincia)
-            //        .Where(a =>
-            //        a.Centre.Comuna.Provincia.RegionId == reg
-            //        && a.FechaMuestreo >= start_dt
-            //        && a.FechaMuestreo <= end_dt);
-
-            //    var temp = tipo == (int)Tipo.Temperatura;
-
-            //    IQueryable<IGrouping<Provincia, EnsayoFito>> provincias;
-
-            //    provincias = ambientales.GroupBy(c => c.Centre.Comuna.Provincia).OrderBy(o => o.Key.Name);
-
-            //    foreach (var provincia in provincias)
-            //    {
-            //        var cyr = Math.Round(provincia.Where(a => temp ? a.Temperatura.HasValue : a.Salinidad.HasValue)
-            //            .Average(a => temp ? a.Temperatura.Value : a.Salinidad.Value),2);
-            //        graphs.Add(new { provincia = provincia.Key.Name, ton = cyr });
-            //    }
-            //}
-            //else 
-            if (tipo == (int)DeclarationType.Production)
-            {
-                var tp = (DeclarationType)tipo;
-
-                var planilla = _context.SernapescaDeclarations
-                    .Include(c => c.Centre.Commune.Province)
-                    .Where(a =>
-                    a.Dato == tp
-                    && a.ProductionType != ProductionType.Unknown
-                    && a.ItemType != Item.Product
-                    && a.Centre.Commune.Province.RegionId == reg
-                    && a.Date >= start_dt
-                    && a.Date <= end_dt);
-
-                IQueryable<IGrouping<Province, SernapescaDeclaration>> provincias;
-
-                provincias = planilla.GroupBy(c => c.Centre.Commune.Province).OrderBy(o => o.Key.Name);
+                var provincias = planilla.GroupBy(c => c.SernapescaDeclaration.OriginPsmb.Commune.Province).OrderBy(o => o.Key.Name);
 
                 var colors = new Dictionary<string, string>{
                     { "Palena", "#ff9e01" },
@@ -498,25 +273,9 @@ namespace BiblioMit.Views
             {
                 var tp = (DeclarationType)tipo;
 
-                var planilla = tipo == (int)DeclarationType.Seed ?
-                    _context.SernapescaDeclarations
-                    .Include(c => c.Centre.Commune.Province)
-                    .Where(a =>
-                    a.Dato == tp && a.OriginId == 1
-                    && a.Centre.Commune.Province.RegionId == reg
-                    && a.Date>= start_dt
-                    && a.Date<= end_dt) :
-                    _context.SernapescaDeclarations
-                    .Include(c => c.Centre.Commune.Province)
-                    .Where(a =>
-                    a.Dato == tp
-                    && a.Centre.Commune.Province.RegionId == reg
-                    && a.Date>= start_dt
-                    && a.Date <= end_dt);
+                var planilla = await GetDates(tp, config).ConfigureAwait(false);
 
-                IQueryable<IGrouping<Province, SernapescaDeclaration>> provincias;
-
-                provincias = planilla.GroupBy(c => c.Centre.Commune.Province).OrderBy(o => o.Key.Name);
+                var provincias = planilla.GroupBy(c => c.SernapescaDeclaration.OriginPsmb.Commune.Province).OrderBy(o => o.Key.Name);
 
                 foreach (var provincia in provincias)
                 {
@@ -529,7 +288,170 @@ namespace BiblioMit.Views
             }
             return Json(graphs);
         }
+        [AllowAnonymous]
+        public async Task<JsonResult> GetComunas(int tipo, int year, int start, int end, bool? tb)
+        {
+            if (!tb.HasValue) tb = false;
+            var config = GetConfig(year, start, end);
+            config.Before = true;
 
+            var graphs = new List<object>();
+
+            if (tipo > (int)DeclarationType.Production)
+            {
+                var temp = tipo == (int)DeclarationType.Temperature;
+
+                var ambientaleslst = await GetAssays(config).ConfigureAwait(false);
+
+                var comunas = ambientaleslst.GroupBy(c => c.Psmb.Commune).OrderBy(o => o.Key.Name);
+
+                foreach (var comuna in comunas)
+                {
+                    if (!comuna.Any(c => temp ? c.Temperature.HasValue : c.Salinity.HasValue)) { continue; }
+                    double? cyr = null;
+                    double? cyr_1 = null;
+                    if (temp)
+                    {
+                        if (comuna.Any(c => c.SamplingDate.Year == year && c.Temperature.HasValue))
+                        {
+                            cyr = Math.Round(comuna.Where(a => a.SamplingDate.Year == year && a.Temperature.HasValue)
+                                .Average(a => a.Temperature.Value), 2);
+                        }
+                        if (comuna.Any(c => c.SamplingDate.Year == config.YearBefore() && c.Temperature.HasValue))
+                        {
+                            cyr_1 = Math.Round(comuna.Where(a => a.SamplingDate.Year == config.YearBefore() && a.Temperature.HasValue)
+                            .Average(a => a.Temperature.Value), 2);
+                        }
+                    }
+                    else
+                    {
+                        if (comuna.Any(c => c.SamplingDate.Year == year && c.Salinity.HasValue))
+                        {
+                            cyr = Math.Round(comuna.Where(a => a.SamplingDate.Year == year && a.Salinity.HasValue)
+                            .Average(a => a.Salinity.Value), 2);
+                        }
+                        if (comuna.Any(c => c.SamplingDate.Year == config.YearBefore() && c.Salinity.HasValue))
+                        {
+                            cyr_1 = Math.Round(comuna.Where(a => a.SamplingDate.Year == config.YearBefore() && a.Salinity.HasValue)
+                            .Average(a => a.Salinity.Value), 2);
+                        }
+                    }
+                    graphs.Add(new { comuna = comuna.Key.Name, lastyr = cyr_1, year = cyr });
+                }
+            }
+            else if (tipo == (int)DeclarationType.Production && !tb.Value)
+            {
+                var tp = (DeclarationType)tipo;
+
+                var planillalst = await GetDates(tp, config).ConfigureAwait(false);
+
+                var comunas = planillalst.GroupBy(c => c.SernapescaDeclaration.OriginPsmb.Commune).OrderBy(o => o.Key.Name);
+
+                foreach (var comuna in comunas)
+                {
+                    var cyr = comuna.Where(a => a.Date.Year == year);
+                    var cyr_1 = comuna.Where(a => a.Date.Year == config.YearBefore());
+                    var aa_congelado = (int)Math.Round(cyr.Where(a => a.ProductionType == ProductionType.Frozen).Sum(a => a.Weight));
+                    var ba_congelado = (int)Math.Round(cyr_1.Where(a => a.ProductionType == ProductionType.Frozen).Sum(a => a.Weight));
+                    var ab_conserva = (int)Math.Round(cyr.Where(a => a.ProductionType == ProductionType.Preserved).Sum(a => a.Weight));
+                    var bb_conserva = (int)Math.Round(cyr_1.Where(a => a.ProductionType == ProductionType.Preserved).Sum(a => a.Weight));
+                    var ac_refrigerado = (int)Math.Round(cyr.Where(a => a.ProductionType == ProductionType.Refrigerated).Sum(a => a.Weight));
+                    var bc_refrigerado = (int)Math.Round(cyr_1.Where(a => a.ProductionType == ProductionType.Refrigerated).Sum(a => a.Weight));
+                    //var ad_desconicido = (int)Math.Round(cyr.Where(a => a.TipoProduccion == ProductionType.Desconocido).Sum(a => a.Peso));
+                    //var bd_desconocido = (int)Math.Round(cyr_1.Where(a => a.TipoProduccion == ProductionType.Desconocido).Sum(a => a.Peso));
+                    graphs.Add(new
+                    {
+                        comuna = comuna.Key.Name,
+                        aa_congelado,
+                        ab_conserva,
+                        ac_refrigerado,
+                        ba_congelado,
+                        bb_conserva,
+                        bc_refrigerado
+                    });
+                }
+
+            }
+            else
+            {
+                var tp = (DeclarationType)tipo;
+
+                var dateslst = await GetDates(tp, config).ConfigureAwait(false);
+
+                var comunas = dateslst.GroupBy(c => c.SernapescaDeclaration.OriginPsmb.Commune).OrderBy(o => o.Key.Name);
+
+                foreach (var comuna in comunas)
+                {
+                    var cyr = (int)Math.Round(comuna.Where(a => a.Date.Year == year).Sum(a => a.Weight));
+                    var cyr_1 = (int)Math.Round(comuna.Where(a => a.Date.Year == config.YearBefore()).Sum(a => a.Weight));
+                    graphs.Add(new { comuna = comuna.Key.Name, year = cyr, lastyr = cyr_1 });
+                }
+            }
+            return Json(graphs);
+        }
+
+        [AllowAnonymous]
+        public async Task<JsonResult> GetMeses(int tipo, int year, int start, int end)
+        {
+            var config = GetConfig(year, start, end);
+
+            var graphs = new List<object>();
+
+            if (tipo > (int)DeclarationType.Production)
+            {
+                var ambientaleslst = await GetAssays(config).ConfigureAwait(false);
+
+                var meses = ambientaleslst.GroupBy(c => c.SamplingDate.Month).OrderBy(o => o.Key);
+
+                var temp = tipo == (int)DeclarationType.Temperature;
+
+                foreach (var month in meses)
+                {
+                    var value = Math.Round(month.Where(a => temp ? a.Temperature.HasValue : a.Salinity.HasValue)
+                        .Average(a => temp ? a.Temperature.Value : a.Salinity.Value), 2);
+                    graphs.Add(new { date = $"{year}-{month.Key}", value });
+                }
+            }
+            else if (tipo == (int)DeclarationType.Production)
+            {
+                var tp = (DeclarationType)tipo;
+
+                var planillalst = await GetDates(tp, config).ConfigureAwait(false);
+
+                var meses = planillalst.GroupBy(c => c.Date.Month).OrderBy(o => o.Key);
+
+                foreach (var month in meses)
+                {
+                    var congelado = (int)Math.Round(month.Where(a => a.ProductionType == ProductionType.Frozen).Sum(a => a.Weight));
+                    var conserva = (int)Math.Round(month.Where(a => a.ProductionType == ProductionType.Preserved).Sum(a => a.Weight));
+                    var refrigerado = (int)Math.Round(month.Where(a => a.ProductionType == ProductionType.Refrigerated).Sum(a => a.Weight));
+                    //var desconocido = (int)Math.Round(month.Where(a => a.TipoProduccion == ProductionType.Desconocido).Sum(a => a.Peso));
+                    graphs.Add(new
+                    {
+                        date = $"{year}-{month.Key}",
+                        congelado,
+                        conserva,
+                        refrigerado
+                        //, desconocido
+                    });
+                }
+            }
+            else
+            {
+                var tp = (DeclarationType)tipo;
+
+                var planilla = await GetDates(tp, config).ConfigureAwait(false);
+
+                var meses = planilla.GroupBy(c => c.Date.Month).OrderBy(o => o.Key);
+
+                foreach (var month in meses)
+                {
+                    var cyr = (int)Math.Round(month.Sum(a => a.Weight));
+                    graphs.Add(new { date = $"{year}-{month.Key}", value = cyr });
+                }
+            }
+            return Json(graphs);
+        }
         [AllowAnonymous]
         public ActionResult Index(int? yr, int? start, int? end, int? reg, int? ver, int? tp)
         {
@@ -546,10 +468,10 @@ namespace BiblioMit.Views
 
             var years = new List<int>();
             var months = new List<int>();
-            years.AddRange(_context.SernapescaDeclarations.Select(a => a.Date.Year).Distinct().ToList());
+            years.AddRange(_context.DeclarationDates.Select(a => a.Date.Year).Distinct().ToList());
 
             if (!yr.HasValue && years != null) yr = years.Max();
-            months.AddRange(_context.SernapescaDeclarations.Where(a => a.Date.Year == yr).Select(a => a.Date.Month).Distinct().ToList());
+            months.AddRange(_context.DeclarationDates.Where(a => a.Date.Year == yr).Select(a => a.Date.Month).Distinct().ToList());
             if (!start.HasValue) start = months.Min();
             if (!end.HasValue) end = months.Max();
 
@@ -610,7 +532,7 @@ namespace BiblioMit.Views
             var years = new List<int>();
             var months = new List<int>();
 
-            months.AddRange(_context.SernapescaDeclarations
+            months.AddRange(_context.DeclarationDates
                 .Where(a => a.Date.Year == yr).Select(a => a.Date.Month).Distinct().ToList());
             var start = months.Min();
             var end = months.Max();
@@ -715,5 +637,16 @@ namespace BiblioMit.Views
         //        return View();
         //    }
         //}
+    }
+    public class Config
+    {
+        public int Reg { get; set; }
+        public int Year { get; set; }
+        public DateTime Start { get; set; }
+        public DateTime End { get; set; }
+        public bool Before { get; set; }
+        public int YearBefore() => Year - 1;
+        public DateTime StartBefore() => Start.AddYears(-1);
+        public DateTime EndBefore() => End.AddYears(-1);
     }
 }

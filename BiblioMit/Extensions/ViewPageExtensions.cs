@@ -10,8 +10,16 @@ namespace BiblioMit.Extensions
     public static class ViewPageExtensions
     {
         private const string BLOCK_BUILDER = "BlockBuilder";
-
-        public static HtmlString Block(this RazorPageBase webPage, Func<dynamic, HelperResult> template, string name)
+        public static HtmlString Blocks(this RazorPageBase webPage, string name, params Func<dynamic, HelperResult>[] templates)
+        {
+            var sb = new StringBuilder();
+            foreach (var t in templates)
+            {
+                sb.Append(webPage.Block(name, t));
+            }
+            return new HtmlString(sb.ToString());
+        }
+        public static HtmlString Block(this RazorPageBase webPage, string name, Func<dynamic, HelperResult> template)
         {
             var sb = new StringBuilder();
             using TextWriter tw = new StringWriter(sb);

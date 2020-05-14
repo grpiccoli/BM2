@@ -8,7 +8,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
@@ -27,13 +29,16 @@ namespace BiblioMit.Controllers
         private readonly IServiceProvider _serviceProvider;
         private readonly IImport _import;
         private readonly ITableToExcel _tableToExcel;
+        private readonly IStringLocalizer<EntriesController> _localizer;
 
         public EntriesController(ApplicationDbContext context,
             IImport import,
+            IStringLocalizer<EntriesController> localizer,
             IServiceProvider serviceProvider,
             UserManager<ApplicationUser> userManager,
             ITableToExcel tableToExcel)
         {
+            _localizer = localizer;
             _tableToExcel = tableToExcel;
             _import = import;
             _context = context;
@@ -164,7 +169,7 @@ namespace BiblioMit.Controllers
                 entry.FileName = entry.InputFile.FileName;
                 entry.Date = DateTime.Now;
                 entry.Success = false;
-                _context.Add(entry);
+                await _context.Entries.AddAsync(entry).ConfigureAwait(false);
                 await _context.SaveChangesAsync()
                     .ConfigureAwait(false);
 
@@ -172,12 +177,19 @@ namespace BiblioMit.Controllers
 
                 Stream stream = entry.InputFile.OpenReadStream();
                 using ExcelPackage package = new ExcelPackage(stream);
-                await _import.ReadAsync(package, entry, entry.DeclarationType).ConfigureAwait(false);
+                var t = entry.DeclarationType switch
+                {
+                    DeclarationType.Seed => await _import.ReadAsync<SeedDeclaration>(package, entry).ConfigureAwait(false),
+                    DeclarationType.Harvest => await _import.ReadAsync<HarvestDeclaration>(package, entry).ConfigureAwait(false),
+                    DeclarationType.Supply => await _import.ReadAsync<SupplyDeclaration>(package, entry).ConfigureAwait(false),
+                    DeclarationType.Production => await _import.ReadAsync<ProductionDeclaration>(package, entry).ConfigureAwait(false),
+                    _ => Task.FromException(new ArgumentException(_localizer["Error input format"]))
+                };
                 return RedirectToAction(nameof(Index), new { id = entry.Id });
             }
             var Filters = new Dictionary<string, List<string>>
             {
-                ["Tipo"] = new List<string> { "Semilla", "Cosecha", "Abastecimiento", "Producción" }
+                ["Tipo"] = DeclarationType.Supply.Enum2ListNames().ToList()
             };
 
             ViewData[nameof(DeclarationType)] = DeclarationType.Supply.Enum2MultiSelect(Filters, "Name");

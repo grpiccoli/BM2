@@ -1,19 +1,21 @@
 ﻿using BiblioMit.Extensions;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BiblioMit.Models.Entities.Environmental
 {
     public class GenusPhytoplankton
     {
         public int Id { get; set; }
+        [DisallowNull, Required]
         public string Name { get; private set; }
-        [Required]
+        [Required, DisallowNull]
         public string NormalizedName { get; private set; }
-        public void SetName(string value)
+        public void SetName([DisallowNull]string value)
         {
             NormalizedName = value;
-            Name = value?.ToString().FirstCharToUpper();
+            Name = value.FirstCharToUpper();
         }
         [Required]
         public int GroupId { get; set; }

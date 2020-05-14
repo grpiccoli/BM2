@@ -92,7 +92,7 @@
 
     var tools = new Dictionary<string, string[][]>();
 
-    var admin = User.Identity.Name == "WebMaster";
+    var admin = User.Claims.Any(c => c.Value == "webmaster");
 
     if (User.Identity.IsAuthenticated)
     {
@@ -100,18 +100,24 @@
 
         if (admin || User.Claims.Any(c => c.Value == "per" || c.Value == "sernapesca" || c.Value == "intemit") )
         {
-            digest.Add(Localizer["Administration"].Value, new string[][]
+            var adminstrings = new List<string[]>
             {
-                new string[6]{ "Entries", "Index", Localizer["Uploaded Files"].Value, "","","" },
                 new string[6]{ "Columnas", "Index", Localizer["Input Format"].Value, "","","" }
-            });
-            if (User.IsInRole("Administrador"))
+            };
+            if (admin || User.Claims.Any(c => c.Value == "per" || c.Value == "sernapesca"))
             {
-                digest.Add(Localizer["Prod Uploads"].Value, new string[][]
+                adminstrings.Add(
+                new string[6]{ "Entries", "Index", Localizer["Uploaded Files"].Value, "","","" }
+                );
+                if (User.IsInRole("Administrador"))
                 {
+                    digest.Add(Localizer["Prod Uploads"].Value, new string[][]
+                    {
                     new string[6]{ "Entries", "Create", Localizer["Production"].Value, "","","" }
-                });
+                    });
+                }
             }
+            digest.Add(Localizer["Administration"].Value, adminstrings.ToArray());
         }
 
         if (admin || User.Claims.Any(c => c.Value == "intemit") )

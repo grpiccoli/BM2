@@ -1,6 +1,6 @@
-﻿<partial name="_LibsPg" model='new HashSet<string> { "fine-uploader" }' />
+﻿<partial name="_Libs0" model='new HashSet<string> { "fine-uploader" }' />
 
-@this.Block(@<script type="text/template" id="qq-template-manual-trigger">
+@this.Blocks("Styles", @<script type="text/template" id="qq-template-manual-trigger">
                  <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Arroje archivos aquí">
                      <div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
                          <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
@@ -62,8 +62,8 @@
                          </div>
                      </dialog>
                  </div>
-    </script>, "Styles")
-@this.Block(@<style>
+    </script>,
+    @<style>
     .qq-upload-list{
         max-height:400px;
     }
@@ -83,9 +83,9 @@
     #fine-uploader-manual-trigger .qq-uploader .qq-total-progress-bar-container {
         width: 60%;
     }
-</style>, "Styles")
+</style>)
 <div id="fine-uploader-manual-trigger"></div>
-@this.Block(
+@this.Block("Scripts",
 @<script>
     $(document).ready(function () {
         var token = $('input:hidden[name="__RequestVerificationToken"]').val();
@@ -153,4 +153,4 @@
             manualUploader.uploadStoredFiles();
         });
     });
-</script>, "Scripts")
+</script>)

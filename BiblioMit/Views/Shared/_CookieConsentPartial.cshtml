@@ -15,12 +15,13 @@
             <span aria-hidden="true">@Localizer["Accept"]</span>
         </button>
     </div>
-    @this.Block(@<script>
+    @this.Block("Scripts", 
+    @<script>
                            (function () {
                                var button = document.querySelector("#cookieConsent button[data-cookie-string]");
-                               button.addEventListener("click", function (_e) {
+                               button.addEventListener("click", (_e) => {
                                    document.cookie = button.dataset.cookieString;
                                }, false);
                            })();
-    </script>, "Scripts")
+    </script>)
 }

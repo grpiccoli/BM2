@@ -5,8 +5,9 @@ declare class Choices {
     setChoices(callback: any): void;
     getValue(val?: boolean): any;
     disable(): void;
-    removeActiveItemsByValue(value: number): void;
-    setChoiceByValue(value: number): void;
+    removeActiveItemsByValue(value: any): void;
+    removeActiveItems(): void;
+    setChoiceByValue(value: any): void;
     enable(): void;
 }
 

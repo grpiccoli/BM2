@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using GoogleMapsComponents.Maps;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace BiblioMit.Blazor
@@ -9,6 +11,9 @@ namespace BiblioMit.Blazor
     {
         DateTime GetMinDate();
         DateTime GetMaxDate();
+        Task<IEnumerable<PolygonOptions>> GetPsmbPolygonsAsync();
+        Task<IEnumerable<PolygonOptions>> GetCuencaPolygonsAsync();
+        Task<IEnumerable<PolygonOptions>> GetCommunePolygonsAsync();
         Task<IReadOnlyCollection<SelectListItem>> GetPhytoplanktonOrders();
         Task<IReadOnlyCollection<SelectListItem>> GetPhytoplanktonGenus();
         Task<IReadOnlyCollection<SelectListItem>> GetPhytoplanktonSp();

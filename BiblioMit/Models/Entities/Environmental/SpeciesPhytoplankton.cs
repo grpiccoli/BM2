@@ -14,7 +14,7 @@ namespace BiblioMit.Models
         {
             NormalizedName = value;
             TextInfo text = CultureInfo.InvariantCulture.TextInfo;
-            Name = text.ToLower(value?.ToString());
+            Name = text.ToLower(value);
         }
         [Required]
         public int GenusId { get; set; }

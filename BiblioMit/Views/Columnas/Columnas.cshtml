@@ -56,6 +56,27 @@
                        Name = Html.DisplayNameFor(model => model.Operation)
                    }' />
                     </th>
+                    <th>
+                        <partial name="_TableFilter" view-data="@ViewData" model='new TableFilterVM
+                   {
+                       Id = "DecimalPlaces",
+                       Name = Html.DisplayNameFor(model => model.DecimalPlaces)
+                   }' />
+                    </th>
+                    <th>
+                        <partial name="_TableFilter" view-data="@ViewData" model='new TableFilterVM
+                   {
+                       Id = "DecimalSeparator",
+                       Name = Html.DisplayNameFor(model => model.DecimalSeparator)
+                   }' />
+                    </th>
+                    <th>
+                        <partial name="_TableFilter" view-data="@ViewData" model='new TableFilterVM
+                   {
+                       Id = "DeleteAfter2ndNegative",
+                       Name = Html.DisplayNameFor(model => model.DeleteAfter2ndNegative)
+                   }' />
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -80,6 +101,15 @@
                     <td contenteditable="true">
                         @Html.DisplayFor(modelItem => item.Operation)
                     </td>
+                    <td contenteditable="true">
+                        @Html.DisplayFor(modelItem => item.DecimalPlaces)
+                    </td>
+                    <td contenteditable="true">
+                        @Html.DisplayFor(modelItem => item.DecimalSeparator)
+                    </td>
+                    <td contenteditable="true">
+                        @Html.DisplayFor(modelItem => item.DeleteAfter2ndNegative)
+                    </td>
                 </tr>
                 }
             </tbody>
@@ -103,12 +133,16 @@
                 var url = '@Html.Raw(Url.Action("Editar",(string)ViewData["controller"],
                           new {
                               id = "P0",
-                              decription = "A1",
+                              description = "A1",
                               headers = "C2",
-                              conversion = "C3"
+                              conversion = "C3",
+                              places = "C4",
+                              sep = "C5",
+                              negative = "C6"
                           }))';
-                url = url.replace("P0", id).replace("A1", values[2]).replace("C2", values[3]).replace("C3", values[4]);
-                alert(url);
+                url = url.replace("P0", id).replace("A1", values[2]).replace("C2", values[3])
+                    .replace("C3", values[4]).replace("C4", values[5]).replace("C5", values[6]).replace("C6", values[7]);
+                alert(url.replace('&', '\n').replace('?','?\n'));
                 $.post(url, { "__RequestVerificationToken": $("input[name='__RequestVerificationToken']").val() }, function (r) {
                     alert('cambios guardados en la base de datos. Presione Ctrl+Z para deshacer');
                 });

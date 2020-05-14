@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -137,11 +136,16 @@ namespace BiblioMit.Controllers
             var selc = c.ToList();
             var seli = i.ToList();
 
-            ViewData["comunas"] = from Commune u in _context.Communes
-                                                  .Include(a => a.Psmbs)
-                                                  .Include(a => a.Province)
-                                                  .ThenInclude(a => a.Region)
-                                                  .Where(a => a.Psmbs.Any(b => b.Discriminator == PsmbType.ResearchCentre))
+            var rc = _context.ResearchCentres
+                .Include(a => a.Polygon)
+                .Include(c => c.Company)
+                .Include(a => a.Commune)
+                    .ThenInclude(a => a.Province)
+                        .ThenInclude(a => a.Region)
+                .Where(p => p.PolygonId.HasValue && p.CommuneId.HasValue && p.CompanyId.HasValue);
+
+            ViewData["comunas"] = from Commune u in rc
+                        .Select(a => a.Commune)
                           select new BSSVM {
                               Selected = selc.Contains(u.Id),
                               Subtext = u.Province.GetFullName(),
@@ -151,48 +155,24 @@ namespace BiblioMit.Controllers
 
             TextInfo textInfo = new CultureInfo("es-CL", false).TextInfo;
 
-            ViewData["company"] = from Company u in _context.Companies
-                .Where(a => a.Acronym != null)
-                                  select new BSSVM {
-                                      Icon = $"bib-{u.Acronym}-mono",
-                                      Tokens = u.BusinessName,
-                                      Selected = seli.Contains(u.Id),
-                                      Subtext =
-                                      $"({u.Acronym}) {u.Id}-{u.Id.RUTGetDigit()}",
-                                      Value = u.Id,
-                                      Text = textInfo.ToTitleCase(textInfo
-                                      .ToLower(u.BusinessName.Substring(0, Math.Min(u.BusinessName.Length, 50)))),
-                                      Hellip = u.BusinessName.Length > 50
-                                    };
+            ViewData["company"] = from Company u in rc.Select(c => c.Company)
+                    select new BSSVM {
+                        Icon = $"bib-{u.Acronym}-mono",
+                        Tokens = u.BusinessName,
+                        Selected = seli.Contains(u.Id),
+                        Subtext = $"({u.Acronym}) {u.GetRUT()}",
+                        Value = u.Id,
+                        Text = textInfo.ToTitleCase(textInfo
+                        .ToLower(u.BusinessName.Substring(0, Math.Min(u.BusinessName.Length, 50)))),
+                        Hellip = u.BusinessName.Length > 50
+                    };
 
             ViewData["c"] = string.Join(",",c);
             ViewData["i"] = string.Join(",",i);
 
-            var centres = _context.ResearchCentres
-                .Include(a => a.Polygon)
-                .Include(a => a.Company)
-                .Include(a => a.Commune)
-                    .ThenInclude(a => a.Province)
-                    .ThenInclude(a => a.Region)
-                .Where(a =>
-                a.PolygonId.HasValue
-                && selc.Any() && a.CommuneId.HasValue ? selc.Contains(a.CommuneId.Value) : true
-                && seli.Any() && a.CompanyId.HasValue ? seli.Contains(a.CompanyId.Value) : true
-                );
-
-            var polygons = new List<object>();
-
-            foreach (var g in centres)
-            {
-                polygons.Add(g.Polygon.Vertices.OrderBy(o => o.Order).Select(m => 
-                new {
-                    lat = m.Latitude,
-                    lng = m.Longitude
-                }));
-            }
-
-
-
+            var centres = rc
+                .Where(a => selc.Contains(a.CommuneId.Value)
+                && seli.Contains(a.CompanyId.Value));
             return View(centres);
         }
 

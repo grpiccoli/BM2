@@ -26,12 +26,12 @@
                     {
                         foreach (var input in bundle.InputFiles)
                         {
-                            this.Block(@<link href="@input.Insert(0, "~/")" rel="stylesheet" asp-append-version="true" />, style);
+                            this.Block(style, @<link href="@input.Insert(0, "~/")" rel="stylesheet" asp-append-version="true" />);
                         }
                     }
                     else
                     {
-                        this.Block(@<link href="@file" rel="stylesheet" asp-append-version="true" />, style);
+                        this.Block(style, @<link href="@file" rel="stylesheet" asp-append-version="true" />);
                     }
                 }
                 else
@@ -40,12 +40,12 @@
                     {
                         foreach (var input in bundle.InputFiles)
                         {
-                            this.Block(@<script src="@input.Insert(0, "~/")" asp-append-version="true"></script>, script);
+                            this.Block(script, @<script src="@input.Insert(0, "~/")" asp-append-version="true"></script>);
                         }
                     }
                     else
                     {
-                        this.Block(@<script src="@file" asp-append-version="true"></script>, script);
+                        this.Block(script, @<script src="@file" asp-append-version="true"></script>);
                     }
                 }
                 continuar = true;
@@ -59,11 +59,11 @@
             {
                 if (file.Contains(".css"))
                 {
-                    this.Block(@<link href="@($"{l.Destination.Replace("wwwroot", "")}/{file}")" rel="stylesheet" />, style);
+                    this.Block(style, @<link href="@($"{l.Destination.Replace("wwwroot", "")}/{file}")" rel="stylesheet" />);
                 }
                 else if (file.Contains(".js"))
                 {
-                    this.Block(@<script src="@($"{l.Destination.Replace("wwwroot", "")}/{file}")"></script>, script);
+                    this.Block(script, @<script src="@($"{l.Destination.Replace("wwwroot", "")}/{file}")"></script>);
                 }
             }
             else
@@ -82,17 +82,17 @@
                 }
                 if (file.Contains(".css"))
                 {
-                    this.Block(@<link href="@($"{Context.Request.Scheme}://{url}/{l.Library}/{file}")" rel="stylesheet"
+                    this.Block(style, @<link href="@($"{Context.Request.Scheme}://{url}/{l.Library}/{file}")" rel="stylesheet"
                                   asp-fallback-href="@($"{l.Destination.Replace("wwwroot", "")}/{file}")"
                                   asp-subresource-integrity-href="@($"{l.Destination}/{file}")"
-                                      />, style);
+                                      />);
                 }
                 else if (file.Contains(".js"))
                 {
-                    this.Block(@<script src="@($"{Context.Request.Scheme}://{url}/{l.Library}/{file}")"
+                    this.Block(script, @<script src="@($"{Context.Request.Scheme}://{url}/{l.Library}/{file}")"
                                     asp-fallback-src="@($"{l.Destination.Replace("wwwroot", "")}/{file}")"
                                     asp-subresource-integrity-src="@($"{l.Destination}/{file}")"
-                                        ></script>, script);
+                                        ></script>);
                 }
             }
         }}

@@ -6,7 +6,7 @@
     ViewData["lang"] = Localizer["en"];
 }
 
-<partial name="_LibsPg" model='new HashSet<string> { "bootstrap-select", "bibliomit", "bibico" }' />
+<partial name="_Libs0" model='new HashSet<string> { "bootstrap-select", "bibliomit", "bibico" }' />
 
 @*@section Styles{
     <link rel="stylesheet" type="text/css" href="~/css/bibico/style.min.css" asp-append-version="true" />
@@ -280,7 +280,7 @@
     <partial name="_PagingPub" view-data="ViewData" />
 }
 
-@this.Block(@<script>
+@this.Block("Scripts", @<script>
     $(function () {
         $('.title').tooltip({
             title: translate
@@ -298,6 +298,6 @@
             return localData;
         }
     });
-</script>, "Scripts")
+</script>)
 
 <partial name="_ValidationScriptsPartial" />

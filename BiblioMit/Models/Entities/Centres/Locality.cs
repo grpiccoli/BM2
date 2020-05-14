@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 
@@ -12,13 +13,17 @@ namespace BiblioMit.Models
         [Display(Name = "Unique Territorial Code CUT")]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
+        [DisallowNull]
+        [Required]
         public string Name { get; private set; }
-        public void SetName(string value)
+        public void SetName([DisallowNull] string value)
         {
             Name = value;
-            NormalizedName = value?.ToString().RemoveDiacritics().ToUpperInvariant();
+            NormalizedName = value.CleanCell();
         }
         public LocalityType Discriminator { get; set; }
+        [DisallowNull]
+        [Required]
         public string NormalizedName { get; private set; }
         public virtual ICollection<Polygon> Polygons { get; } = new List<Polygon>();
         public virtual ICollection<Census> Censuses { get; } = new List<Census>();

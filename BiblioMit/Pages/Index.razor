@@ -2,6 +2,7 @@
 
 @using GoogleMapsComponents
 @using GoogleMapsComponents.Maps
+@using BiblioMit.Models
 
 @inject IEnvironmental service
 
@@ -121,20 +122,20 @@
                 </div>
             </div>
             @*<div id="semaforo" class="row @(User.Identity.IsAuthenticated ? "" : "d-none")">
-            <div class="container-fluid">
-                <div class="row">
-                    <select class="form-control" id="tl" multiple></select>
-                </div>
-                <div class="row">
-                    <a id="info" href="#" data-toogle="popover" data-placement="right" title="Requerimientos variables semáforo">
-                        <i class="fas fa-question-circle fa-tw"> tabla de ayuda semáforo</i>
-                    </a>
-                </div>
-            </div>
-        </div>*@
+                    <div class="container-fluid">
+                        <div class="row">
+                            <select class="form-control" id="tl" multiple></select>
+                        </div>
+                        <div class="row">
+                            <a id="info" href="#" data-toogle="popover" data-placement="right" title="Requerimientos variables semáforo">
+                                <i class="fas fa-question-circle fa-tw"> tabla de ayuda semáforo</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>*@
         </div>
         <div class="col-8">
-            <GoogleMap @ref="@map1" Id="map1" Options="@mapOptions"></GoogleMap>
+            <GoogleMap @ref="@map" Id="map" Options="@mapOptions"></GoogleMap>
         </div>
     </div>
     <div class="row">
@@ -235,7 +236,7 @@
 
 @code {
     //map
-    private GoogleMap map1;
+    private GoogleMap map;
     private MapOptions mapOptions;
     //chart
     string FormatY(object value)
@@ -244,6 +245,45 @@
     }
     //init
     private EnvironmentalForm form = new EnvironmentalForm();
+    //searchers
+    public IList<SelectListItem> SelectedOrders { get; set; } = new List<SelectListItem>();
+    public IList<SelectListItem> SelectedGenus { get; set; } = new List<SelectListItem>();
+    public IList<SelectListItem> SelectedSp { get; set; } = new List<SelectListItem>();
+    public IList<SelectListItem> SelectedCommunes { get; set; } = new List<SelectListItem>();
+    public IList<SelectListItem> SelectedPsmbs { get; set; } = new List<SelectListItem>();
+    private IList<SelectListItem> selectedCatchments { get; set; } = new List<SelectListItem>();
+    public IList<SelectListItem> SelectedCatchments
+    {
+        get
+        {
+            return selectedCatchments;
+        }
+        set
+        {
+            selectedCatchments = CatchChange(selectedCatchments, value);
+        }
+    }
+    private IList<SelectListItem> CatchChange(IList<SelectListItem> oldVars, IList<SelectListItem> newVars)
+    {
+        if (form.Start.HasValue && form.End.HasValue)
+        {
+            var oldNotNew = oldVars.ExceptNull(newVars).ToList();
+            var newNotOld = newVars.ExceptNull(oldVars).ToList();
+        }
+        return newVars;
+    }
+    private IList<Variable> selectedVariables { get; set; } = new List<Variable>();
+    public IList<Variable> SelectedVariables
+    {
+        get
+        {
+            return selectedVariables;
+        }
+        set
+        {
+            selectedVariables = VarChangeAsync(selectedVariables, value).Result;
+        }
+    }
     protected override async Task OnInitializedAsync()
     {
         form.Start = service.GetMinDate();
@@ -272,55 +312,85 @@
             },
             MapTypeId = MapTypeId.Terrain
         };
+        InfoWindowOptions infoWindowOptions = new InfoWindowOptions()
+        {
+            PixelOffset = new Size()
+            {
+                Height = 50,
+                Width = 150
+            }
+        };
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await SetPolygons(
+                await service.GetCuencaPolygonsAsync().ConfigureAwait(false),
+                nameof(CatchmentArea)).ConfigureAwait(false);
+            await SetPolygons(
+                await service.GetCommunePolygonsAsync().ConfigureAwait(false),
+                nameof(Commune)).ConfigureAwait(false);
+            await SetPolygons(
+                await service.GetPsmbPolygonsAsync().ConfigureAwait(false),
+                nameof(PsmbArea)).ConfigureAwait(false);
+        }
+    }
+
+    public async Task SetPolygons(IEnumerable<PolygonOptions> polygons, string type)
+    {
+        foreach (var p in polygons)
+        {
+            var pol = await GoogleMapsComponents.Maps.Polygon.CreateAsync(map.JsRuntime, p);
+            await pol.AddListener<MouseEvent>("click", async (e) =>
+            {
+                bool select = await GraphClick(p.ZIndex.ToString(), type).ConfigureAwait(false);
+                string color = select ? "red" : "";
+                await pol.SetOptions(new PolygonOptions
+                {
+                    FillColor = color,
+                    StrokeColor = color
+                }).ConfigureAwait(false);
+            }).ConfigureAwait(false);
+            await pol.SetMap(map.InteropObject).ConfigureAwait(false);
+        }
+    }
+
+    public async Task<bool> GraphClick(string id, string type)
+    {
+        var list = type switch
+        {
+            nameof(CatchmentArea) => selectedCatchments,
+            nameof(Commune) => SelectedCommunes,
+            nameof(PsmbArea) => SelectedPsmbs,
+            _ => null
+        };
+        if (list != null)
+        {
+            var item = list.FirstOrDefault(c => c.Value == id);
+            if (item != null)
+            {
+                list.Remove(item);
+                return false;
+            }
+        }
+        var formlist = type switch
+        {
+            nameof(CatchmentArea) => form.Catchments,
+            nameof(Commune) => form.Communes,
+            nameof(PsmbArea) => form.Psmbs,
+            _ => null
+        };
+        var selectedItem = formlist.FirstOrDefault(c => c.Value == id);
+        list.Add(selectedItem);
+        return true;
     }
 
     public void OnRangeSelect(DateRange range)
     {
         //Use range.Start and range.End here
         //form.Datas.Clear();
-    }
-
-    public IList<SelectListItem> SelectedOrders { get; set; }
-    public IList<SelectListItem> SelectedGenus { get; set; }
-    public IList<SelectListItem> SelectedSp { get; set; }
-    public IList<SelectListItem> SelectedCommunes { get; set; }
-    public IList<SelectListItem> SelectedPsmbs { get; set; }
-
-    private IList<SelectListItem> selectedCatchments;
-
-    public IList<SelectListItem> SelectedCatchments
-    {
-        get
-        {
-            return selectedCatchments;
-        }
-        set
-        {
-            selectedCatchments = CatchChange(selectedCatchments, value);
-        }
-    }
-    private IList<SelectListItem> CatchChange(IList<SelectListItem> oldVars, IList<SelectListItem> newVars)
-    {
-        if (form.Start.HasValue && form.End.HasValue)
-        {
-            var oldNotNew = oldVars.ExceptNull(newVars).ToList();
-            var newNotOld = newVars.ExceptNull(oldVars).ToList();
-        }
-        return newVars;
-    }
-
-    private IList<Variable> selectedVariables;
-
-    public IList<Variable> SelectedVariables
-    {
-        get
-        {
-            return selectedVariables;
-        }
-        set
-        {
-            selectedVariables = VarChangeAsync(selectedVariables, value).Result;
-        }
     }
 
     private async Task<IList<Variable>> VarChangeAsync(IList<Variable> oldVars, IList<Variable> newVars)

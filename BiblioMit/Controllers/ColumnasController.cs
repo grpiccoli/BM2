@@ -77,18 +77,21 @@ namespace BiblioMit.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<JsonResult> Editar(int id, string description, string headers, string conversion)
+        public async Task<JsonResult> Editar(int id, string description, string headers, string conversion, int places, char separator, bool negative)
         {
             var model = await _context.Registries
                 .FindAsync(id).ConfigureAwait(false);
             var heads = _context.Headers.Where(h => h.RegistryId == id);
             model.Description = string.IsNullOrWhiteSpace(description) ? null : description;
             model.Operation = string.IsNullOrWhiteSpace(conversion) ? null : conversion;
+            model.DecimalPlaces = places;
+            model.DecimalSeparator = separator;
+            model.DeleteAfter2ndNegative = negative;
             var all = headers?.Split(";;");
             if (all.Any())
             {
-                var newh = all.Select(a => { var h = new Header(); h.SetName(a); return h; });
                 _context.Headers.RemoveRange(heads);
+                var newh = all.Select(a => { var h = new Header { RegistryId = id }; h.SetName(a); return h; });
                 _context.Headers.AddRange(newh);
             }
             _context.Registries.Update(model);

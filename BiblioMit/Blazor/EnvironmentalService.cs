@@ -1,6 +1,7 @@
 ﻿using BiblioMit.Data;
 using BiblioMit.Extensions;
 using ChartJs.Blazor.ChartJS.Common.Time;
+using GoogleMapsComponents.Maps;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -170,6 +171,69 @@ namespace BiblioMit.Blazor
                         v).ConfigureAwait(false));
                 }
             return resp;
+        }
+        public async Task<IEnumerable<PolygonOptions>> GetCuencaPolygonsAsync()
+        {
+            var polygonsCom = await _context.CatchmentAreas
+                .Include(p => p.Polygon)
+                    .ThenInclude(p => p.Vertices)
+                .ToListAsync().ConfigureAwait(false);
+            return polygonsCom
+                .Select(p => new PolygonOptions
+                {
+                    Paths = new List<IEnumerable<LatLngLiteral>>
+                    {
+                        p.Polygon.Vertices.OrderBy(v => v.Order)
+                        .Select(v => new LatLngLiteral
+                        {
+                            Lat = v.Latitude,
+                            Lng = v.Longitude
+                        })
+                    },
+                    ZIndex = p.Id
+                });
+        }
+        public async Task<IEnumerable<PolygonOptions>> GetCommunePolygonsAsync()
+        {
+            var polygonsCom = await _context.Communes
+                .Include(p => p.Polygons)
+                    .ThenInclude(p => p.Vertices)
+                .Where(p => p.CatchmentAreaId.HasValue)
+                .ToListAsync().ConfigureAwait(false);
+            return polygonsCom
+                .Select(p => new PolygonOptions 
+                {
+                    Paths = p.Polygons
+                    .Select(g => g.Vertices.OrderBy(v => v.Order)
+                    .Select(v => new LatLngLiteral 
+                    { 
+                        Lat = v.Latitude, 
+                        Lng = v.Longitude 
+                    })),
+                    ZIndex = p.Id
+                });
+        }
+        public async Task<IEnumerable<PolygonOptions>> GetPsmbPolygonsAsync()
+        {
+            var polygonsCom = await _context.PsmbAreas
+                .Include(p => p.Polygon)
+                    .ThenInclude(p => p.Vertices)
+                .Where(p => p.PolygonId.HasValue)
+                .ToListAsync().ConfigureAwait(false);
+            return polygonsCom
+                .Select(p => new PolygonOptions
+                {
+                    Paths = new List<IEnumerable<LatLngLiteral>>
+                    {
+                        p.Polygon.Vertices.OrderBy(v => v.Order)
+                        .Select(v => new LatLngLiteral
+                        {
+                            Lat = v.Latitude,
+                            Lng = v.Longitude
+                        })
+                    },
+                    ZIndex = p.Id
+                });
         }
     }
 }

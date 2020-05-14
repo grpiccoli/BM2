@@ -1,7 +1,12 @@
-﻿namespace BiblioMit.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BiblioMit.Models
 {
     public enum Item
     {
-        Product, Resource
+        [Display(Name = "PRODUCTO")]
+        Product = 0,
+        [Display(Name = "RECURSO")]
+        Resource = 1
     }
 }

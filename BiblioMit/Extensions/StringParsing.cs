@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using NCalc;
+using System.Collections.Generic;
 
 namespace BiblioMit.Extensions
 {
@@ -31,7 +32,7 @@ namespace BiblioMit.Extensions
             double? num = null;
             if (decimalSeparator.HasValue)
             {
-                text = Regex.Replace(text, @$"[^\d]{decimalSeparator.Value}", "");
+                text = Regex.Replace(text, @$"[^\d]\{decimalSeparator.Value}", "");
                 if (string.IsNullOrEmpty(text)) return null;
                 var orders = text.Split(decimalSeparator.Value);
                 if(orders.Length > 1)
@@ -52,13 +53,15 @@ namespace BiblioMit.Extensions
                 text = Regex.Replace(text, @"\.+", ".");
                 text = Regex.Replace(text, @",+", ",");
                 if (string.IsNullOrEmpty(text)) return null;
-                var separators = Regex.Matches(text, @"\D").Select(m => m.Value);
+                bool negative = text.First() == '-';
+                char sign = negative ? '-' : '+';
+                //var separators = Regex.Matches(text, @"\D").Select(m => m.Value);
                 var orders = Regex.Matches(text, @"[0-9]+").Select(m => m.Value);
-                var negative = text.First() == '-';
                 num = orders.Count() switch
                 {
-                    1 => double.Parse(orders.First(), CultureInfo.InvariantCulture),
-                    _ => double.Parse($"{orders.First()}.{orders.Last()}", CultureInfo.InvariantCulture)
+                    1 => double.Parse($"{sign}{orders.First()}", CultureInfo.InvariantCulture),
+                    2 => SolveDouble(sign,orders.First(),orders.Last()),
+                    _ => double.Parse($"{sign}{string.Join("",orders.SkipLast(1))}.{orders.Last()}", CultureInfo.InvariantCulture)
                 };
             }
             if (operation != null)
@@ -66,6 +69,15 @@ namespace BiblioMit.Extensions
                 return (double)Evaluate(num, operation);
             }
             return num;
+        }
+        public static double? SolveDouble(char sign, string head, string tail)
+        {
+            if (tail == null) return null;
+            return tail.Length switch
+            {
+                3 => null,
+                _ => double.Parse($"{sign}{head}.{tail}", CultureInfo.InvariantCulture)
+            };
         }
         public static int? ParseInt(this string text, bool? deleteAfter2ndNegative = null, string operation = null)
         {
@@ -92,15 +104,13 @@ namespace BiblioMit.Extensions
         }
         public static ProductionType? ParseProductionType(this string text)
         {
-            foreach (var tipo in Enum.GetNames(typeof(ProductionType)))
+            if (text == null) return 0;
+            IEnumerable<string> tipos = ProductionType.Unknown.GetNamesList();
+            for (int i = 1; i < tipos.Count(); i++)
             {
-                if (text.Contains(tipo.ToString(CultureInfo.InvariantCulture)
-                    .ToUpperInvariant(),
-                    StringComparison.Ordinal))
+                if (text.Contains(tipos.ElementAt(i), StringComparison.Ordinal))
                 {
-                    var parsed = Enum.TryParse(tipo, out ProductionType production);
-                    if (parsed)
-                        return production;
+                    return (ProductionType)i;
                 }
             }
             return ProductionType.Unknown;
@@ -108,22 +118,20 @@ namespace BiblioMit.Extensions
         public static Item? ParseItem(this string text)
         {
             if (text == null) return null;
-            foreach (var tipo in Enum.GetNames(typeof(Item)))
+            IEnumerable<string> tipos = Item.Product.GetNamesList();
+            for (int i = 0; i < tipos.Count(); i++)
             {
-                if (text[0].Equals(
-                    tipo.ToString(CultureInfo.InvariantCulture)[0].ToString(CultureInfo.InvariantCulture).ToUpperInvariant()))
+                if (text[0].Equals(tipos.ElementAt(i)[0]))
                 {
-                    var parsed = Enum.TryParse(tipo, out Item production);
-                    if (parsed)
-                        return production;
+                    return (Item)i;
                 }
             }
             return null;
         }
-        public static DeclarationType? ParseTipo(this string text)
-        {
-            if (text == null) return null;
-            return text[0].Equals("M") ? DeclarationType.RawMaterial : DeclarationType.Production;
-        }
+        //public static DeclarationType? ParseTipo(this string text)
+        //{
+        //    if (text == null) return null;
+        //    return text[0].Equals("M") ? DeclarationType.RawMaterial : DeclarationType.Production;
+        //}
     }
 }

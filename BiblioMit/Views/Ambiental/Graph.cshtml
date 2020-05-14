@@ -2,31 +2,26 @@
     ViewData["Title"] = "Plataforma Ambiental";
 }
 
-@section Styles{
-    <link rel="stylesheet" href="~/lib/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/lib/choices.js/public/assets/styles/choices.min.css" asp-append-version="true" />
-}
-
-@section Scripts{
-    <script src="~/lib/jquery/dist/jquery.min.js" type="text/javascript" language="javascript" asp-append-version="true"></script>
-    <script src="~/lib/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js" type="text/javascript" language="javascript" asp-append-version="true"></script>
-    <script src="~/lib/bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js" type="text/javascript" language="javascript" asp-append-version="true"></script>
-    <script src="~/lib/choices.js/public/assets/scripts/choices.min.js" type="text/javascript" language="javascript" asp-append-version="true"></script>
-    <script src="~/files/graph.js" type="text/javascript" language="javascript" asp-append-version="true"></script>
-}
+@*tested with:
+    amcharts v4.1.6 updated to 4.9.20
+    marker clusterer v5.0.3*@
+<partial name="_GMaps" />
+<partial name="_ValidationScriptsPartial" />
+<partial name="_AmCharts" />
+<partial name="_LibsPg" model='new HashSet<string> { "@google/markerclustererplus", "bootstrap-datepicker", "choices.js", "moment.js", "popperjs", "tippy.js", "jqueryui" }' />
 
 <div class="container-fluid">
     <div class="row">
         <div class="col-4">
             <div class="row">
                 <div class="input-group input-daterange">
-                    <input id="start" disabled="disabled" type="text" class="form-control actual_range" value="@ViewData["start"]">
+                    <input id="start" type="text" class="form-control actual_range" value="@ViewData["start"]">
                     <div class="input-group-append">
                         <div class="input-group-text">
                             a
                         </div>
                     </div>
-                    <input id="end" disabled="disabled" type="text" class="form-control actual_range" value="@ViewData["end"]">
+                    <input id="end" type="text" class="form-control actual_range" value="@ViewData["end"]">
                 </div>
             </div>
             <div class="row">
@@ -48,9 +43,9 @@
                             </div>
                         </div>
                         <div class="row">
-                            <a id="info" href="#" data-toogle="popover" data-placement="right" title="Requerimientos variables semáforo">
+                            <button id="infobtn" class="btn btn-sm">
                                 <i class="fas fa-question-circle fa-tw"> tabla de ayuda semáforo</i>
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -64,91 +59,82 @@
         <div class="chartdiv w-100" style="height:300px;"></div>
     </div>
 </div>
-
-<div id="infotable" class="d-none" style="float:right;">
-    <table class="small table-striped text-center w-100">
-        <tr>
-            <th>Análisis</th>
-            <th>PSMB</th>
-            <th>Especie</th>
-            <th>Talla</th>
-            <th>Larva</th>
-            <th>Est.Repr.</th>
-            <th>Sexo</th>
-        </tr>
-        <tr>
-            <th class="text-left">Captura por Especie</th>
-            <td>&#x2713;</td>
-            <td>&#x2713;</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <th class="text-left">% Especie</th>
-            <td>&#x2713;</td>
-            <td>&#x2713;</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <th class="text-left">% Talla por Especie</th>
-            <td>&#x2713;</td>
-            <td>&#x2713;</td>
-            <td>&#x2713;</td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <th class="text-left">Prom Larvas por Especie</th>
-            <td>&#x2713;</td>
-            <td>&#x2713;</td>
-            <td></td>
-            <td>&#x2713;</td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <th class="text-left">IG Reproductores</th>
-            <td>&#x2713;</td>
-            <td>&#x2713;</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>&#x2713;</td>
-        </tr>
-        <tr>
-            <th class="text-left">% Est.Repr.</th>
-            <td>&#x2713;</td>
-            <td>&#x2713;</td>
-            <td></td>
-            <td></td>
-            <td>&#x2713;</td>
-            <td></td>
-        </tr>
-        <tr>
-            <th class="text-left">% Sexo</th>
-            <td>&#x2713;</td>
-            <td>&#x2713;</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>&#x2713;</td>
-        </tr>
-    </table>
-</div>
-
-<partial name="_ValidationScriptsPartial" />
-
-@section ScripTop{
-    <script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCkBD_nY7LaeVohfyIt-M2a2BuIhuy-51c&language=es&region=CL"></script>
-    <script src="https://www.amcharts.com/lib/version/4.1.6/core.js"></script>
-    <script src="https://www.amcharts.com/lib/version/4.1.6/charts.js"></script>
-    <script src="https://www.amcharts.com/lib/version/4.1.6/themes/kelly.js"></script>
-    <script src="https://www.amcharts.com/lib/version/4.1.6/lang/es_ES.js"></script>
+@if (User.Identity.IsAuthenticated)
+{
+    <div id="infotable" class="d-none" style="float:right;">
+        <table class="small table-striped text-center w-100">
+            <tr>
+                <th>Análisis</th>
+                <th>PSMB</th>
+                <th>Especie</th>
+                <th>Talla</th>
+                <th>Larva</th>
+                <th>Est.Repr.</th>
+                <th>Sexo</th>
+            </tr>
+            <tr>
+                <th class="text-left">Captura por Especie</th>
+                <td>&#x2713;</td>
+                <td>&#x2713;</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <th class="text-left">% Especie</th>
+                <td>&#x2713;</td>
+                <td>&#x2713;</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <th class="text-left">% Talla por Especie</th>
+                <td>&#x2713;</td>
+                <td>&#x2713;</td>
+                <td>&#x2713;</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <th class="text-left">Prom Larvas por Especie</th>
+                <td>&#x2713;</td>
+                <td>&#x2713;</td>
+                <td></td>
+                <td>&#x2713;</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <th class="text-left">IG Reproductores</th>
+                <td>&#x2713;</td>
+                <td>&#x2713;</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>&#x2713;</td>
+            </tr>
+            <tr>
+                <th class="text-left">% Est.Repr.</th>
+                <td>&#x2713;</td>
+                <td>&#x2713;</td>
+                <td></td>
+                <td></td>
+                <td>&#x2713;</td>
+                <td></td>
+            </tr>
+            <tr>
+                <th class="text-left">% Sexo</th>
+                <td>&#x2713;</td>
+                <td>&#x2713;</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>&#x2713;</td>
+            </tr>
+        </table>
+    </div>
 }

@@ -1,0 +1,18 @@
+﻿@model string
+@{ var version = string.IsNullOrWhiteSpace(Model) ? "4" : Model; }
+@if (int.Parse(version[0].ToString()) >= 4)
+{
+    @this.Blocks("TOPScripts",
+    @<script src="https://www.amcharts.com/lib/@version/core.js"></script>,
+    @<script src="https://www.amcharts.com/lib/@version/charts.js"></script>,
+    @<script src="https://www.amcharts.com/lib/@version/themes/kelly.js"></script>,
+    @<script src="https://www.amcharts.com/lib/@version/lang/es_ES.js"></script>)
+}
+else
+{
+    @this.Blocks("TOPScripts", 
+    @<script src="https://www.amcharts.com/lib/@version/amcharts.js"></script>,
+    @<script src="https://www.amcharts.com/lib/@version/pie.js"></script>,
+    @<script src="https://www.amcharts.com/lib/@version/gauge.js"></script>,
+    @<script src="https://www.amcharts.com/lib/@version/plugins/export/export.js"></script>)
+}

@@ -1,11 +1,11 @@
 ﻿
-<partial name="_LibsPg" model='new HashSet<string> { "dragndrop" }' />
+<partial name="_Libs0" model='new HashSet<string> { "dragndrop" }' />
 
 @if (ViewData["Error"] != null)
 {
-    @this.Block(@<script>
+    @this.Block("Scripts", @<script>
             $(document).ready(function () {
                 alert('ERROR: @ViewData["Error"] Por favor verifique el formato del archivo y vuelva a intentarlo');
              })
-    </script>, "Scripts")
+    </script>)
 }

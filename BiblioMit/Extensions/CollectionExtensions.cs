@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BiblioMit.Models.Entities.Digest;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,6 +14,53 @@ namespace BiblioMit.Extensions
         {
             list?.Clear();
             listToAdd.ForEach(x => list.Add(x));
+        }
+        public static void AddOrSum(this ICollection<DeclarationDate> dates, DeclarationDate date)
+        {
+            if (date == null) return;
+            if (dates == null) dates = new List<DeclarationDate>();
+            if (dates.Any(d => d.Date == date.Date))
+            {
+                dates.FirstOrDefault(d => d.Date == date.Date).Weight += date.Weight;
+            }
+            else
+            {
+                dates.Add(date);
+            }
+        }
+        public static async void AddOrChange(this DbSet<DeclarationDate> dates, DeclarationDate date)
+        {
+            if (date == null || dates == null) return;
+            if (dates.Any(d => d.SernapescaDeclarationId == date.SernapescaDeclarationId && d.Date == date.Date))
+            {
+                var old = await dates
+                    .FirstOrDefaultAsync(d => d.SernapescaDeclarationId == date.SernapescaDeclarationId && d.Date == date.Date)
+                    .ConfigureAwait(false);
+                old.Weight = date.Weight;
+                dates.Update(old);
+            }
+            dates.Add(date);
+        }
+        public static void Move<T>(this List<T> list, int oldIndex, int newIndex)
+        {
+            if (list == null) return;
+            T item = list[oldIndex];
+            list.RemoveAt(oldIndex);
+            list.Insert(newIndex, item);
+        }
+        public static void MoveFirst<T>(this List<T> list, Func<T, bool> func)
+        {
+            if (list == null) return;
+            T item = list.FirstOrDefault(func);
+            list.Remove(item);
+            list.Prepend(item);
+        }
+        public static void MoveLast<T>(this List<T> list, Func<T, bool> func)
+        {
+            if (list == null) return;
+            T item = list.FirstOrDefault(func);
+            list.Remove(item);
+            list.Append(item);
         }
         public static IEnumerable<TKey> ExceptNull<TKey>(this IEnumerable<TKey> list, IEnumerable<TKey> listExcept)
         {
