@@ -696,7 +696,7 @@ declare namespace google.maps {
         setOpacity(opacity: number | null): void;
         /** @see {@link https://developers.google.com/maps/documentation/javascript/reference/marker#Marker.setOptions Maps JavaScript API} */
         setOptions(options: ReadonlyMarkerOptions): void;
-    /** @see {@link https://developers.google.com/maps/documentation/javascript/reference/marker#Marker.setPosition Maps JavaScript API} */
+        /** @see {@link https://developers.google.com/maps/documentation/javascript/reference/marker#Marker.setPosition Maps JavaScript API} */
         setPlace(options: ReadonlyPlaceOptions): void;
         setPosition(latlng: LatLng | ReadonlyLatLngLiteral | null): void;
         /** @see {@link https://developers.google.com/maps/documentation/javascript/reference/marker#Marker.setShape Maps JavaScript API} */

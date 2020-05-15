@@ -12,9 +12,9 @@
     "@types/signalr": "^2.2.36",
     "@types/bootstrap": "^4.3.2",
     "@types/bootstrap-select": "^1.11.1",
-    "@types/amcharts": "^3.21.5",
     "@types/bootstrap-datepicker": "^0.0.14",
     "@types/moment": "^2.13.0",
+    "@types/modernizr": "^3.5.3",
     "cldr-data-downloader": "^0.3.5",
     "google-translate-api": "^2.3.0"
   },

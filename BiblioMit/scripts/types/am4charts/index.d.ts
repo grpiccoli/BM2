@@ -16,6 +16,7 @@
 
 declare class am4charts {
     static DateAxis: any;
+    static Legend: any;
     static ValueAxis: any;
     static XYChart: any;
     static XYCursor: any;

@@ -1,3 +1,3 @@
-﻿declare class signalR{
+﻿declare class signalR {
     static HubConnectionBuilder: any;
 }

@@ -1,26 +1,5 @@
-﻿//CHART
-am4core.useTheme(am4themes_kelly);
-var chart:any = am4core.create('chartdiv', am4charts.XYChart);
-chart.scrollbarX = new am4core.Scrollbar();
-chart.scrollbarX.parent = chart.bottomAxesContainer;
-chart.scrollbarY = new am4core.Scrollbar();
-chart.scrollbarY.parent = chart.leftAxesContainer;
-chart.language.locale = am4lang_es_ES;
-var dataSource = chart.dataSource;
-var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
-dateAxis.dataFields.category = 'date';
-//dateAxis.dateFormats.setKey("day", "MM");
-//dateAxis.dateFormats.setKey("month", "MMM");
-dateAxis.dateFormats.setKey('year', 'yy');
-dateAxis.periodChangeDateFormats.setKey('month', 'MMM yy');
-dateAxis.tooltipDateFormat = 'dd MMM, yyyy';
-dateAxis.renderer.minGridDistance = 40;
-var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
-chart.cursor = new am4charts.XYCursor();
-chart.cursor.xAxis = dateAxis;
-chart.exporting.menu = new am4core.ExportMenu();
-$.getJSON('/ambiental/exportmenu', menu => chart.exporting.menu.items = menu);
-var series:any = new Object();
+﻿//out vars
+var series: any = new Object();
 var choiceOps = {
     maxItemCount: 10,
     removeItemButton: true,
@@ -34,7 +13,7 @@ var choiceOps = {
     noResultsText: 'Sin resultados',
     noChoicesText: 'Sin opciones a elegir',
     itemSelectText: 'Presione para seleccionar',
-    maxItemText: (maxItemCount:number) => {
+    maxItemText: (maxItemCount: number) => {
         return `Máximo ${maxItemCount} valores`;
     },
     fuseOptions: {
@@ -45,43 +24,87 @@ const etl = document.getElementById('tl');
 choiceOps.placeholderValue = 'Variables semáforo';
 const tl = new Choices(etl, choiceOps);
 const semaforo = !document.getElementById('semaforo').classList.contains('d-none');
+//passive support
+var supportsPassiveOption = false;
+try {
+    var opts = Object.defineProperty({}, 'passive', {
+        get: function () {
+            supportsPassiveOption = true;
+            return;
+        }
+    });
+    var noop = function () { };
+    window.addEventListener('testPassiveEventSupport', noop, opts);
+    window.removeEventListener('testPassiveEventSupport', noop, opts);
+} catch (e) { }
+//CHART
+var chart: any = am4core.create("chartdiv", am4charts.XYChart);
+am4core.ready(async function () {
+    am4core.useTheme(am4themes_kelly);
+    //chart.scrollbarX = new am4core.Scrollbar();
+    //chart.scrollbarY = new am4core.Scrollbar();
+    chart.language.locale = am4lang_es_ES;
+    var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+    dateAxis.dataFields.category = 'date';
+    //dateAxis.dateFormats.setKey("day", "MM");
+    //dateAxis.dateFormats.setKey("month", "MMM");
+    dateAxis.dateFormats.setKey('year', 'yy');
+    dateAxis.periodChangeDateFormats.setKey('month', 'MMM yy');
+    dateAxis.tooltipDateFormat = 'dd MMM, yyyy';
+    dateAxis.renderer.minGridDistance = 40;
+    var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+    chart.legend = new am4charts.Legend();
+    chart.cursor = new am4charts.XYCursor();
+    chart.exporting.menu = new am4core.ExportMenu();
+    await fetch('/ambiental/exportmenu').then(j => j.json())
+        .then(menu => chart.exporting.menu.items = menu);
+});
 //LOAD DATA
-function fetchData(url:string, tag:string, name:string) {
-    return fetch(url)
+async function fetchData(url:string, tag:string, name:string) {
+    return await fetch(url)
         .then(data => data.json())
         .then(j => {
             var counter = 0;
-            chart.data.forEach((c:any) => {
+            chart.data.map((c: any) => {
                 if (counter < j.length && c.date == j[counter].date) {
                     c[tag] = j[counter].value;
                     counter++;
                 }
-            })
+            });
             series[tag] = chart.series.push(new am4charts.LineSeries());
             series[tag].dataFields.valueY = tag;
             series[tag].dataFields.dateX = 'date';
             series[tag].name = name;
             series[tag].tooltipText = '{name}: [bold]{valueY}[/]';
-            series[tag].tooltip.pointerOrientation = 'vertical';
+            series[tag].showOnInit = false;
         });
 }
 async function loadData(values: any, event: any, boolpsmb: boolean) {
     psmb.disable();
     variables.disable();
     if (semaforo) tl.disable();
-    //var tag, area tag, var name, area name, group value
-    var sd = $('#start').val();
-    var ed = $('#end').val();
+    var sd = $('#start').val(), ed = $('#end').val();
+    var x:any = [], st = 0, rd = 0, grp = true;
+    if (boolpsmb) {
+        //var tag, area tag, var name, area name, group value
+        x = [null, event.value, null, event.label, null];
+        rd = st + 4;
+    } else {
+        x = [event.value, null, event.label, null, event.groupValue === "Fitoplancton" ? "fito" : "graph"];
+        st++;
+        grp = false;
+    }
+    var nd = st + 2;
     var promises = values.map((e:any) => {
-        var x = boolpsmb ? [e.value, event.value, e.label, event.label, e.groupId === 2 ? "fito" : "graph"] :
-            [event.value, e.value, event.label, e.label, event.groupValue === "Fitoplancton" ? "fito" : "graph"];
+        x[st] = e.value;
+        x[nd] = e.label;
+        if (grp) x[rd] = e.groupId === 2 ? "fito" : "graph";
         var tag = `${x[0]}_${x[1]}`;
         var name = `${x[2]} ${x[3]}`;
         var url = `/ambiental/${x[4]}data?area=${x[1]}&var=${x[0]}&start=${sd}&end=${ed}`;
         return fetchData(url, tag, name);
     });
-    Promise.all(promises).then(r => {
-        chart.invalidateData();
+    Promise.all(promises).then(_ => {
         psmb.enable();
         variables.enable();
         if (semaforo) tl.enable();
@@ -96,14 +119,14 @@ const epsmb = document.getElementById('psmb');
 epsmb.addEventListener('addItem', (event: any) => {
     loadData(variables.getValue(), event.detail, true);
     clickMap(event);
-}, false);
+}, supportsPassiveOption ? { passive: true } : false);
 epsmb.addEventListener('removeItem', (event: any) => {
     variables.getValue(true).forEach((e:any) => {
         var name = `${e}_${event.detail.value}`;
         chart.series.removeIndex(chart.series.indexOf(series[name])).dispose();
     });
     clickMap(event);
-}, false);
+}, supportsPassiveOption ? { passive: true } : false);
 
 async function getList(name:string) {
     return await fetch(`/ambiental/${name}list`)
@@ -116,13 +139,13 @@ psmb.setChoices(async () => await getList('psmb'));
 const evariable = document.getElementById('variable');
 evariable.addEventListener('addItem', (event:any) =>
     loadData(psmb.getValue(), event.detail, false)
-    , false);
+    , supportsPassiveOption ? { passive: true } : false);
 evariable.addEventListener('removeItem', (event: any) => {
     psmb.getValue(true).forEach((e:any) => {
         var name = `${event.detail.value}_${e}`;
         chart.series.removeIndex(chart.series.indexOf(series[name])).dispose();
     });
-}, false);
+}, supportsPassiveOption ? { passive: true } : false);
 choiceOps.placeholderValue = 'Seleccione variables';
 const variables = new Choices(evariable, choiceOps);
 variables.setChoices(async () => await getList('variable'));
@@ -185,7 +208,7 @@ if (semaforo) {
                 alert('PSMB y especie no seleccionados, seleccione requerimientos y luego análisis');
             }
         }
-    }, false);
+    }, supportsPassiveOption ? { passive: true } : false);
     etl.addEventListener('removeItem', (event: any) => {
         if (event.detail.groupValue === 'Análisis') {
             var a = event.detail.value;
@@ -208,13 +231,8 @@ if (semaforo) {
                 }
             }
         }
-    }, false);
+    }, supportsPassiveOption ? { passive: true } : false);
     tl.setChoices(async () => await getList('tl'));
-    new tippy('#infobtn', {
-        content: document.getElementById('infotable').innerHTML,
-        allowHTML: true,
-        animation: 'scale'
-    });
 }
 //MAP
 function Area(path: google.maps.LatLng[] | google.maps.MVCArray<google.maps.LatLng>) {
@@ -260,12 +278,10 @@ var infowindow = new google.maps.InfoWindow({
 });
 var polygons:any = {};
 window.onload = async function initMap() {
+    var bnds: google.maps.LatLngBounds = new google.maps.LatLngBounds();
     await fetch('/ambiental/mapdata')
         .then(r => r.json())
         .then(data => {
-            var bounds = getBounds(data.slice(0, 3).map((c:any) => c.position));
-            map.fitBounds(bounds);
-            map.setCenter(bounds.getCenter());
             return data.map((dato:any) => {
                 var consessionPolygon = new google.maps.Polygon({
                     paths: dato.position,
@@ -274,8 +290,10 @@ window.onload = async function initMap() {
                 consessionPolygon.setMap(map);
                 consessionPolygon.addListener('click', addListenerOnPolygon);
                 polygons[dato.id] = consessionPolygon;
+                var center = getBounds(dato.position).getCenter();
+                if(dato.id < 4) bnds.extend(center);
                 var marker = new google.maps.Marker({
-                    position: getBounds(dato.position).getCenter(),
+                    position: center,
                     title: `${dato.name} ${dato.id}`
                 });
                 marker.addListener('click', (marker =>
@@ -308,13 +326,15 @@ window.onload = async function initMap() {
 <img src="../images/ico/subpesca.png" height="30" /></a></td></tr>`;
                         infowindow.setContent(content);
                         infowindow.open(map, marker);
-                        map.setCenter(marker.getPosition());
+                        //map.setCenter(marker.getPosition());
                     })(marker));
                 return marker;
             });
         }).then(m =>
-            new MarkerClusterer(map, m, { imagePath: 'https://unpkg.com/@google/markerclustererplus/images/m' })
+            new MarkerClusterer(map, m, { imagePath: '/images/markers/m' })
         ).then(_ => {
+            map.fitBounds(bnds);
+            map.setCenter(bnds.getCenter());
             loadDates();
             variables.setChoiceByValue('t');
             psmb.setChoiceByValue('1');

@@ -1,4 +1,4 @@
-declare class Choices {
+﻿declare class Choices {
     ajax(callback: any): any;
     constructor(element: HTMLElement, options: ChoicesOptions);
     hideDropdown(): void;

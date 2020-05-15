@@ -3,37 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
 using System.Reflection;
 using System.ComponentModel.DataAnnotations;
-using System.Resources;
-using System.ComponentModel;
 using System.Globalization;
+using BiblioMit.Controllers;
 
 namespace BiblioMit.Extensions
 {
-    public sealed class LocalizedDescriptionAttribute : DescriptionAttribute
-    {
-        private readonly string _resourceKey;
-        private readonly ResourceManager _resource;
-        public LocalizedDescriptionAttribute(
-            string resourceKey,
-            Type resourceType)
-        {
-            _resource = new ResourceManager(resourceType);
-            _resourceKey = resourceKey;
-        }
-        public override string Description
-        {
-            get
-            {
-                string displayName = _resource.GetString(_resourceKey, CultureInfo.InvariantCulture);
-                return string.IsNullOrEmpty(displayName)
-                    ? string.Format(CultureInfo.InvariantCulture, "{0}", _resourceKey)
-                    : displayName;
-            }
-        }
-    }
     [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Extensions require 'this' parameter")]
     public static partial class EnumExtensions
     {
@@ -52,22 +28,36 @@ namespace BiblioMit.Extensions
             IDictionary<string, List<string>> Filters = null)
             where TEnum : struct, IConvertible, IFormattable => 
             new MultiSelectList(((TEnum[])Enum.GetValues(typeof(TEnum)))
-                .Select(async s => new SelectListItem
+                .Select(s => new SelectListItem
                 { 
                     Value = s.ToString("d", null),
-                    Text = await s.GetAttrDescriptionAsync().ConfigureAwait(false)
-                }).Select(t => t.Result),
+                    Text = s.GetAttrDescription()
+                }),
                 Filters != null
                 && Filters.ContainsKey(typeof(TEnum).ToString()) ? Filters[typeof(TEnum).ToString()] : null);
-        public static MultiSelectList Name2MultiSelect<TEnum>(this TEnum @enum,
+        public static IEnumerable<ChoicesGroup> Enum2ChoicesGroup<TEnum>(this TEnum @enum)
+            where TEnum : struct, IConvertible, IFormattable =>
+            ((TEnum[])Enum.GetValues(typeof(TEnum))).GroupBy(e => e.GetAttrGroupName())
+            .OrderBy(g => g.Key)
+            .Select((g, i) => new ChoicesGroup
+                {
+                    Label = g.Key,
+                    Id = i,
+                    Choices = g.Select(t => new ChoicesItem 
+                    { 
+                        Label = $"{t.GetAttrName()} ({t.GetAttrPrompt()})", 
+                        Value = t.ToString()
+                    })
+                });
+    public static MultiSelectList Name2MultiSelect<TEnum>(this TEnum @enum,
             IDictionary<string, List<string>> Filters = null)
             where TEnum : struct, IConvertible, IFormattable =>
             new MultiSelectList(((TEnum[])Enum.GetValues(typeof(TEnum)))
-                .Select(async s => new SelectListItem
+                .Select(s => new SelectListItem
                 {
                     Value = s.ToString("d", null),
-                    Text = await s.GetAttrNameAsync().ConfigureAwait(false)
-                }).Select(t => t.Result),
+                    Text = s.GetAttrName()
+                }),
                 Filters != null
                 && Filters.ContainsKey(typeof(TEnum).ToString()) ? Filters[typeof(TEnum).ToString()] : null);
         public static MultiSelectList Flag2MultiSelect<TEnum>(this TEnum @enum,
@@ -92,150 +82,60 @@ namespace BiblioMit.Extensions
             };
         public static IEnumerable<SelectListItem> Name2Select<TEnum>(this TEnum @enum)
             where TEnum : struct, IConvertible, IFormattable => ((TEnum[])Enum.GetValues(typeof(TEnum)))
-                .Select(async t => new SelectListItem
+                .Select(t => new SelectListItem
                 {
                     Value = t.ToString("d", null),
-                    Text = await t.GetAttrNameAsync().ConfigureAwait(false)
-                }).Select(t => t.Result);
+                    Text = t.GetAttrName()
+                });
         public static IEnumerable<SelectListItem> Description2Select<TEnum>(this TEnum @enum)
-            where TEnum : struct, IConvertible, IFormattable => ((TEnum[])Enum.GetValues(typeof(TEnum)))
-                .Select(async t => new SelectListItem
-                {
-                    Value = t.ToString("d", null),
-                    Text = await t.GetAttrDescriptionAsync().ConfigureAwait(false)
-                }).Select(t => t.Result);
-        public static IEnumerable<SelectListItem> Flag2Select<TEnum>(this TEnum @enum)
             where TEnum : struct, IConvertible, IFormattable => ((TEnum[])Enum.GetValues(typeof(TEnum)))
                 .Select(t => new SelectListItem
                 {
                     Value = t.ToString("d", null),
-                    Text = t.ToString()
+                    Text = t.GetAttrDescription()
                 });
+        public static IEnumerable<SelectListItem> Flag2Select<TEnum>(this TEnum @enum)
+            where TEnum : struct, IConvertible, IFormattable => 
+            ((TEnum[])Enum.GetValues(typeof(TEnum))).Select(t => 
+            new SelectListItem
+            {
+                Value = t.ToString("d", null),
+                Text = t.ToString()
+            });
         public static IEnumerable<TEnum> Enum2List<TEnum>(this TEnum @enum)
-            where TEnum : struct, IConvertible, IFormattable => ((TEnum[])Enum.GetValues(typeof(TEnum)))
-                .Select(t => t);
+            where TEnum : struct, IConvertible, IFormattable => 
+            ((TEnum[])Enum.GetValues(typeof(TEnum))).Select(t => t);
         public static IEnumerable<string> Enum2ListNames<TEnum>(this TEnum @enum)
-            where TEnum : struct, IConvertible, IFormattable => ((TEnum[])Enum.GetValues(typeof(TEnum)))
-        .Select(t => t.ToString());
+            where TEnum : struct, IConvertible, IFormattable => 
+            ((TEnum[])Enum.GetValues(typeof(TEnum))).Select(t => t.ToString());
         #endregion
         //Get Enum Attributes
         #region EnumAttributes
-        public static async Task<string> GetAttrDescriptionAsync<TEnum>(this TEnum e) =>
-            await e.LocalizeStringAsync(e.GetType()
-        .GetMember(e.ToString())
-      .FirstOrDefault()
-      ?.GetCustomAttribute<DisplayAttribute>(false)
-      ?.Description
-      ?? e.ToString()).ConfigureAwait(false);
-        public static async Task<string> GetAttrPromptAsync<TEnum>(this TEnum e) =>
-            await e.LocalizeStringAsync(e.GetType()
-                .GetMember(e.ToString())
-              .FirstOrDefault()
-              ?.GetCustomAttribute<DisplayAttribute>(false)
-              ?.Prompt
-              ?? e.ToString()).ConfigureAwait(false);
-        public static async Task<string> GetAttrNameAsync<TEnum>(this TEnum e) =>
-            await e.LocalizeStringAsync(e.GetType()
-                .GetMember(e.ToString())
-              .FirstOrDefault()
-              ?.GetCustomAttribute<DisplayAttribute>(false)
-              ?.Name
-              ?? e.ToString()).ConfigureAwait(false);
+        public static string GetAttribute<TEnum>(this TEnum e, string attr)
+        {
+            var display = e.GetType().GetMember(e.ToString())
+                  .FirstOrDefault()?.GetCustomAttribute<DisplayAttribute>(false);
+            try
+            {
+                return display?.GetType().InvokeMember($"Get{attr}",
+                    BindingFlags.InvokeMethod | BindingFlags.Instance | BindingFlags.Public, null, display, null,
+                    CultureInfo.InvariantCulture) as string ?? e.ToString();
+            }
+            catch (TargetInvocationException)
+            {
+                return display?.GetType().GetProperty(attr).GetValue(display, null) as string ?? e.ToString();
+            }
+        }
+        public static string GetAttrDescription<TEnum>(this TEnum e) => e.GetAttribute("Description");
+        public static string GetAttrPrompt<TEnum>(this TEnum e) => e.GetAttribute("Prompt");
+        public static string GetAttrName<TEnum>(this TEnum e) => e.GetAttribute("Name");
+        public static string GetAttrGroupName<TEnum>(this TEnum e) => e.GetAttribute("GroupName");
         public static IEnumerable<string> GetNamesList<TEnum>(this TEnum e) =>
             e.GetType()
                 .GetMembers(BindingFlags.Public | BindingFlags.Static)
               .Select(m => m
               .GetCustomAttribute<DisplayAttribute>(false)
-              ?.Name ?? m.ToString());
-        public static async Task<string> GetAttrGroupNameAsync<TEnum>(this TEnum e) =>
-            await e.LocalizeStringAsync(e.GetType()
-                .GetMember(e.ToString())
-              .FirstOrDefault()
-              ?.GetCustomAttribute<DisplayAttribute>(false)
-              ?.GroupName
-              ?? e.ToString()).ConfigureAwait(false);
+              ?.GetName() ?? m.ToString());
         #endregion
-        public static string GetDescription(this Enum enumValue)
-        {
-            FieldInfo fi = enumValue?.GetType().GetField(enumValue.ToString());
-            DescriptionAttribute[] attributes =
-                (DescriptionAttribute[])fi.GetCustomAttributes(
-                typeof(DescriptionAttribute),
-                false);
-            if (attributes != null &&
-                attributes.Length > 0)
-                return attributes[0].Description;
-            else
-                return enumValue.ToString();
-        }
-
-        public static string Localize(this Enum e, string attribute, string lang)
-        {
-            if (lang != null && lang.Contains("es", StringComparison.InvariantCultureIgnoreCase))
-            {
-                //var rm = new ResourceManager(typeof(EnumResources));
-                //var name = e?.GetType().Name + "_" + e + "_" + attribute;
-                //var resourceDisplayName = rm.GetString(name, CultureInfo.InvariantCulture);
-                //return string.IsNullOrWhiteSpace(resourceDisplayName) ? GetAttr(e, attribute) : resourceDisplayName;
-                return GetAttr(e, attribute);
-            }
-            return GetAttr(e, attribute);
-        }
-
-        public static string GetAttr(this Enum e, string attribute) =>
-            attribute switch
-            {
-                "Prompt" => e?.GetType()
-                            .GetMember(e.ToString())
-                          .FirstOrDefault()
-                          ?.GetCustomAttribute<DisplayAttribute>(false)
-                          ?.Prompt
-                          ?? e.ToString(),
-                "Description" =>
-                        e?.GetType()
-                            .GetMember(e.ToString())
-                          .FirstOrDefault()
-                          ?.GetCustomAttribute<DisplayAttribute>(false)
-                          ?.Description
-                          ?? e.ToString(),
-                "GroupName" =>
-                        e?.GetType()
-                            .GetMember(e.ToString())
-                          .FirstOrDefault()
-                          ?.GetCustomAttribute<DisplayAttribute>(false)
-                          ?.GroupName
-                          ?? e.ToString(),
-                _ =>
-                        e?.GetType()
-                            .GetMember(e.ToString())
-                          .FirstOrDefault()
-                          ?.GetCustomAttribute<DisplayAttribute>(false)
-                          ?.Name
-                          ?? e.ToString()
-            };
-        public static string GetDisplayName(this Enum e, string lang = null)
-        {
-            if (e == null)
-            {
-                return null;
-            }
-            if (lang != null && lang.Contains("es", StringComparison.InvariantCulture))
-            {
-                //var rm = new ResourceManager(typeof(EnumResources));
-                //var name = e.GetType().Name + "_" + e;
-                //var resourceDisplayName = rm.GetString(name, CultureInfo.InvariantCulture);
-                //return string.IsNullOrWhiteSpace(resourceDisplayName) ? string.Format(CultureInfo.InvariantCulture, "{0}", e) : resourceDisplayName;
-                return string.Format(CultureInfo.InvariantCulture, "{0}", e);
-            }
-            else
-            {
-                return e.GetType()
-                    .GetMember(e.ToString())
-                  .FirstOrDefault()
-                  ?.GetCustomAttribute<DisplayAttribute>(false)
-                  ?.Name
-                  ?? e.ToString();
-            }
-        }
     }
 }

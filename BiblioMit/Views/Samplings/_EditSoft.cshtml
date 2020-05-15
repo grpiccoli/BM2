@@ -10,7 +10,7 @@
 <form asp-action="EditSoft" role="form">
     <partial name="_ModalHeader" model='new ModalHeader
 {
-    Heading = Model.SoftType.GetDisplayName(ViewData["lang"] as string)
+    Heading = Model.SoftType.GetAttrName()
         + " | " + Localizer["Subject"].Value
         + ":  " + Model.Id.ToString().Replace(Model.SamplingId.ToString(), "")
         + " | " + Localizer["Sample"].Value

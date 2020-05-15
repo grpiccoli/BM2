@@ -198,9 +198,6 @@
     <None Remove="scripts\progress.ts" />
     <None Remove="scripts\sendDisabledSelects.ts" />
     <None Remove="scripts\translate.ts" />
-    <None Remove="scripts\types\am4charts\index.d.ts" />
-    <None Remove="scripts\types\signalr\index.d.ts" />
-    <None Remove="scripts\types\tippy.js\index.d.ts" />
     <None Remove="scripts\validate-localization.ts" />
   </ItemGroup>
     
@@ -248,7 +245,25 @@
 
   <ItemGroup>
     <Folder Include="Pages\Shared\" />
-    <Folder Include="scripts\types\amcharts\" />
+    <Folder Include="wwwroot\images\markers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\Blazor.Variable.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Blazor.Variable.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\Blazor.Variable.es.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Blazor.Variable.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Blazor.Variable.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

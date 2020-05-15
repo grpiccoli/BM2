@@ -4,7 +4,6 @@
 
 @{
     ViewData["Title"] = Localizer["Details"];
-    var c = ViewData["lang"] as string;
     var subject = (Model.Count() != 0) ? Model.First() : null;
 }
 
@@ -115,8 +114,8 @@ else
                     </th>
                     @foreach (SoftType e in Enum.GetValues(typeof(SoftType)))
                     {
-                        <th title="@e.GetDisplayName(c)">
-                            @e.GetDisplayName(c)
+                        <th title="@e.GetAttrName()">
+                            @e.GetAttrName()
                         </th>
                     }
                     <th>
@@ -164,7 +163,7 @@ else
                     @individual.Sex.ToString().Substring(0, 1)
                 </td>
                 <td>
-                    @individual.Maturity.GetDisplayName(c)
+                    @individual.Maturity.GetAttrName()
                 </td>
                 @foreach (var dictSoft in editTissue)
                 {
@@ -194,7 +193,7 @@ else
                                     foreach (var itm in ind)
                                     {
                                         <text>
-                                            @itm.Count @Html.DisplayFor(modelItem => itm.Degree) @itm.Tissue.GetDisplayName(c),
+                                            @itm.Count @Html.DisplayFor(modelItem => itm.Degree) @itm.Tissue.GetAttrName(),
                                         </text>
                                     }
                                 }

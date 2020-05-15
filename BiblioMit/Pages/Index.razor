@@ -23,10 +23,10 @@
                                @bind-Values="@SelectedVariables"
                                Placeholder="Variables">
                         <SelectedTemplate Context="variable">
-                            @variable.GetAttrNameAsync().Result
+                            @variable.GetAttrName()
                         </SelectedTemplate>
                         <ResultTemplate Context="variable">
-                            @variable.GetAttrNameAsync().Result
+                            @variable.GetAttrName()
                         </ResultTemplate>
                     </Typeahead>
                 </div>
@@ -345,7 +345,7 @@
             var pol = await GoogleMapsComponents.Maps.Polygon.CreateAsync(map.JsRuntime, p);
             await pol.AddListener<MouseEvent>("click", async (e) =>
             {
-                bool select = await GraphClick(p.ZIndex.ToString(), type).ConfigureAwait(false);
+                bool select = GraphClick(p.ZIndex.ToString(), type);
                 string color = select ? "red" : "";
                 await pol.SetOptions(new PolygonOptions
                 {
@@ -357,7 +357,7 @@
         }
     }
 
-    public async Task<bool> GraphClick(string id, string type)
+    public bool GraphClick(string id, string type)
     {
         var list = type switch
         {
@@ -426,8 +426,8 @@
     }
 
     public async Task<IEnumerable<Variable>> SearchVariablesAsync(string searchText) =>
-    await Task.FromResult<IEnumerable<Variable>>(form.Variables.Where(x =>
-    x.GetAttrNameAsync().Result.Contains(searchText, StringComparison.OrdinalIgnoreCase)));
+        await Task.FromResult<IEnumerable<Variable>>(form.Variables.Where(x =>
+    x.GetAttrName().Contains(searchText, StringComparison.OrdinalIgnoreCase)));
 
     public async Task<IEnumerable<SelectListItem>> SearchOrdersAsync(string searchText) =>
         await Task.FromResult<IEnumerable<SelectListItem>>(form.Orders.Where(x =>

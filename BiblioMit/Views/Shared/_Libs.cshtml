@@ -15,7 +15,7 @@
     {
         var bundles = Bundler.GetBundles(lib);
         var continuar = false;
-        if (bundles != null) 
+        if (bundles != null && bundles.Any()) 
         { 
             foreach (var bundle in bundles)
             {

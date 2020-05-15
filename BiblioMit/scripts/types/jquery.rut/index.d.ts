@@ -4,7 +4,7 @@ interface JQueryStatic {
     validateRut(
         rut: string,
         callback: (r: number, dv: string) => void,
-        object: { minimumLength: number }) : boolean;
+        object: { minimumLength: number }): boolean;
 }
 
 interface JQuery<TElement = HTMLElement> {

@@ -512,20 +512,18 @@ namespace BiblioMit.Views
             ViewData["Ver"] = ver;
             return View();
         }
-
         [AllowAnonymous]
-        public JsonResult GetAttr(int tp, string lg)
+        public JsonResult GetAttr(int tp)
         {
             var m = (DeclarationType)tp;
             return Json(new
             {
-                Def = m.Localize("Description", lg),
-                Group = m.Localize("GroupName", lg),
-                Name = m.Localize("Name", lg),
-                Units = m.Localize("Prompt", lg)
+                Def = m.GetAttrDescription(),
+                Group = m.GetAttrGroupName(),
+                Name = m.GetAttrName(),
+                Units = m.GetAttrPrompt()
             });
         }
-
         [AllowAnonymous]
         public JsonResult GetRange(int yr)
         {

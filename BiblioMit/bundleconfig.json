@@ -21,6 +21,12 @@
     ]
   },
   {
+    "outputFileName": "wwwroot/js/tippy.min.js",
+    "inputFiles": [
+      "scripts/tippy.js"
+    ]
+  },
+  {
     "outputFileName": "wwwroot/js/tablePopover.min.js",
     "inputFiles": [
       "scripts/tablePopover.js"

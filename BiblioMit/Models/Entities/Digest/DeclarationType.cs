@@ -4,9 +4,8 @@ namespace BiblioMit.Models.Entities.Digest
 {
     public enum DeclarationType
     {
-        //[Display(GroupName = "Plants", Name = "Raw Material", Prompt = "Tons")]
-        //RawMaterial = 0,
-        [Display(Description = "Action whose purpose is the fixation of invertebrate larvae through the arrangement of collectors.",
+        [Display(
+            Description = "Action whose purpose is the fixation of invertebrate larvae through the arrangement of collectors.",
             GroupName = "Farm",
             Name = "Seed Uptake",
             Prompt = "Tons")]

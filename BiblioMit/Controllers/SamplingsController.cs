@@ -48,10 +48,6 @@ namespace BiblioMit.Controllers
             {
                 return NotFound();
             }
-
-            var feature = HttpContext.Features.Get<IRequestCultureFeature>();
-            ViewData["lang"] = feature.RequestCulture.Culture.TwoLetterISOLanguageName.ToUpperInvariant();
-
             ViewData["SampleId"] = id;
 
             return View(await _context.Individuals
@@ -125,15 +121,12 @@ namespace BiblioMit.Controllers
                 Sampling = sample
             };
 
-            var feature = HttpContext.Features.Get<IRequestCultureFeature>();
-            var lang = feature.RequestCulture.Culture.TwoLetterISOLanguageName.ToUpperInvariant();
-
             var sexes = from Sex e in Enum.GetValues(typeof(Sex))
-                        select new { Id = e, Name = e.GetDisplayName(lang) };
+                        select new { Id = e, Name = e.GetAttrName() };
             ViewData["Sex"] = new SelectList(sexes, "Id", "Name");
 
             var maturities = from Maturity e in Enum.GetValues(typeof(Maturity))
-                             select new { Id = e, Name = e.GetDisplayName(lang) };
+                             select new { Id = e, Name = e.GetAttrName() };
             ViewData["Maturity"] = new SelectList(maturities, "Id", "Name");
 
             return PartialView("_AddIndividual", model);
@@ -169,15 +162,9 @@ namespace BiblioMit.Controllers
             var softs = _context.Softs
                 .Include(i => i.Individual)
                 .Where(m => m.IndividualId == id && m.SoftType == softType);
-
-            var feature = HttpContext.Features.Get<IRequestCultureFeature>();
-            var lang = feature.RequestCulture.Culture.TwoLetterISOLanguageName.ToUpperInvariant();
-            ViewData["lang"] = lang;
-
             var degrees = from Degree e in Enum.GetValues(typeof(Degree))
-                          select new { Id = e, Name = e.GetDisplayName(lang) };
+                          select new { Id = e, Name = e.GetAttrName() };
             ViewData["Degree"] = new SelectList(degrees, "Id", "Name");
-
             IndividualSoftTissueViewModel model = new IndividualSoftTissueViewModel()
             {
                 Id = id,
@@ -203,7 +190,7 @@ namespace BiblioMit.Controllers
                         Check = softs.Any(s => s.Tissue == t),
                         Count = softs.Any(s => s.Tissue == t) ? softs.FirstOrDefault(s => s.Tissue == t).Count : null,
                         Degree = softs.Any(s => s.Tissue == t) ? softs.FirstOrDefault(s => s.Tissue == t).Degree : null,
-                        Text = t.GetDisplayName(lang),
+                        Text = t.GetAttrName(),
                         Value = ((int)t).ToString(CultureInfo.InvariantCulture),
                     }).ToList());
             }
@@ -436,24 +423,17 @@ namespace BiblioMit.Controllers
             {
                 return NotFound();
             }
-
             var individual = await _context.Individuals.SingleOrDefaultAsync(m => m.Id == id).ConfigureAwait(false);
             if (individual == null)
             {
                 return NotFound();
             }
-
-            var feature = HttpContext.Features.Get<IRequestCultureFeature>();
-            var lang = feature.RequestCulture.Culture.TwoLetterISOLanguageName.ToUpperInvariant();
-
             var sexes = from Sex e in Enum.GetValues(typeof(Sex))
-                        select new { Id = e, Name = e.GetDisplayName(lang) };
+                        select new { Id = e, Name = e.GetAttrName() };
             ViewData["Sex"] = new SelectList(sexes, "Id", "Name");
-
             var maturities = from Maturity e in Enum.GetValues(typeof(Maturity))
-                             select new { Id = e, Name = e.GetDisplayName(lang) };
+                             select new { Id = e, Name = e.GetAttrName() };
             ViewData["Maturity"] = new SelectList(maturities, "Id", "Name");
-
             return PartialView("_EditIndividual", individual);
         }
 

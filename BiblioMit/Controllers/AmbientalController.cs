@@ -11,7 +11,9 @@ using System.Dynamic;
 using Range = BiblioMit.Models.Range;
 using System.Threading.Tasks;
 using BiblioMit.Models.Entities.Semaforo;
-using System.Diagnostics.CodeAnalysis;
+using BiblioMit.Blazor;
+using BiblioMit.Extensions;
+using Microsoft.Extensions.Localization;
 
 namespace BiblioMit.Controllers
 {
@@ -19,69 +21,62 @@ namespace BiblioMit.Controllers
     public class AmbientalController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public AmbientalController(ApplicationDbContext context)
+        private readonly IStringLocalizer<AmbientalController> _localizer;
+        public AmbientalController(
+            ApplicationDbContext context,
+            IStringLocalizer<AmbientalController> localizer)
         {
+            _localizer = localizer;
             _context = context;
         }
 
         [AllowAnonymous]
         public IActionResult ExportMenu()
         {
-            var model = User.Identity.IsAuthenticated ? 
-            new List<object>
+            var images = new ExportMenu
             {
-                new
+                Label = _localizer["Image"],
+                Menu = new List<IExport>
                 {
-                    label = "...",
-                    menu = new List<object>
-                    {
-                        new
-                        {
-                            label = "Imagen",
-                            menu = new List<object>
-                            {
-                                new { type = "png", label = "PNG" },
-                                new { type = "jpg", label = "JPG" },
-                                new { type = "gif", label = "GIF" },
-                                new { type = "svg", label = "SVG" },
-                                new { type = "pdf", label = "PDF" }
-                            }
-                        },
-                        new
-                        {
-                            label = "Datos",
-                            menu = new List<object>
-                            {
-                                new { type = "json", label = "JSON" },
-                                new { type = "csv", label = "CSV" },
-                                new { type = "xlsx", label = "XLSX" }
-                            }
-                        },
-                        new { label = "Imprimir", type = "print" }
-                    }
+                    new ExportItem { Type = "jpg", Label = "JPG" }
                 }
-            }:
-            new List<object>
+            };
+            var datos = new ExportMenu
             {
-                new
+                Label = _localizer["Data"],
+                Menu = new List<IExport>
                 {
-                    label = "...",
-                    menu = new List<object>
+                    new ExportItem { Type = "pdf", Label = "PDF" }
+                }
+            };
+            if (User.Identity.IsAuthenticated)
+            {
+                images.Menu = images.Menu.Concat(new List<IExport>
+                {
+                    new ExportItem { Type = "png", Label = "PNG" },
+                    new ExportItem { Type = "gif", Label = "GIF" },
+                    new ExportItem { Type = "svg", Label = "SVG" }
+                });
+                datos.Menu = datos.Menu.Concat(new List<IExport>
+                {
+                    new ExportItem { Type = "json", Label = "JSON" },
+                    new ExportItem { Type = "csv", Label = "CSV" },
+                    new ExportItem { Type = "xlsx", Label = "XLSX" } 
+                });
+            }
+            var model = new List<ExportMenu>
+            {
+                new ExportMenu
+                {
+                    Label = "...",
+                    Menu = new List<IExport>
                     {
-                        new
-                        {
-                            label = "Imagen",
-                            menu = new List<object>
-                            {
-                                new { type = "jpg", label = "JPG" },
-                            }
-                        },
-                        new { label = "Imprimir", type = "print" }
+                        images,
+                        datos,
+                        new ExportItem { Label = _localizer["Print"], Type = "print" }
                     }
                 }
             };
-
             return Json(model);
         }
 
@@ -89,74 +84,46 @@ namespace BiblioMit.Controllers
         // GET: Arrivals
         public async Task<IActionResult> PSMBList()
         {
-            var areas = new List<object>
-            {
-                new
+            var areas = await _context.CatchmentAreas
+                .Include(c => c.Communes)
+                .Select(c => new ChoicesGroup
                 {
-                    label = "Cuencas",
-                    id = 1,
-                    choices = new List<object>
+                    Id = c.Id + 1,
+                    Label = $"{_localizer["Catchment Area"]} {c.Name}",
+                    Choices = c.Communes.Select(com => new ChoicesItem
                     {
-                        new
-                        {
-                            value = "1",
-                            label = "Norte"
-                        },
-                        new
-                        {
-                            value = "3",
-                            label = "Centro"
-                        },
-                        new
-                        {
-                            value = "2",
-                            label = "Sur"
-                        }
-                    }
-                }
-            };
-
-            var areasList = await _context.Communes
-                .Include(c => c.CatchmentArea)
-                .Where(c => c.CatchmentAreaId.HasValue)
-                .ToListAsync().ConfigureAwait(false);
-
-            areas.AddRange(areasList
-                .GroupBy(c => c.CatchmentAreaId)
-                .Select(g => new
-                {
-                    label = "Cuenca " + g.First().CatchmentArea.Name,
-                    id = g.Key + 1,
-                    choices = g
-                    .Select(i => new
-                    {
-                        value = i.Id.ToString(CultureInfo.InvariantCulture),
-                        label = $"{i.Name}"
+                        Value = com.Id.ToString(CultureInfo.InvariantCulture),
+                        Label = com.Name
                     })
-                }));
-
+                }).ToListAsync().ConfigureAwait(false);
+            areas.Add(new ChoicesGroup
+                {
+                    Id = 1,
+                    Label = _localizer["Catchment Areas"],
+                    Choices = _context.CatchmentAreas.Select(c => new ChoicesItem
+                    {
+                        Value = c.Id.ToString(CultureInfo.InvariantCulture),
+                        Label = c.Name
+                    })
+                });
             if (User.Identity.IsAuthenticated)
             {
-                var psmbs = _context.PsmbAreas
-                    .Include(p => p.Commune)
-                        .ThenInclude(c => c.CatchmentArea)
-                    .Where(c => c.PolygonId.HasValue && c.Commune.CatchmentAreaId.HasValue);
-                var psmbsList = await psmbs
-                .ToListAsync().ConfigureAwait(false);
-
-                areas.AddRange(psmbsList
-                .GroupBy(c => c.Commune.CatchmentAreaId)
-                .Select(g => new
-                {
-                    label = "Cuenca " + g.First().Commune.CatchmentArea.Name,
-                    id = g.Key + 1,
-                    choices = g
-                    .Select(i => new
-                    {
-                        value = (i.Id * 100).ToString(CultureInfo.InvariantCulture),
-                        label = $"{i.Id} {i.Name}, {i.Commune.Name}"
-                    })
-                }));
+                var psmbs = _context.CatchmentAreas
+                    .Include(p => p.Communes)
+                        .ThenInclude(c => c.Psmbs
+                        .Where(p => p.Discriminator == Models.Entities.Centres.PsmbType.PsmbArea
+                        && p.PolygonId.HasValue))
+                        .Select(c => new ChoicesGroup 
+                        { 
+                            Id = c.Id + 1,
+                            Label = $"{_localizer["Catchment Area"]} {c.Name}",
+                            Choices = c.Communes.SelectMany(com => com.Psmbs.Select(p => new ChoicesItem 
+                            { 
+                                Value = (p.Id * 100).ToString(CultureInfo.InvariantCulture),
+                                Label = string.Join(" ",(new object[]{p.Id, p.Name, com.Name}).Where(o => o != null))
+                            }))
+                        });
+                areas.AddRange(psmbs);
             }
             return Json(areas);
         }
@@ -164,58 +131,40 @@ namespace BiblioMit.Controllers
         [AllowAnonymous]
         public JsonResult VariableList()
         {
-            var fito = new List<object>
+            var result = Variable.t.Enum2ChoicesGroup();
+            var groups = new ChoicesGroup 
             {
-                new
+                Label = _localizer["Phylogenetic Groups (Cel/mL)"],
+                Id = 3,
+                Choices = _context.PhylogeneticGroups.Select(p => new ChoicesItem
                 {
-                    value = "phy",
-                    label = "Fitoplancton Total"
-                }
+                    Value = p.Id.ToString(CultureInfo.InvariantCulture),
+                    Label = p.Name
+                })
             };
-            fito.AddRange(_context.PhylogeneticGroups.Select(p => new
+            var orders = new ChoicesGroup
             {
-                value = p.NormalizedName,
-                label = $"{p.Name} Total"
-            }));
-
-            var result = new List<object>
-            {
-                new
+                Label = _localizer["Genus (Cel/mL)"],
+                Id = 4,
+                Choices = _context.GenusPhytoplanktons.Select(p => new ChoicesItem
                 {
-                    label = "Variables Oceanográficas",
-                    id = 1,
-                    choices = new List<object>
-                    {
-                        new
-                        {
-                            value = "t",
-                            label = "Temperatura"
-                        },
-                        new
-                        {
-                            value = "ph",
-                            label = "pH"
-                        },
-                        new
-                        {
-                            value = "sal",
-                            label = "Salinidad"
-                        },
-                        new
-                        {
-                            value = "o2",
-                            label = "Oxígeno"
-                        }
-                    }
-                },
-                new
-                {
-                    label = "Fitoplancton",
-                    id = 2,
-                    choices = fito
-                }
+                    Value = p.Id.ToString(CultureInfo.InvariantCulture),
+                    Label = p.Name
+                })
             };
-            return Json(result);
+            var species = new ChoicesGroup
+            {
+                Label = _localizer["Species (Cel/mL)"],
+                Id = 5,
+                Choices = _context.SpeciesPhytoplanktons
+                .Include(s => s.Genus)
+                .Select(p => new ChoicesItem
+                {
+                    Value = p.Id.ToString(CultureInfo.InvariantCulture),
+                    Label = p.GetName()
+                })
+            };
+            return Json(result.Concat(new List<ChoicesGroup> { groups, orders, species }));
         }
         public JsonResult TLData(int a, int psmb, int sp, int? t, int? l, int? rs, int? s, string start, string end) {
             var i = Convert.ToDateTime(start, CultureInfo.InvariantCulture);
@@ -619,7 +568,7 @@ namespace BiblioMit.Controllers
                     var pol = new GMapPolygon
                     {
                         Id = c.Id,
-                        Name = "Cuenca " + c.Name,
+                        Name = $"{_localizer["Catchment Area"]} {c.Name}",
                         Region = "Los Lagos"
                     };
                     pol.Position.Add(c.Polygon.Vertices.OrderBy(o => o.Order).Select(o =>
@@ -643,7 +592,7 @@ namespace BiblioMit.Controllers
                 var pol = new GMapPolygon
                 {
                     Id = c.Id,
-                    Name = "Comuna " + c.Name,
+                    Name = $"{_localizer["Commune"]} {c.Name}",
                     Provincia = c.Province.Name,
                     Region = "Los Lagos"
                 };
@@ -688,7 +637,7 @@ namespace BiblioMit.Controllers
             }
             return Json(map);
         }
-        public AmData SelectData(
+        private static AmData SelectData(
             IGrouping<DateTime, PlanktonAssay> g,
             string var, bool fito)
         {
@@ -786,39 +735,6 @@ namespace BiblioMit.Controllers
             return Json(data);
         }
         [AllowAnonymous]
-        public IActionResult Map(int[] c, int[] i)
-        {
-            var selc = c.ToList();
-            var seli = i.ToList();
-
-            TextInfo textInfo = new CultureInfo("es-CL", false).TextInfo;
-
-            ViewData["c"] = string.Join(",", c);
-            ViewData["i"] = string.Join(",", i);
-
-            var centres = _context.PsmbAreas
-                .Include(a => a.Polygon)
-                .Include(a => a.Commune)
-                    .ThenInclude(a => a.Province)
-                    .ThenInclude(a => a.Region)
-                .Where(a => a.Farms.Any() && a.PolygonId.HasValue);
-
-            return View(centres);
-        }
-
-        public JsonResult GetSpecies(string groupId) =>
-            Json(_context.Phytoplanktons
-                .Include(f => f.Species)
-                    .ThenInclude(s => s.Genus)
-                .Where(p => p.Species.Genus.Group.NormalizedName.Equals(groupId, StringComparison.Ordinal))
-                .Select(p => new {
-                    name = p.Species,
-                    id = p.Species,
-                    icon = "",
-                    unit = "(Cel/mL)",
-                    group = p.Species.Genus.GroupId
-                }).Distinct());
-        [AllowAnonymous]
         public IActionResult Graph()
         {
             ViewData["start"] = _context.PlanktonAssays.Min(e => e.SamplingDate)
@@ -846,5 +762,30 @@ namespace BiblioMit.Controllers
         public string Comuna { get; set; }
         public string Provincia { get; set; }
         public string Region { get; set; }
+    }
+    public class IExport
+    {
+        public string Label { get; set; }
+    }
+    public class ExportMenu : IExport
+    {
+        public IEnumerable<IExport> Menu { get; set; }
+    }
+    public class ExportItem : IExport
+    {
+        public string Type { get; set; }
+    }
+    public class IChoices
+    {
+        public string Label { get; set; }
+    }
+    public class ChoicesItem : IChoices
+    {
+        public string Value { get; set; }
+    }
+    public class ChoicesGroup : IChoices
+    {
+        public int Id { get; set; }
+        public IEnumerable<ChoicesItem> Choices { get; set; }
     }
 }

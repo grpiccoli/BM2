@@ -151,13 +151,9 @@ namespace BiblioMit.Controllers
         // GET: Photos/Create
         public IActionResult Create()
         {
-            var feature = HttpContext.Features.Get<IRequestCultureFeature>();
-            var lang = feature.RequestCulture.Culture.TwoLetterISOLanguageName.ToUpperInvariant();
-
             ViewData["IndividualId"] = _context.Individuals.GroupBy(i => i.SamplingId);
-
             var mags = from Magnification e in Enum.GetValues(typeof(Magnification))
-                        select new { Id = e, Name = e.GetDisplayName(lang) };
+                        select new { Id = e, Name = e.GetAttrName() };
             ViewData["Magnification"] = new SelectList(mags, "Id", "Name");
 
             return View();
