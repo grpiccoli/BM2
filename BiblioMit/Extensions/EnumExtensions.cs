@@ -7,6 +7,7 @@ using System.Reflection;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using BiblioMit.Controllers;
+using BiblioMit.Models.VM;
 
 namespace BiblioMit.Extensions
 {

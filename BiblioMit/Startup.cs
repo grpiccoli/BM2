@@ -5,6 +5,7 @@ using BiblioMit.Data;
 using BiblioMit.Models;
 using BiblioMit.Services;
 using BiblioMit.Services.Hubs;
+using LazZiya.ExpressLocalization;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -19,11 +20,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
+using LazZiya.ExpressLocalization;
 
 namespace BiblioMit
 {
@@ -113,20 +116,18 @@ namespace BiblioMit
 
             services.Configure<RequestLocalizationOptions>(options =>
             {
-                options.DefaultRequestCulture = new RequestCulture(culture: defaultCulture, uiCulture: defaultCulture);
+                options.DefaultRequestCulture = new RequestCulture(defaultCulture);
                 // Formatting numbers, dates, etc.
                 options.SupportedCultures = supportedCultures;
                 // UI strings that we have localized.
                 options.SupportedUICultures = supportedCultures;
-                options.AddInitialRequestCultureProvider(
-                    new CustomRequestCultureProvider(
-                        async context => 
-                            await Task.FromResult(new ProviderCultureResult(defaultCulture)).ConfigureAwait(false)));
             });
 
             services.AddLocalization(options => options.ResourcesPath = "Resources");
 
-            services.AddRazorPages();
+            services.AddRazorPages()
+                .AddViewLocalization()
+                .AddDataAnnotationsLocalization();
             services.AddServerSideBlazor();
             services.AddTransient<IEnvironmental, EnvironmentalService>();
 
@@ -197,15 +198,6 @@ namespace BiblioMit
 
             var di = new DirectoryInfo(Path.Combine(env?.WebRootPath, string.Join(ch, path)));
 
-            app.UseRequestLocalization(new RequestLocalizationOptions
-            {
-                DefaultRequestCulture = new RequestCulture(defaultCulture),
-                // Formatting numbers, dates, etc.
-                SupportedCultures = supportedCultures,
-                // UI strings that we have localized.
-                SupportedUICultures = supportedCultures
-            });
-
             app.UseHttpsRedirection();
 
             app.UseDefaultFiles();
@@ -220,6 +212,8 @@ namespace BiblioMit
             });
 
             app.UseRouting();
+
+            app.UseRequestLocalization(app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>().Value);
 
             app.UseAuthentication();
 

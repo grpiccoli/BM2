@@ -32,7 +32,7 @@
             var website = new WebSite()
             {
                 AlternateName = "Biblioteca y repositorio digital de Mytilus chilensis",
-                Name = "BiblioMit - " + (string)ViewData["Title"],
+                Name = "BiblioMit - " + ViewData["Title"],
                 Url = new Uri($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")
             };
             var jsonLd = website.ToString();
@@ -66,7 +66,7 @@
         <meta name="google-site-verification" content="g-pGvrm_POLRtvTDGYJTTkKtecLY11qo0zOeNVMY2Eg" />
     </environment>
     <partial name="_Favicons" />
-    <partial name="_Libs" model='(new HashSet<string> { "jquery", "bootstrap", "@fortawesome/fontawesome-free", "site", "modal-action" }, "TOP")' />
+    <partial name="_TagLibs" model='("TOP", new HashSet<string> { "jquery", "bootstrap", "@fortawesome/fontawesome-free", "site", "modal-action" })' />
     @this.WriteBlocks("TOPStyles")
     @this.WriteBlocks("Styles")
     @RenderSection("Styles", required: false)

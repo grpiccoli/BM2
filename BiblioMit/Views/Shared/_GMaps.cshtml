@@ -1,5 +1,6 @@
 ﻿@{
+    var culture = CultureInfo.CurrentCulture.Name.Split("-");
     var key = "AIzaSyCkBD_nY7LaeVohfyIt-M2a2BuIhuy-51c";
     this.Block("TOPScripts",
-        @<script src="https://maps.googleapis.com/maps/api/js?key=@key"></script>);
+        @<script src="https://maps.googleapis.com/maps/api/js?key=@key&language=@culture[0]"></script>);
 }

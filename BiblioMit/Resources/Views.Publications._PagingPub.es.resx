@@ -117,82 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="&amp;" xml:space="preserve">
-    <value>y</value>
+  <data name="First" xml:space="preserve">
+    <value>Primera</value>
   </data>
-  <data name="Articles" xml:space="preserve">
-    <value>Artículos</value>
+  <data name="Last" xml:space="preserve">
+    <value>Última</value>
   </data>
-  <data name="Ascendent" xml:space="preserve">
-    <value>Ascendiente</value>
+  <data name="Next" xml:space="preserve">
+    <value>Siguiente</value>
   </data>
-  <data name="Authors" xml:space="preserve">
-    <value>Autores</value>
-  </data>
-  <data name="BiblioMit Search Engine" xml:space="preserve">
-    <value>Motor de búsqueda BiblioMit</value>
-  </data>
-  <data name="Criteria" xml:space="preserve">
-    <value>Criterio</value>
-  </data>
-  <data name="Date" xml:space="preserve">
-    <value>Fecha</value>
-  </data>
-  <data name="Descendent" xml:space="preserve">
-    <value>Descendiente</value>
-  </data>
-  <data name="Details" xml:space="preserve">
-    <value>Detalles</value>
-  </data>
-  <data name="en" xml:space="preserve">
-    <value>es</value>
-  </data>
-  <data name="Journal" xml:space="preserve">
-    <value>Revista</value>
-  </data>
-  <data name="Order" xml:space="preserve">
-    <value>Orden</value>
-  </data>
-  <data name="Patents" xml:space="preserve">
-    <value>Patentes</value>
-  </data>
-  <data name="Projects" xml:space="preserve">
-    <value>Proyectos</value>
-  </data>
-  <data name="Results per page" xml:space="preserve">
-    <value>Resultados por página</value>
-  </data>
-  <data name="Score" xml:space="preserve">
-    <value>Relevancia</value>
-  </data>
-  <data name="Search" xml:space="preserve">
-    <value>Buscar</value>
-  </data>
-  <data name="Search terms" xml:space="preserve">
-    <value>Términos a buscar</value>
-  </data>
-  <data name="Select at least 1 repository to search" xml:space="preserve">
-    <value>Seleccione a lo menos 1 repositorio a buscar</value>
-  </data>
-  <data name="Select one or more repositories" xml:space="preserve">
-    <value>Seleccione 1 o más repositorios</value>
-  </data>
-  <data name="Source" xml:space="preserve">
-    <value>Fuente</value>
-  </data>
-  <data name="Thesis" xml:space="preserve">
-    <value>Tesis</value>
-  </data>
-  <data name="Thesis and Articles of Universities &amp; Research Centres" xml:space="preserve">
-    <value>Tesis y artículos de universidades y centros de investigación</value>
-  </data>
-  <data name="Title" xml:space="preserve">
-    <value>Título</value>
-  </data>
-  <data name="Type" xml:space="preserve">
-    <value>Tipo</value>
-  </data>
-  <data name="Year" xml:space="preserve">
-    <value>Año</value>
+  <data name="Previous" xml:space="preserve">
+    <value>Anterior</value>
   </data>
 </root>

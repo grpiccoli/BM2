@@ -15,23 +15,24 @@ using Google.Apis.Auth.OAuth2;
 using System.IO;
 using System.Globalization;
 using BiblioMit.Services;
+using Microsoft.Extensions.Localization;
 
 namespace BiblioMit.Controllers
 {
     [AllowAnonymous]
     public class HomeController : Controller
     {
-        //private readonly IStringLocalizer<HomeController> _localizer;
+        private readonly IStringLocalizer<HomeController> _localizer;
         private readonly IPost _postService;
         private readonly INodeService _nodeService;
 
         public HomeController(
-            //IStringLocalizer<HomeController> localizer,
+            IStringLocalizer<HomeController> localizer,
             IPost postService
             , INodeService nodeService
             )
         {
-            //_localizer = localizer;
+            _localizer = localizer;
             _postService = postService;
             _nodeService = nodeService;
         }
@@ -215,14 +216,14 @@ namespace BiblioMit.Controllers
 
         public IActionResult About()
         {
-            ViewData["Message"] = "Acerca de BiblioMit.";
+            ViewData["Message"] = _localizer["About BiblioMit"];
 
             return View();
         }
 
         public IActionResult Contact()
         {
-            ViewData["Message"] = "Contáctenos.";
+            ViewData["Message"] = _localizer["Contact"];
 
             return View();
         }
@@ -240,7 +241,7 @@ namespace BiblioMit.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult SetLanguage(string culture, Uri redirectUri)
+        public IActionResult SetLanguage(string culture, Uri returnUrl)
         {
             if (!string.IsNullOrWhiteSpace(culture))
             {
@@ -251,12 +252,12 @@ namespace BiblioMit.Controllers
                 );
             }
 
-            if(redirectUri == null)
+            if(returnUrl == null)
             {
-                redirectUri = new Uri("~/", UriKind.Relative);
+                returnUrl = new Uri("~/", UriKind.Relative);
             }
 
-            return LocalRedirect(redirectUri.ToString());
+            return LocalRedirect(returnUrl.ToString());
         }
     }
 }

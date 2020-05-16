@@ -35,6 +35,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 var _this = this;
+var lang = $("html").attr("lang");
+var esp = lang === 'es';
 var series = new Object();
 var choiceOps = {
     maxItemCount: 10,
@@ -43,23 +45,24 @@ var choiceOps = {
     paste: false,
     searchResultLimit: 10,
     shouldSort: false,
-    placeholderValue: 'Seleccione áreas',
-    searchPlaceholderValue: 'Buscar datos',
-    loadingText: 'Cargando...',
-    noResultsText: 'Sin resultados',
-    noChoicesText: 'Sin opciones a elegir',
-    itemSelectText: 'Presione para seleccionar',
-    maxItemText: function (maxItemCount) {
-        return "M\u00E1ximo " + maxItemCount + " valores";
-    },
+    placeholderValue: esp ? 'Seleccione áreas' : 'Select areas',
     fuseOptions: {
         include: 'score'
     }
 };
+if (esp) {
+    choiceOps.searchPlaceholderValue = 'Buscar';
+    choiceOps.loadingText = 'Cargando...';
+    choiceOps.noResultsText = 'Sin resultados';
+    choiceOps.noChoicesText = 'Sin opciones a elegir';
+    choiceOps.itemSelectText = 'Presione para seleccionar';
+    choiceOps.maxItemText = function (maxItemCount) { return "M\u00E1ximo " + maxItemCount + " valores"; };
+}
 var etl = document.getElementById('tl');
-choiceOps.placeholderValue = 'Variables semáforo';
+choiceOps.placeholderValue = esp ? 'Variables semáforo' : 'Semaforo Variables';
 var tl = new Choices(etl, choiceOps);
 var semaforo = !document.getElementById('semaforo').classList.contains('d-none');
+var logged = document.getElementById('logoutForm') !== null;
 var supportsPassiveOption = false;
 try {
     var opts = Object.defineProperty({}, 'passive', {
@@ -76,28 +79,32 @@ catch (e) { }
 var chart = am4core.create("chartdiv", am4charts.XYChart);
 am4core.ready(function () {
     return __awaiter(this, void 0, void 0, function () {
-        var dateAxis, valueAxis;
+        var dateAxis;
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    am4core.useTheme(am4themes_kelly);
-                    chart.language.locale = am4lang_es_ES;
-                    dateAxis = chart.xAxes.push(new am4charts.DateAxis());
-                    dateAxis.dataFields.category = 'date';
-                    dateAxis.dateFormats.setKey('year', 'yy');
-                    dateAxis.periodChangeDateFormats.setKey('month', 'MMM yy');
-                    dateAxis.tooltipDateFormat = 'dd MMM, yyyy';
-                    dateAxis.renderer.minGridDistance = 40;
-                    valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
-                    chart.legend = new am4charts.Legend();
-                    chart.cursor = new am4charts.XYCursor();
-                    chart.exporting.menu = new am4core.ExportMenu();
-                    return [4, fetch('/ambiental/exportmenu').then(function (j) { return j.json(); })
-                            .then(function (menu) { return chart.exporting.menu.items = menu; })];
-                case 1:
-                    _a.sent();
-                    return [2];
+            am4core.useTheme(am4themes_kelly);
+            if (esp)
+                chart.language.locale = am4lang_es_ES;
+            dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+            dateAxis.dataFields.category = 'date';
+            dateAxis.dateFormats.setKey('year', 'yy');
+            dateAxis.periodChangeDateFormats.setKey('month', 'MMM yy');
+            dateAxis.tooltipDateFormat = 'dd MMM, yyyy';
+            dateAxis.renderer.minGridDistance = 40;
+            chart.yAxes.push(new am4charts.ValueAxis());
+            chart.legend = new am4charts.Legend();
+            chart.cursor = new am4charts.XYCursor();
+            chart.exporting.menu = new am4core.ExportMenu();
+            if (!logged) {
+                chart.exporting.formatOptions.getKey("png").disabled = true;
+                chart.exporting.formatOptions.getKey("svg").disabled = true;
+                chart.exporting.formatOptions.getKey("pdf").disabled = true;
+                chart.exporting.formatOptions.getKey("json").disabled = true;
+                chart.exporting.formatOptions.getKey("csv").disabled = true;
+                chart.exporting.formatOptions.getKey("xlsx").disabled = true;
+                chart.exporting.formatOptions.getKey("html").disabled = true;
+                chart.exporting.formatOptions.getKey("pdfdata").disabled = true;
             }
+            return [2];
         });
     });
 });
@@ -142,7 +149,7 @@ function loadData(values, event, boolpsmb) {
                 rd = st + 4;
             }
             else {
-                x = [event.value, null, event.label, null, event.groupValue === "Fitoplancton" ? "fito" : "graph"];
+                x = [event.value, null, event.label, null, (event.groupValue === "Fitoplancton" || event.groupValue === "Phytoplankton") ? "fito" : "graph"];
                 st++;
                 grp = false;
             }
@@ -212,7 +219,7 @@ evariable.addEventListener('removeItem', function (event) {
         chart.series.removeIndex(chart.series.indexOf(series[name])).dispose();
     });
 }, supportsPassiveOption ? { passive: true } : false);
-choiceOps.placeholderValue = 'Seleccione variables';
+choiceOps.placeholderValue = esp ? 'Seleccione variables' : 'Select Variables';
 var variables = new Choices(evariable, choiceOps);
 variables.setChoices(function () { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
     switch (_a.label) {
@@ -238,7 +245,7 @@ function getParam(a, x) {
 }
 if (semaforo) {
     etl.addEventListener('addItem', function (event) {
-        if (event.detail.groupValue === 'Análisis') {
+        if (event.detail.groupValue === 'Análisis' || event.detail.groupValue === 'Analysis') {
             var a = event.detail.value;
             var tls = tl.getValue();
             var psmbs = tls.filter(function (x) { return x.groupId === 2; });
@@ -275,17 +282,19 @@ if (semaforo) {
                     });
                 }
                 else {
-                    alert(nm + " no seleccionada, seleccione requerimientos y luego an\u00E1lisis");
+                    var msg = esp ? "no seleccionada, seleccione requerimientos y luego análisis" : "not selected, select requirements and then analysis";
+                    alert(nm + " " + msg);
                 }
             }
             else {
                 tl.removeActiveItemsByValue(a);
-                alert('PSMB y especie no seleccionados, seleccione requerimientos y luego análisis');
+                var msg = esp ? "PSMB y especie no seleccionados, seleccione requerimientos y luego análisis" : "PSMB and species not selected, select requirements and then analysis";
+                alert(msg);
             }
         }
     }, supportsPassiveOption ? { passive: true } : false);
     etl.addEventListener('removeItem', function (event) {
-        if (event.detail.groupValue === 'Análisis') {
+        if (event.detail.groupValue === 'Análisis' || event.detail.groupValue === 'Analysis') {
             var a = event.detail.value;
             var tls = tl.getValue();
             var psmbs = tls.filter(function (x) { return x.groupId === 2; });
@@ -359,59 +368,60 @@ var map = new google.maps.Map(document.getElementById('map'), {
     mapTypeId: 'terrain'
 });
 var infowindow = new google.maps.InfoWindow({
-    maxWidth: 150
+    maxWidth: 500
 });
 var polygons = {};
 window.onload = function initMap() {
     return __awaiter(this, void 0, void 0, function () {
-        var bnds;
+        var bnds, titles;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     bnds = new google.maps.LatLngBounds();
+                    titles = esp ?
+                        ["Código", "Comuna", "Provincia", "Región", "Área", "Fuentes"] :
+                        ["Code", "Commune", "Province", "Region", "Area", "Sources"];
                     return [4, fetch('/ambiental/mapdata')
                             .then(function (r) { return r.json(); })
-                            .then(function (data) {
-                            return data.map(function (dato) {
-                                var consessionPolygon = new google.maps.Polygon({
-                                    paths: dato.position,
-                                    zIndex: dato.id
-                                });
-                                consessionPolygon.setMap(map);
-                                consessionPolygon.addListener('click', addListenerOnPolygon);
-                                polygons[dato.id] = consessionPolygon;
-                                var center = getBounds(dato.position).getCenter();
-                                if (dato.id < 4)
-                                    bnds.extend(center);
-                                var marker = new google.maps.Marker({
-                                    position: center,
-                                    title: dato.name + " " + dato.id
-                                });
-                                marker.addListener('click', (function (marker) {
-                                    return function () {
-                                        var content = "<h4>" + dato.name + "</h4><table><tr><th>C\u00F3digo</th><td align=\"right\">" + dato.id + "</td></tr>";
-                                        if (dato.comuna !== null)
-                                            content +=
-                                                "<tr><th>Comuna</th><td align=\"right\">" + dato.comuna + "</td></tr>";
-                                        if (dato.provincia !== null)
-                                            content +=
-                                                "<tr><th>Provincia</th><td align=\"right\">" + dato.provincia + "</td></tr>";
-                                        content +=
-                                            "<tr><th>Regi\u00F3n</th><td align=\"right\">" + dato.region + "</td>\n</tr><tr><th>\u00C1rea (ha)</th>\n<td align=\"right\">" + Area(consessionPolygon.getPath().getArray()) + "</td>\n</tr>\n<tr><th>Fuentes</th><td></td></tr>\n<tr><td>Sernapesca</td>\n<td align=\"right\">\n<a target=\"_blank\" href=\"https://www.sernapesca.cl\">\n<img src=\"../images/ico/sernapesca.svg\" height=\"30\" /></a></td></tr>\n<tr><td>PER Mitilidos</td>\n<td align=\"right\">\n<a target=\"_blank\" href=\"https://www.mejillondechile.cl\">\n<img src=\"../images/ico/mejillondechile.min.png\" height=\"30\" /></a></td></tr>\n<tr><td>Subpesca</td>\n<td align=\"right\">\n<a target=\"_blank\" href=\"https://www.subpesca.cl\">\n<img src=\"../images/ico/subpesca.png\" height=\"30\" /></a></td></tr>";
-                                        infowindow.setContent(content);
-                                        infowindow.open(map, marker);
-                                    };
-                                })(marker));
-                                return marker;
+                            .then(function (data) { return data.map(function (dato) {
+                            var consessionPolygon = new google.maps.Polygon({
+                                paths: dato.position,
+                                zIndex: dato.id
                             });
-                        }).then(function (m) {
-                            return new MarkerClusterer(map, m, { imagePath: '/images/markers/m' });
-                        }).then(function (_) {
+                            consessionPolygon.setMap(map);
+                            consessionPolygon.addListener('click', addListenerOnPolygon);
+                            polygons[dato.id] = consessionPolygon;
+                            var center = getBounds(dato.position).getCenter();
+                            if (dato.id < 4)
+                                bnds.extend(center);
+                            var marker = new google.maps.Marker({
+                                position: center,
+                                title: dato.name + " " + dato.id
+                            });
+                            marker.addListener('click', (function (marker) {
+                                return function () {
+                                    var content = "<h4>" + dato.name + "</h4><table class=\"table\"><tr><th scope=\"row\">" + titles[0] + "</th><td align=\"right\">" + dato.id + "</td></tr>";
+                                    if (dato.comuna !== null)
+                                        content +=
+                                            "<tr><th scope=\"row\">" + titles[1] + "</th><td align=\"right\">" + dato.comuna + "</td></tr>";
+                                    if (dato.provincia !== null)
+                                        content +=
+                                            "<tr><th scope=\"row\">" + titles[2] + "</th><td align=\"right\">" + dato.provincia + "</td></tr>";
+                                    content +=
+                                        "<tr><th scope=\"row\">" + titles[3] + "</th><td align=\"right\">" + dato.region + "</td>\n</tr><tr><th scope=\"row\">" + titles[4] + " (ha)</th>\n<td align=\"right\">" + Area(consessionPolygon.getPath().getArray()) + "</td>\n</tr>\n<tr><th scope=\"row\">" + titles[5] + "</th><td></td></tr>\n<tr><td>Sernapesca</td>\n<td align=\"right\">\n<a target=\"_blank\" href=\"https://www.sernapesca.cl\">\n<img src=\"../images/ico/sernapesca.svg\" height=\"20\" /></a></td></tr>\n<tr><td>PER Mit\u00EDlidos</td>\n<td align=\"right\">\n<a target=\"_blank\" href=\"https://www.mejillondechile.cl\">\n<img src=\"../images/ico/mejillondechile.min.png\" height=\"20\" /></a></td></tr>\n<tr><td>Subpesca</td>\n<td align=\"right\">\n<a target=\"_blank\" href=\"https://www.subpesca.cl\">\n<img src=\"../images/ico/subpesca.png\" height=\"20\" /></a></td></tr>";
+                                    infowindow.setContent(content);
+                                    infowindow.open(map, marker);
+                                };
+                            })(marker));
+                            return marker;
+                        }); }).then(function (m) { return new MarkerClusterer(map, m, { imagePath: '/images/markers/m' }); }).then(function (_) {
                             map.fitBounds(bnds);
                             map.setCenter(bnds.getCenter());
                             loadDates();
                             variables.setChoiceByValue('t');
                             psmb.setChoiceByValue('1');
+                            if (logged)
+                                chart.exporting.menu = new am4core.ExportMenu();
                         })];
                 case 1:
                     _a.sent();

@@ -6,7 +6,7 @@
        asp-route-srt="@ViewData["srt"]"
        asp-route-asc="@ViewData["asc"]"
        class="paging btn btn-outline-secondary w-100 @ViewData["prevDisabled"]" role="button">
-        &laquo;<text class="hidden-xs hidden-s hidden-sm"> Primera</text>
+        &laquo;<text class="hidden-xs hidden-s hidden-sm"> @Localizer["First"]</text>
     </a>
     <a asp-action="Index"
        asp-route-q="@ViewData["q"]"
@@ -15,7 +15,7 @@
        asp-route-srt="@ViewData["srt"]"
        asp-route-asc="@ViewData["asc"]"
        class="paging btn btn-outline-secondary w-100 @ViewData["prevDisabled"]" role="button">
-        &lsaquo;<text class="hidden-xs hidden-s hidden-sm"> Anterior</text>
+        &lsaquo;<text class="hidden-xs hidden-s hidden-sm"> @Localizer["Previous"]</text>
     </a>
     @if ((int)ViewData["low"] > 1)
     {
@@ -49,7 +49,7 @@
        asp-route-srt="@ViewData["srt"]"
        asp-route-asc="@ViewData["asc"]"
        class="paging btn btn-outline-secondary w-100 @ViewData["nextDisabled"]" role="button">
-        <text class="hidden-xs hidden-s hidden-sm">Siguiente </text>&rsaquo;
+        <text class="hidden-xs hidden-s hidden-sm">@Localizer["Next"] </text>&rsaquo;
     </a>
     <a asp-action="Index"
        asp-route-q="@ViewData["q"]"
@@ -58,6 +58,6 @@
        asp-route-srt="@ViewData["srt"]"
        asp-route-asc="@ViewData["asc"]"
        class="paging btn btn-outline-secondary w-100 @ViewData["nextDisabled"]" role="button">
-        <text class="hidden-xs hidden-s hidden-sm">Última </text>&raquo;
+        <text class="hidden-xs hidden-s hidden-sm">@Localizer["Last"] </text>&raquo;
     </a>
 </div>

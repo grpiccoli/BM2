@@ -14,6 +14,7 @@ using BiblioMit.Models.Entities.Semaforo;
 using BiblioMit.Blazor;
 using BiblioMit.Extensions;
 using Microsoft.Extensions.Localization;
+using BiblioMit.Models.VM;
 
 namespace BiblioMit.Controllers
 {
@@ -29,99 +30,55 @@ namespace BiblioMit.Controllers
             _localizer = localizer;
             _context = context;
         }
-
-        [AllowAnonymous]
-        public IActionResult ExportMenu()
-        {
-            var images = new ExportMenu
-            {
-                Label = _localizer["Image"],
-                Menu = new List<IExport>
-                {
-                    new ExportItem { Type = "jpg", Label = "JPG" }
-                }
-            };
-            var datos = new ExportMenu
-            {
-                Label = _localizer["Data"],
-                Menu = new List<IExport>
-                {
-                    new ExportItem { Type = "pdf", Label = "PDF" }
-                }
-            };
-            if (User.Identity.IsAuthenticated)
-            {
-                images.Menu = images.Menu.Concat(new List<IExport>
-                {
-                    new ExportItem { Type = "png", Label = "PNG" },
-                    new ExportItem { Type = "gif", Label = "GIF" },
-                    new ExportItem { Type = "svg", Label = "SVG" }
-                });
-                datos.Menu = datos.Menu.Concat(new List<IExport>
-                {
-                    new ExportItem { Type = "json", Label = "JSON" },
-                    new ExportItem { Type = "csv", Label = "CSV" },
-                    new ExportItem { Type = "xlsx", Label = "XLSX" } 
-                });
-            }
-            var model = new List<ExportMenu>
-            {
-                new ExportMenu
-                {
-                    Label = "...",
-                    Menu = new List<IExport>
-                    {
-                        images,
-                        datos,
-                        new ExportItem { Label = _localizer["Print"], Type = "print" }
-                    }
-                }
-            };
-            return Json(model);
-        }
-
         [AllowAnonymous]
         // GET: Arrivals
         public async Task<IActionResult> PSMBList()
         {
-            var areas = await _context.CatchmentAreas
-                .Include(c => c.Communes)
-                .Select(c => new ChoicesGroup
+            var areas = new List<ChoicesGroup>
+            {
+                new ChoicesGroup
                 {
-                    Id = c.Id + 1,
-                    Label = $"{_localizer["Catchment Area"]} {c.Name}",
-                    Choices = c.Communes.Select(com => new ChoicesItem
-                    {
-                        Value = com.Id.ToString(CultureInfo.InvariantCulture),
-                        Label = com.Name
-                    })
-                }).ToListAsync().ConfigureAwait(false);
-            areas.Add(new ChoicesGroup
-                {
-                    Id = 1,
+                    Id = 4,
                     Label = _localizer["Catchment Areas"],
                     Choices = _context.CatchmentAreas.Select(c => new ChoicesItem
                     {
                         Value = c.Id.ToString(CultureInfo.InvariantCulture),
-                        Label = c.Name
+                        Label = $"{_localizer["Catchment Area"]} {c.Name}"
                     })
-                });
+                }
+            };
+            areas.AddRange(await _context.CatchmentAreas
+                .Include(c => c.Communes)
+                .Select(c => new ChoicesGroup
+                {
+                    Id = c.Id,
+                    Label = $"{_localizer["Catchment Area"]} {c.Name}",
+                    Choices = c.Communes
+                    .Select(com => new ChoicesItem
+                    {
+                        Value = com.Id.ToString(CultureInfo.InvariantCulture),
+                        Label = $"{com.Name} {c.Name}"
+                    })
+                }).ToListAsync().ConfigureAwait(false));
             if (User.Identity.IsAuthenticated)
             {
-                var psmbs = _context.CatchmentAreas
-                    .Include(p => p.Communes)
-                        .ThenInclude(c => c.Psmbs
-                        .Where(p => p.Discriminator == Models.Entities.Centres.PsmbType.PsmbArea
-                        && p.PolygonId.HasValue))
+                var psmbLst = await _context.Communes
+                    .Include(p => p.Psmbs)
+                    .Where(p => p.CatchmentAreaId.HasValue)
+                    .ToListAsync().ConfigureAwait(false);
+                var psmbs = psmbLst
                         .Select(c => new ChoicesGroup 
                         { 
-                            Id = c.Id + 1,
-                            Label = $"{_localizer["Catchment Area"]} {c.Name}",
-                            Choices = c.Communes.SelectMany(com => com.Psmbs.Select(p => new ChoicesItem 
-                            { 
-                                Value = (p.Id * 100).ToString(CultureInfo.InvariantCulture),
-                                Label = string.Join(" ",(new object[]{p.Id, p.Name, com.Name}).Where(o => o != null))
-                            }))
+                            Id = c.Id,
+                            Label = c.Name,
+                            Choices = c.Psmbs
+                            .Where(p => p.PolygonId.HasValue 
+                            && p.Discriminator == Models.Entities.Centres.PsmbType.PsmbArea)
+                            .Select(p => new ChoicesItem 
+                            {
+                                Value = p.Id.ToString(CultureInfo.InvariantCulture),
+                                Label = $"{p.Code} {p.Name} {c.Name}"
+                            })
                         });
                 areas.AddRange(psmbs);
             }
@@ -584,7 +541,7 @@ namespace BiblioMit.Controllers
                 .Include(c => c.Province)
                 .Include(c => c.Polygons)
                     .ThenInclude(c => c.Vertices)
-                    .Where(c => c.CatchmentAreaId.HasValue && c.Polygons.Any())
+                    .Where(c => c.CatchmentAreaId.HasValue)
                     .ToListAsync().ConfigureAwait(false);
 
             map = map.Concat(comuna.Select(c =>
@@ -612,15 +569,16 @@ namespace BiblioMit.Controllers
                         .ThenInclude(p => p.Province)
                     .Include(p => p.Polygon)
                         .ThenInclude(p => p.Vertices)
-                    .Where(c => c.PolygonId.HasValue && c.Commune.CatchmentAreaId.HasValue)
+                    .Where(c => c.Commune.CatchmentAreaId.HasValue && c.PolygonId.HasValue
+                    && c.PlanktonAssays.Any())
                     .ToListAsync().ConfigureAwait(false);
                 map = map.Concat(psmb
                     .Select(c =>
                     {
                         var pol = new GMapPolygon
                         {
-                            Id = c.Id * 100,
-                            Name = "PSMB " + c.Name,
+                            Id = c.Id,
+                            Name = $"{c.Code} {c.Name}",
                             Comuna = c.Commune.Name,
                             Provincia = c.Commune.Province.Name,
                             Region = "Los Lagos"
@@ -700,17 +658,18 @@ namespace BiblioMit.Controllers
                     .ThenInclude(f => f.Species)
                         .ThenInclude(f => f.Genus)
                             .ThenInclude(f => f.Group);
-            var mod = area / 100_000;
-            if(mod > 1) area /= 100;
-            assays = mod switch
+            if(area < 4)
             {
-                0 => assays
-                        .Where(e => e.Psmb.Commune.CatchmentAreaId == area),
-                1 => assays
-                        .Where(e => e.Psmb.CommuneId == area),
-                _ => assays
-                        .Where(e => e.PsmbId == area)
-            };
+                assays.Where(e => e.Psmb.Commune.CatchmentAreaId == area);
+            }
+            else if(area < 100_000)
+            {
+                assays.Where(e => e.PsmbId == area);
+            }
+            else
+            {
+                assays.Where(e => e.Psmb.CommuneId == area);
+            }
             var i = Convert.ToDateTime(start, CultureInfo.InvariantCulture);
             var f = Convert.ToDateTime(end, CultureInfo.InvariantCulture);
             var ensayos = await assays
@@ -743,49 +702,5 @@ namespace BiblioMit.Controllers
                 .ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
             return View();
         }
-    }
-    public class AmData
-    {
-        public string Date { get; set; }
-        public double Value { get; set; }
-    }
-    public class GMapCoordinate
-    {
-        public double Lat { get; set; }
-        public double Lng { get; set; }
-    }
-    public class GMapPolygon
-    {
-        public List<IEnumerable<GMapCoordinate>> Position { get; } = new List<IEnumerable<GMapCoordinate>>();
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Comuna { get; set; }
-        public string Provincia { get; set; }
-        public string Region { get; set; }
-    }
-    public class IExport
-    {
-        public string Label { get; set; }
-    }
-    public class ExportMenu : IExport
-    {
-        public IEnumerable<IExport> Menu { get; set; }
-    }
-    public class ExportItem : IExport
-    {
-        public string Type { get; set; }
-    }
-    public class IChoices
-    {
-        public string Label { get; set; }
-    }
-    public class ChoicesItem : IChoices
-    {
-        public string Value { get; set; }
-    }
-    public class ChoicesGroup : IChoices
-    {
-        public int Id { get; set; }
-        public IEnumerable<ChoicesItem> Choices { get; set; }
     }
 }

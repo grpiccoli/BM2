@@ -12,35 +12,25 @@ namespace BiblioMit.Models.VM
     {
         //Parent
         public Company Company { get; set; }
-
         //Attributes
-
-        [Display(Name = "Tipo")]
+        [Display(Name = "Type")]
         public Typep Typep { get; set; }
-
-        [Display(Name = "Fuente")]
+        [Display(Name = "Source")]
         public string Source { get; set; }
-
         public Uri Uri { get; set; }
-
-        [Display(Name = "Título")]
+        [Display(Name = "Title")]
         public string Title { get; set; }
-
-        [Display(Name = "Resumen")]
+        [Display(Name = "Abstract")]
         public string Abstract { get; set; }
-
-        [Display(Name = "Revista")]
+        [Display(Name = "Journal")]
         public string Journal { get; set; }
-
         [Display(Name = "DOI")]
         public string DOI { get; set; }
-
-        [Display(Name = "Año")]
+        [Display(Name = "Year")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy}")]
         public DateTime Date { get; set; }
-
-        [Display(Name = "Autores")]
+        [Display(Name = "Authors")]
         public IEnumerable<AuthorVM> Authors { get; set; }
     }
 }

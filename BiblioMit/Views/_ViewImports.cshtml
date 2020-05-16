@@ -7,14 +7,15 @@
 @using BiblioMit.Models.AccountViewModels
 @using BiblioMit.Models.ManageViewModels
 @using BiblioMit.Areas.Identity
+@using Microsoft.Extensions.Options
+@*@addTagHelper *, WebOptimizer.Core*@
+@addTagHelper *, Boxed.AspNetCore.TagHelpers
+@addTagHelper *, BiblioMit
 @using Microsoft.AspNetCore.Builder
 @using Microsoft.AspNetCore.Localization
 @using Microsoft.AspNetCore.Mvc.Localization
-@using Microsoft.Extensions.Options
-@*@addTagHelper *, WebOptimizer.Core*@
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-@addTagHelper *, Boxed.AspNetCore.TagHelpers
-@addTagHelper *, BiblioMit
+@addTagHelper *, LazZiya.ExpressLocalization
 @inject IViewLocalizer Localizer
 @inject IOptions<RequestLocalizationOptions> LocOptions
 @using Microsoft.AspNetCore.Authorization

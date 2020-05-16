@@ -50,7 +50,7 @@ namespace BiblioMit.Areas.Identity.Pages.Account
                 ModelState.AddModelError(string.Empty, ErrorMessage);
             }
 
-            returnUrl ??= new Uri("~/");
+            if (returnUrl == null) returnUrl = new Uri("~/");
 
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme)
@@ -113,10 +113,12 @@ namespace BiblioMit.Areas.Identity.Pages.Account
     {
         [Required]
         [EmailAddress]
+        [Display(Name = "Email")]
         public string Email { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
+        [Display(Name = "Password")]
         public string Password { get; set; }
 
         [Display(Name = "Remember me?")]

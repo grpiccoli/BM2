@@ -43,7 +43,7 @@
         {
             <form class="px-4 py-3" asp-controller="Account"
                   asp-action="Login" asp-route-returnUrl="@Context.Request.Path"
-                  asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" autocomplete="on">
+                  method="post" autocomplete="on">
                 <div class="form-group">
                     <label asp-for="Email">@Localizer["Email"]</label>
                     <input asp-for="Email" class="form-control" autocomplete="email">

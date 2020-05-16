@@ -21,6 +21,12 @@
     ]
   },
   {
+    "outputFileName": "wwwroot/js/centres.min.js",
+    "inputFiles": [
+      "wwwroot/js/centres.js"
+    ]
+  },
+  {
     "outputFileName": "wwwroot/js/tippy.min.js",
     "inputFiles": [
       "scripts/tippy.js"

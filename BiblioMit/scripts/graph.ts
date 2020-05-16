@@ -1,29 +1,32 @@
 ﻿//out vars
+var lang = $("html").attr("lang");
+var esp = lang === 'es';
 var series: any = new Object();
-var choiceOps = {
+var choiceOps:any = {
     maxItemCount: 10,
     removeItemButton: true,
     duplicateItemsAllowed: false,
     paste: false,
     searchResultLimit: 10,
     shouldSort: false,
-    placeholderValue: 'Seleccione áreas',
-    searchPlaceholderValue: 'Buscar datos',
-    loadingText: 'Cargando...',
-    noResultsText: 'Sin resultados',
-    noChoicesText: 'Sin opciones a elegir',
-    itemSelectText: 'Presione para seleccionar',
-    maxItemText: (maxItemCount: number) => {
-        return `Máximo ${maxItemCount} valores`;
-    },
+    placeholderValue: esp ? 'Seleccione áreas' : 'Select areas',
     fuseOptions: {
         include: 'score'
     }
 };
+if (esp) {
+    choiceOps.searchPlaceholderValue = 'Buscar';
+    choiceOps.loadingText = 'Cargando...';
+    choiceOps.noResultsText = 'Sin resultados';
+    choiceOps.noChoicesText = 'Sin opciones a elegir';
+    choiceOps.itemSelectText = 'Presione para seleccionar';
+    choiceOps.maxItemText = (maxItemCount: number) => `Máximo ${maxItemCount} valores`;
+}
 const etl = document.getElementById('tl');
-choiceOps.placeholderValue = 'Variables semáforo';
+choiceOps.placeholderValue = esp ? 'Variables semáforo' : 'Semaforo Variables';
 const tl = new Choices(etl, choiceOps);
 const semaforo = !document.getElementById('semaforo').classList.contains('d-none');
+var logged = document.getElementById('logoutForm') !== null;
 //passive support
 var supportsPassiveOption = false;
 try {
@@ -41,9 +44,7 @@ try {
 var chart: any = am4core.create("chartdiv", am4charts.XYChart);
 am4core.ready(async function () {
     am4core.useTheme(am4themes_kelly);
-    //chart.scrollbarX = new am4core.Scrollbar();
-    //chart.scrollbarY = new am4core.Scrollbar();
-    chart.language.locale = am4lang_es_ES;
+    if (esp) chart.language.locale = am4lang_es_ES;
     var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
     dateAxis.dataFields.category = 'date';
     //dateAxis.dateFormats.setKey("day", "MM");
@@ -52,12 +53,20 @@ am4core.ready(async function () {
     dateAxis.periodChangeDateFormats.setKey('month', 'MMM yy');
     dateAxis.tooltipDateFormat = 'dd MMM, yyyy';
     dateAxis.renderer.minGridDistance = 40;
-    var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+    chart.yAxes.push(new am4charts.ValueAxis());
     chart.legend = new am4charts.Legend();
     chart.cursor = new am4charts.XYCursor();
     chart.exporting.menu = new am4core.ExportMenu();
-    await fetch('/ambiental/exportmenu').then(j => j.json())
-        .then(menu => chart.exporting.menu.items = menu);
+    if (!logged) {
+        chart.exporting.formatOptions.getKey("png").disabled = true;
+        chart.exporting.formatOptions.getKey("svg").disabled = true;
+        chart.exporting.formatOptions.getKey("pdf").disabled = true;
+        chart.exporting.formatOptions.getKey("json").disabled = true;
+        chart.exporting.formatOptions.getKey("csv").disabled = true;
+        chart.exporting.formatOptions.getKey("xlsx").disabled = true;
+        chart.exporting.formatOptions.getKey("html").disabled = true;
+        chart.exporting.formatOptions.getKey("pdfdata").disabled = true;
+    }
 });
 //LOAD DATA
 async function fetchData(url:string, tag:string, name:string) {
@@ -90,7 +99,7 @@ async function loadData(values: any, event: any, boolpsmb: boolean) {
         x = [null, event.value, null, event.label, null];
         rd = st + 4;
     } else {
-        x = [event.value, null, event.label, null, event.groupValue === "Fitoplancton" ? "fito" : "graph"];
+        x = [event.value, null, event.label, null, (event.groupValue === "Fitoplancton" || event.groupValue === "Phytoplankton") ? "fito" : "graph"];
         st++;
         grp = false;
     }
@@ -146,7 +155,7 @@ evariable.addEventListener('removeItem', (event: any) => {
         chart.series.removeIndex(chart.series.indexOf(series[name])).dispose();
     });
 }, supportsPassiveOption ? { passive: true } : false);
-choiceOps.placeholderValue = 'Seleccione variables';
+choiceOps.placeholderValue = esp ? 'Seleccione variables' : 'Select Variables';
 const variables = new Choices(evariable, choiceOps);
 variables.setChoices(async () => await getList('variable'));
 //SEMAFORO select
@@ -167,7 +176,7 @@ function getParam(a:string, x:any) {
 }
 if (semaforo) {
     etl.addEventListener('addItem', (event:any) => {
-        if (event.detail.groupValue === 'Análisis') {
+        if (event.detail.groupValue === 'Análisis' || event.detail.groupValue === 'Analysis') {
             var a = event.detail.value;
             var tls = tl.getValue();
             var psmbs = tls.filter((x:any) => x.groupId === 2);
@@ -201,16 +210,18 @@ if (semaforo) {
                         tl.enable();
                     });
                 } else {
-                    alert(`${nm} no seleccionada, seleccione requerimientos y luego análisis`);
+                    var msg = esp ? "no seleccionada, seleccione requerimientos y luego análisis" : "not selected, select requirements and then analysis";
+                    alert(`${nm} ${msg}`);
                 }
             } else {
                 tl.removeActiveItemsByValue(a);
-                alert('PSMB y especie no seleccionados, seleccione requerimientos y luego análisis');
+                var msg = esp ? "PSMB y especie no seleccionados, seleccione requerimientos y luego análisis" : "PSMB and species not selected, select requirements and then analysis";
+                alert(msg);
             }
         }
     }, supportsPassiveOption ? { passive: true } : false);
     etl.addEventListener('removeItem', (event: any) => {
-        if (event.detail.groupValue === 'Análisis') {
+        if (event.detail.groupValue === 'Análisis' || event.detail.groupValue === 'Analysis') {
             var a = event.detail.value;
             var tls = tl.getValue();
             var psmbs = tls.filter((x: any) => x.groupId === 2);
@@ -274,15 +285,17 @@ var map = new google.maps.Map(document.getElementById('map'), {
     mapTypeId: 'terrain'
 });
 var infowindow = new google.maps.InfoWindow({
-    maxWidth: 150
+    maxWidth: 500
 });
 var polygons:any = {};
 window.onload = async function initMap() {
     var bnds: google.maps.LatLngBounds = new google.maps.LatLngBounds();
+    var titles = esp ?
+        ["Código", "Comuna", "Provincia", "Región", "Área", "Fuentes"] :
+        ["Code", "Commune", "Province", "Region", "Area", "Sources"]
     await fetch('/ambiental/mapdata')
         .then(r => r.json())
-        .then(data => {
-            return data.map((dato:any) => {
+        .then(data => data.map((dato:any) => {
                 var consessionPolygon = new google.maps.Polygon({
                     paths: dato.position,
                     zIndex: dato.id
@@ -299,45 +312,45 @@ window.onload = async function initMap() {
                 marker.addListener('click', (marker =>
                     () => {
                         var content =
-                            `<h4>${dato.name}</h4><table><tr><th>Código</th><td align="right">${dato.id}</td></tr>`;
+                            `<h4>${dato.name}</h4><table class="table"><tr><th scope="row">${titles[0]}</th><td align="right">${dato.id}</td></tr>`;
                         if (dato.comuna !== null)
                             content +=
-                                `<tr><th>Comuna</th><td align="right">${dato.comuna}</td></tr>`;
+                                `<tr><th scope="row">${titles[1]}</th><td align="right">${dato.comuna}</td></tr>`;
                         if (dato.provincia !== null)
                             content +=
-                                `<tr><th>Provincia</th><td align="right">${dato.provincia}</td></tr>`;
+                                `<tr><th scope="row">${titles[2]}</th><td align="right">${dato.provincia}</td></tr>`;
                         content +=
-                            `<tr><th>Región</th><td align="right">${dato.region}</td>
-</tr><tr><th>Área (ha)</th>
+                            `<tr><th scope="row">${titles[3]}</th><td align="right">${dato.region}</td>
+</tr><tr><th scope="row">${titles[4]} (ha)</th>
 <td align="right">${Area(consessionPolygon.getPath().getArray())}</td>
 </tr>
-<tr><th>Fuentes</th><td></td></tr>
+<tr><th scope="row">${titles[5]}</th><td></td></tr>
 <tr><td>Sernapesca</td>
 <td align="right">
 <a target="_blank" href="https://www.sernapesca.cl">
-<img src="../images/ico/sernapesca.svg" height="30" /></a></td></tr>
-<tr><td>PER Mitilidos</td>
+<img src="../images/ico/sernapesca.svg" height="20" /></a></td></tr>
+<tr><td>PER Mitílidos</td>
 <td align="right">
 <a target="_blank" href="https://www.mejillondechile.cl">
-<img src="../images/ico/mejillondechile.min.png" height="30" /></a></td></tr>
+<img src="../images/ico/mejillondechile.min.png" height="20" /></a></td></tr>
 <tr><td>Subpesca</td>
 <td align="right">
 <a target="_blank" href="https://www.subpesca.cl">
-<img src="../images/ico/subpesca.png" height="30" /></a></td></tr>`;
+<img src="../images/ico/subpesca.png" height="20" /></a></td></tr>`;
                         infowindow.setContent(content);
                         infowindow.open(map, marker);
-                        //map.setCenter(marker.getPosition());
                     })(marker));
                 return marker;
-            });
-        }).then(m =>
-            new MarkerClusterer(map, m, { imagePath: '/images/markers/m' })
+            })).then(m => new MarkerClusterer(map, m, { imagePath: '/images/markers/m' })
         ).then(_ => {
             map.fitBounds(bnds);
             map.setCenter(bnds.getCenter());
             loadDates();
             variables.setChoiceByValue('t');
             psmb.setChoiceByValue('1');
+            if (logged) chart.exporting.menu = new am4core.ExportMenu();
+            //chart.scrollbarX = new am4core.Scrollbar();
+            //chart.scrollbarY = new am4core.Scrollbar();
         });
 };
 function loadDates() {

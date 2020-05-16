@@ -1,5 +1,5 @@
 ﻿(function ($) {
-    var culture = navigator.language.split('-')[0];
+    var culture = $("html").attr("lang");
     $.when(
         $.get("/lib/cldr-data/supplemental/likelySubtags.json"),
         $.get("/lib/cldr-data/main/" + culture + "/numbers.json"),
