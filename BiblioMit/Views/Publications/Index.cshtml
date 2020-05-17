@@ -1,13 +1,19 @@
 @model IEnumerable<BiblioMit.Models.VM.PublicationVM>
 @using System.Text.RegularExpressions
+@using BiblioMit.Models.VM
+@using Newtonsoft.Json
 
 @{
     ViewData["Title"] = Localizer["BiblioMit Search Engine"].Value;
-    ViewData["lang"] = Localizer["en"].Value;
+    var src = (string[])ViewData["src"];
+    var asc = (bool)ViewData["asc"];
+    var trpp = (int)ViewData["trpp"];
+    var srt = (string)ViewData["srt"];
 }
 
-<partial name="_Libs" model='new HashSet<string> { "bibico", "bibliomit", "bootstrap-select" }' />
+<partial name="_Libs" model='new HashSet<string> { "bibico", "bibliomit", "bootstrap-select", "bootstrap-select-localize", "@popperjs/core", "tippy.js", "tippyTranslate", "statsGraph" }' />
 
+<input id="title" class="d-none"/>
 <div class="row">
     <div class="col-12 col-lg-9">
         <h3>
@@ -17,7 +23,7 @@
             <i class="fas fa-chart-bar fa-fw"></i> @Localizer["Projects"] @Localizer["&"] <i class="fas fa-registered fa-fw"></i> @Localizer["Patents"]:
         </h3>
     </div>
-    @if ((bool)ViewData["any"])
+    @if (src.Any())
     {
         <div class="col-12 col-lg-3">
             <partial name="_Clock" view-data="ViewData" />
@@ -27,34 +33,34 @@
 
 <hr class="section-heading-spacer">
 <form id="search" asp-action="Index" method="get" class="form-inline">
-    <div class="col-12 col-md-4">
-        <select name="src"
+    <div class="form-group col-12 col-md-4">
+        <select name="src" data-language="@Localizer["en"]"
                 placeholder="@Localizer["Select at least 1 repository to search"]"
-                class="selectpicker form-control w-100" multiple data-live-search="true"
+                class="custom-select selectpicker form-control w-100" multiple data-live-search="true"
                 data-actions-box="true" data-size="5"
                 title="@Localizer["Select one or more repositories"] …" data-selected-text-format="count > 3">
             <optgroup label="@Localizer["Thesis and Articles of Universities & Research Centres"]">
                 @foreach (var u in (Dictionary<string, string>)ViewData["ues"])
                 {
-                    <option data-tokens="university universidad thesis tesis @u.Key" selected="@(((string[])ViewData["src"]).Contains(u.Key))" data-icon="bib-@u.Key-mono" data-subtext="(@u.Key)" value="@u.Key">@u.Value</option>
+                    <option data-tokens="university universidad thesis tesis @u.Key" selected="@src.Contains(u.Key)" data-icon="bib-@u.Key-mono" data-subtext="(@u.Key)" value="@u.Key">@u.Value</option>
                 }
             </optgroup>
             <optgroup label="@Localizer["Projects"]:">
                 @foreach (var u in (Dictionary<string, string>)ViewData["proj"])
                 {
-                    <option data-tokens="projects proyectos @u.Key" selected="@(((string[])ViewData["src"]).Contains(u.Key))" data-icon="bib-@u.Key.ToLower()-mono" data-subtext="(@u.Value)" value="@u.Key">@u.Key</option>
+                    <option data-tokens="projects proyectos @u.Key" selected="@src.Contains(u.Key)" data-icon="bib-@u.Key.ToLower()-mono" data-subtext="(@u.Value)" value="@u.Key">@u.Key</option>
                 }
             </optgroup>
             <optgroup label="@Localizer["Articles"]">
                 @foreach (var u in (Dictionary<string, string>)ViewData["gs"])
                 {
-                    <option data-tokens="articles artículos @u.Key" selected="@(((string[])ViewData["src"]).Contains(u.Key))" data-icon="bib-@u.Key-mono" data-subtext="(@u.Key)" value="@u.Key">@u.Value</option>
+                    <option data-tokens="articles artículos @u.Key" selected="@src.Contains(u.Key)" data-icon="bib-@u.Key-mono" data-subtext="(@u.Key)" value="@u.Key">@u.Value</option>
                 }
             </optgroup>
             <optgroup label="@Localizer["Patents"]">
                 @foreach (var u in (Dictionary<string, string>)ViewData["gp"])
                 {
-                    <option data-tokens="patents patentes @u.Key" selected="@(((string[])ViewData["src"]).Contains(u.Key))" data-icon="bib-@u.Key-mono" data-subtext="(@u.Key)" value="@u.Key">@u.Value</option>
+                    <option data-tokens="patents patentes @u.Key" selected="@src.Contains(u.Key)" data-icon="bib-@u.Key-mono" data-subtext="(@u.Key)" value="@u.Key">@u.Value</option>
                 }
             </optgroup>
         </select>
@@ -66,25 +72,34 @@
                     <i class="fas fa-sliders-h"></i>
                 </button>
                 <div class="dropdown-menu bloc">
-                    <h6 class="dropdown-header">@Localizer["Criteria"]:</h6>
-                    <select size="3" class="form-control" name="srt">
-                        <option value="score" selected="@(((string)ViewData["srt"]).Contains("score"))">@Localizer["Score"]</option>
-                        <option value="title" selected="@(((string)ViewData["srt"]).Contains("title"))">@Localizer["Title"]</option>
-                        <option value="date" selected="@(((string)ViewData["srt"]).Contains("date"))">@Localizer["Date"]</option>
-                    </select>
-                    <h6 class="dropdown-header">@Localizer["Order"]:</h6>
-                    <select size="2" class="form-control" name="asc">
-                        <option value="false" selected="@(!(bool)(ViewData["asc"]))">@Localizer["Descendent"]</option>
-                        <option value="true" selected="@((bool)(ViewData["asc"]))">@Localizer["Ascendent"]</option>
-                    </select>
-                    <h6 class="dropdown-header">@Localizer["Results per page"]:</h6>
-                    <select size="5" class="form-control" name="trpp">
-                        <option value="5" selected="@((int)ViewData["trpp"]==5)">5</option>
-                        <option value="10" selected="@((int)ViewData["trpp"]==10)">10</option>
-                        <option value="20" selected="@((int)ViewData["trpp"]==20)">20</option>
-                        <option value="50" selected="@((int)ViewData["trpp"]==50)">50</option>
-                        <option value="100" selected="@((int)ViewData["trpp"]==100)">100</option>
-                    </select>
+                    <div class="form-group">
+                        <label class="dropdown-header">@Localizer["Criteria"]:</label>
+                        <select class="form-control w-100" name="srt" size="4">
+                            <option value="" selected="@(string.IsNullOrWhiteSpace(srt))">@Localizer["Default"]</option>
+                            <option value="score" selected="@srt.Contains("score")">@Localizer["Score"]</option>
+                            <option value="title" selected="@srt.Contains("title")">@Localizer["Title"]</option>
+                            <option value="date" selected="@srt.Contains("date")">@Localizer["Date"]</option>
+                        </select>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="form-group">
+                        <label class="dropdown-header">@Localizer["Order"]:</label>
+                        <select class="form-control w-100" name="asc" size="2">
+                            <option value="false" selected="@(!asc)">@Localizer["Descendent"]</option>
+                            <option value="true" selected="@asc">@Localizer["Ascendent"]</option>
+                        </select>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="form-group">
+                        <label class="dropdown-header">@Localizer["Results per page"]:</label>
+                        <select class="form-control w-100" name="trpp" size="5">
+                            <option value="5" selected="@(trpp==5)">5</option>
+                            <option value="10" selected="@(trpp==10)">10</option>
+                            <option value="20" selected="@(trpp==20)">20</option>
+                            <option value="50" selected="@(trpp==50)">50</option>
+                            <option value="100" selected="@(trpp==100)">100</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
@@ -95,54 +110,44 @@
     </div>
 </form>
 
-@if ((bool)ViewData["any"])
+@if (src.Any())
 {
+    var counts = (Dictionary<Typep, int>)ViewData["counts"];
+    int sum = counts.Sum(s => s.Value);
+    var percentages = counts.ToDictionary(c => c.Key, c => c.Value * 100 / sum);
+    var multipleRepos = src.Count() > 1;
+    var titles = new List<string> { $"{sum} Total" };
     <div class="container-fluid">
         <div class="row flex-nowrap">
             <div class="col-6 col-md-3 btn-group-vertical">
-                @if ((bool)ViewData["multiple"])
+                @if (multipleRepos)
                 {
                     <button type="button" onclick="selectData(0);" class="stat btn btn-block btn-sm btn-outline-secondary">
                         <i class="fas fa-globe-americas fa-fw"></i>
-                        <span><strong>@ViewData["all"]</strong> Resultados en <strong>@ViewData["tot"]</strong> Reps.</span>
+                        <span><strong>@sum</strong> @Localizer["Results in"] <strong>@src.Length</strong> Reps.</span>
                     </button>
                 }
-                @if ((bool)ViewData["articles"])
+                @foreach (var count in counts)
                 {
+                    var name = count.Key.GetAttrName();
                     <button type="button" onclick="selectData(1);" class="stat btn btn-block btn-sm btn-outline-warning">
                         <i class="fas fa-book fa-fw"></i>
-                        <span><strong>@ViewData["artscnt"]</strong> @Localizer["Articles"] (@ViewData["%arts"]%)</span>
+                        <span><strong>@count.Value</strong> @name (@percentages[count.Key]%)</span>
                     </button>
-                }
-                @if ((bool)ViewData["tesis"])
-                {
-                    <button type="button" onclick="selectData(2);" class="stat btn btn-block btn-sm btn-outline-success">
-                        <i class="fas fa-graduation-cap fa-fw"></i>
-                        <span><strong>@ViewData["tesiscnt"]</strong> @Localizer["Thesis"] (@ViewData["%tesis"]%)</span>
-                    </button>
-                }
-                @if ((bool)ViewData["projects"])
-                {
-                    <button type="button" onclick="selectData(3);" class="stat btn btn-block btn-sm btn-outline-danger">
-                        <i class="fas fa-chart-bar fa-fw"></i>
-                        <span><strong>@ViewData["projcnt"]</strong> @Localizer["Projects"] (@ViewData["%proj"]%)</span>
-                    </button>
-                }
-                @if ((bool)ViewData["patents"])
-                {
-                    <button type="button" onclick="selectData(4);" class="stat btn btn-block btn-sm btn-outline-info">
-                        <i class="fas fa-registered fa-fw"></i>
-                        <span><strong>@ViewData["patscnt"]</strong> @Localizer["Patents"] (@ViewData["%pats"]%)</span>
-                    </button>
+                    titles.Add($"{count.Value} {name}");
                 }
             </div>
-            @if ((bool)ViewData["couple"])
+            @if (multipleRepos)
             {
                 <div class="col-6 col-md-3">
                     <div class="chartdiv chart" id="chartdiv"></div>
                 </div>
                 <div class="col-12 col-md-6" id="legenddiv"></div>
-                <partial name="_StatsGraph" view-data="ViewData" />
+                @this.Block("TOP", @<script>
+                    var chartData = @Html.Raw(ViewData["chartData"]);
+                    var titles = @Html.Raw(JsonConvert.SerializeObject(titles));
+                </script>)
+                <partial name="_AmCharts" />
             }
         </div>
     </div>
@@ -200,7 +205,7 @@
                             </p>
                         </td>
                         <td class="d-none d-sm-table-cell">
-                            @Html.DisplayFor(modelItem => item.Typep)
+                            @item.Typep.GetAttrName()
                         </td>
                         <td>
                             <div class="d-block d-sm-none">
@@ -218,7 +223,7 @@
                                 </div>
                                 <div>
                                     <h3>
-                                        @Html.DisplayFor(modelItem => item.Typep)
+                                        @item.Typep.GetAttrName()
                                     </h3>
                                 </div>
                             </div>
@@ -235,15 +240,16 @@
                                 </p>
                                 @if (item.Authors != null && item.Authors.Any())
                                 {
+                                    var last = item.Authors.Last();
+                                    var sep = ";";
                                     <p>
-                                        @for (var i = 0; i < item.Authors.Count(); i++)
+                                        @foreach (var author in item.Authors)
                                         {
-                                            var sep = i + 1 == item.Authors.Count() ? "." : ";";
-                                            string aut = $"{item.Authors.ElementAt(i).Last}, {item.Authors.ElementAt(i).Name}{sep} ";
+                                            if (author.Equals(last)) sep = ".";
                                             <a asp-action="Index" asp-route-src="@ViewData["srcs"]"
-                                               asp-route-q="@item.Authors.ElementAt(i).Last, @item.Authors.ElementAt(i).Name"
+                                               asp-route-q="@author.Last, @author.Name"
                                                asp-route-srt="@ViewData["srt"]" asp-route-asc="@ViewData["asc"]"
-                                               asp-route-trpp="@ViewData["trpp"]">@aut</a>
+                                               asp-route-trpp="@ViewData["trpp"]">@author.Last, @author.Name</a>@sep
                                         }
                                     </p>
                                 }
@@ -275,25 +281,5 @@
     </div>
     <partial name="_PagingPub" view-data="ViewData" />
 }
-
-@this.Block("Scripts", @<script>
-    $(function () {
-        $('.title').tooltip({
-            title: translate
-        });
-        function translate() {
-            var e = $(this);
-            var localData = "error";
-            $.ajax({
-                url: "/home/translate",
-                type: 'post',
-                async: false,
-                data: {text: e.children(":first").html().replace(/[\n\r]+/g, " ").replace(/&nbsp;/g, " "), to: "@ViewData["lang"]"},
-                success: function (d) { localData = d; }
-            });
-            return localData;
-        }
-    });
-</script>)
 
 <partial name="_ValidationScriptsPartial" />

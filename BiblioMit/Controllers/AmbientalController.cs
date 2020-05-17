@@ -123,10 +123,10 @@ namespace BiblioMit.Controllers
             };
             return Json(result.Concat(new List<ChoicesGroup> { groups, orders, species }));
         }
-        public JsonResult TLData(int a, int psmb, int sp, int? t, int? l, int? rs, int? s, string start, string end) {
+        public async Task<JsonResult> TLData(int a, int psmb, int sp, int? t, int? l, int? rs, int? s, string start, string end) {
             var i = Convert.ToDateTime(start, CultureInfo.InvariantCulture);
             var f = Convert.ToDateTime(end, CultureInfo.InvariantCulture);
-            IEnumerable<ExpandoObject> data = new List<ExpandoObject>();
+            var data = new List<AmData>();
             //a 1 semilla, 2 larva, 3 reproductor
             var psmbs = new Dictionary<int,int>{
                 {20, 101990},
@@ -147,176 +147,161 @@ namespace BiblioMit.Controllers
                 case 11:
                     if (t.HasValue)
                     {
-                        var date1 = Enumerable.Range(0, 1 + f.Subtract(i).Days)
-                        .Select(offset => new Talla { SpecieSeed = new SpecieSeed { Seed = new Seed { Date = i.AddDays(offset) } } });
-                        var ensayos1 = _context.Tallas
+                        var db = _context.Tallas
                         .Include(tl => tl.SpecieSeed)
                         .ThenInclude(ss => ss.Seed)
-                        .Where(tl =>
-                        (psmb == 23 || tl.SpecieSeed.Seed.FarmId == psmbs[psmb])
-                        && (sp == 34 || tl.SpecieSeed.SpecieId == sps[sp])
-                        && tl.Range == (Range)(t.Value % 10))
-                        .ToList();
-                        ensayos1.AddRange(date1);
-                        data = ensayos1
-                        .GroupBy(tl => tl.SpecieSeed.Seed.Date.Date)
+                        .Where(tl => tl.Range == (Range)(t.Value % 10));
+                        if (psmb != 23) db = db.Where(tl => tl.SpecieSeed.Seed.Farm.Code == psmbs[psmb]);
+                        if (sp != 34) db = db.Where(tl => tl.SpecieSeed.SpecieId == sps[sp]);
+                        var list = await db.ToListAsync().ConfigureAwait(false);
+                        data = list.GroupBy(tl => tl.SpecieSeed.Seed.Date)
                         .OrderBy(g => g.Key)
                         .Select(g =>
                         {
-                            dynamic expando = new ExpandoObject();
-                            expando.date = g.Key.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                            var expando = new AmData
+                            {
+                                Date = g.Key.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
+                            };
                             var cs = g.Where(gg => gg.Id != 0).Select(m => m.Proportion);
-                            ((IDictionary<string, object>)expando)
-                            .Add($"{a}_{psmb}_{sp}_{t.Value}", cs.Any() ? (double?)Math.Round(cs.Average()) : null);
-                            return (ExpandoObject)expando;
-                        });
+                            if (!cs.Any()) return null;
+                            expando.Value = Math.Round(cs.Average());
+                            return expando;
+                        }).Where(d => d != null).ToList();
                     }
                     break;
                 case 12:
                     if (l.HasValue)
                     {
-                        var date2 = Enumerable.Range(0, 1 + f.Subtract(i).Days)
-                        .Select(offset => new Larva { Larvae = new Larvae { Date = i.AddDays(offset) } });
-                        var ensayos2 = _context.Larvas
+                        var db = _context.Larvas
                         .Include(tl => tl.Larvae)
-                        .Where(tl =>
-                        (psmb == 23 || tl.Larvae.FarmId == psmbs[psmb])
-                        && (sp == 34 || tl.SpecieId == sps[sp])
-                        && tl.LarvaType == (LarvaType)(l.Value % 10))
-                        .ToList();
-                        ensayos2.AddRange(date2);
-                        data = ensayos2
-                        .GroupBy(tl => tl.Larvae.Date.Date)
+                        .Where(tl => tl.LarvaType == (LarvaType)(l.Value % 10));
+                        if (psmb != 23) db = db.Where(tl => tl.Larvae.Farm.Code == psmbs[psmb]);
+                        if (sp != 34) db = db.Where(tl => tl.SpecieId == sps[sp]);
+                        var list = await db.ToListAsync().ConfigureAwait(false);
+                        data = list.GroupBy(tl => tl.Larvae.Date)
                         .OrderBy(g => g.Key)
                         .Select(g =>
                         {
-                            dynamic expando = new ExpandoObject();
-                            expando.date = g.Key.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                            var expando = new AmData
+                            {
+                                Date = g.Key.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
+                            };
                             var cs = g.Where(gg => gg.Id != 0).Select(m => m.Count);
-                            ((IDictionary<string, object>)expando)
-                            .Add($"{a}_{psmb}_{sp}_{l.Value}", cs.Any() ? (double?)Math.Round(cs.Average()) : null);
-                            return (ExpandoObject)expando;
-                        });
+                            if (!cs.Any()) return null;
+                            expando.Value = Math.Round(cs.Average());
+                            return expando;
+                        }).Where(d => d != null).ToList();
                     }
                     break;
                 case 13:
                     if (s.HasValue)
                     {
-                        var date3 = Enumerable.Range(0, 1 + f.Subtract(i).Days)
-                        .Select(offset => new Spawning { Date = i.AddDays(offset) });
-                        var ensayos3 = _context.Spawnings
-                        .Where(tl =>
-                        (psmb == 23 || tl.FarmId == psmbs[psmb]))
-                        .ToList();
-                        ensayos3.AddRange(date3);
-                        data = ensayos3
-                        .GroupBy(tl => tl.Date.Date)
+                        var db = _context.Spawnings as IQueryable<Spawning>;
+                        if (psmb != 23) db = db.Where(tl => tl.Farm.Code == psmbs[psmb]);
+                        var list = await db.ToListAsync().ConfigureAwait(false);
+                        data = list.GroupBy(tl => tl.Date)
                         .OrderBy(g => g.Key)
                         .Select(g =>
                         {
-                            dynamic expando = new ExpandoObject();
-                            expando.date = g.Key.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                            var expando = new AmData
+                            {
+                                Date = g.Key.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
+                            };
                             var cs = g.Where(gg => gg.Id != 0).Select(m => s.Value == 70 ? m.FemaleIG : m.MaleIG);
-                            ((IDictionary<string, object>)expando)
-                            .Add($"{a}_{psmb}_{sp}_{s.Value}", cs.Any() ? (double?)Math.Round(cs.Average()) : null);
-                            return (ExpandoObject)expando;
-                        });
+                            if (!cs.Any()) return null;
+                            expando.Value = Math.Round(cs.Average());
+                            return expando;
+                        }).Where(d => d != null).ToList();
                     }
                     break;
                 case 14:
-                    var date4 = Enumerable.Range(0, 1 + f.Subtract(i).Days)
-                    .Select(offset => new SpecieSeed { Seed = new Seed { Date = i.AddDays(offset) } });
-                    var ensayos4 = _context.SpecieSeeds
-                    .Include(ss => ss.Seed)
-                    .Where(tl =>
-                    (psmb == 23 || tl.Seed.FarmId == psmbs[psmb])
-                    && (sp == 34 || tl.SpecieId == sps[sp]))
-                    .ToList();
-                    ensayos4.AddRange(date4);
-                    data = ensayos4
-                    .GroupBy(tl => tl.Seed.Date.Date)
-                    .OrderBy(g => g.Key)
-                    .Select(g =>
+                    if (true)
                     {
-                        dynamic expando = new ExpandoObject();
-                        expando.date = g.Key.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-                        var cs = g.Where(gg => gg.Id != 0).Select(m => m.Capture);
-                        ((IDictionary<string, object>)expando)
-                        .Add($"{a}_{psmb}_{sp}", cs.Any() ? (double?)Math.Round(cs.Average()) : null);
-                        return (ExpandoObject)expando;
-                    });
+                        var db = _context.SpecieSeeds
+                        .Include(ss => ss.Seed) as IQueryable<SpecieSeed>;
+                        if (psmb != 23) db = db.Where(tl => tl.Seed.Farm.Code == psmbs[psmb]);
+                        if (sp != 34) db = db.Where(tl => tl.SpecieId == sps[sp]);
+                        var list = await db.ToListAsync().ConfigureAwait(false);
+                        data = list.GroupBy(tl => tl.Seed.Date)
+                        .OrderBy(g => g.Key)
+                        .Select(g =>
+                        {
+                            var expando = new AmData
+                            {
+                                Date = g.Key.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
+                            };
+                            var cs = g.Where(gg => gg.Id != 0).Select(m => m.Capture);
+                            if (!cs.Any()) return null;
+                            expando.Value = Math.Round(cs.Average());
+                            return expando;
+                        }).Where(d => d != null).ToList();
+                    }
                     break;
                 case 15:
                     if (rs.HasValue)
                     {
-                        var date5 = Enumerable.Range(0, 1 + f.Subtract(i).Days)
-                        .Select(offset => new ReproductiveStage { Spawning = new Spawning { Date = i.AddDays(offset) } });
-                        var ensayos5 = _context.ReproductiveStages
-                        .Where(tl =>
-                        (psmb == 23 || tl.Spawning.FarmId == psmbs[psmb])
-                        && tl.Stage == (Stage)(rs.Value % 10))
-                        .ToList();
-                        ensayos5.AddRange(date5);
-                        data = ensayos5
-                        .GroupBy(tl => tl.Spawning.Date.Date)
+                        var db = _context.ReproductiveStages
+                        .Where(tl => tl.Stage == (Stage)(rs.Value % 10));
+                        if (psmb != 23) db = db.Where(tl => tl.Spawning.Farm.Code == psmbs[psmb]);
+                        var list = await db.ToListAsync().ConfigureAwait(false);
+                        data = list.GroupBy(tl => tl.Spawning.Date)
                         .OrderBy(g => g.Key)
                         .Select(g =>
                         {
-                            dynamic expando = new ExpandoObject();
-                            expando.date = g.Key.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                            var expando = new AmData
+                            {
+                                Date = g.Key.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
+                            };
                             var cs = g.Where(gg => gg.Id != 0).Select(m => m.Proportion);
-                            ((IDictionary<string, object>)expando)
-                            .Add($"{a}_{psmb}_{sp}_{rs.Value}", cs.Any() ? (double?)Math.Round(cs.Average()) : null);
-                            return (ExpandoObject)expando;
-                        });
+                            if (!cs.Any()) return null;
+                            expando.Value = Math.Round(cs.Average());
+                            return expando;
+                        }).Where(d => d != null).ToList();
                     }
                     break;
                 case 16:
                     if (s.HasValue)
                     {
-                        var date6 = Enumerable.Range(0, 1 + f.Subtract(i).Days)
-                        .Select(offset => new Spawning { Date = i.AddDays(offset) });
-                        var ensayos6 = _context.Spawnings
-                        .Where(tl =>
-                        (psmb == 23 || tl.FarmId == psmbs[psmb]))
-                        .ToList();
-                        ensayos6.AddRange(date6);
-                        data = ensayos6
-                        .GroupBy(tl => tl.Date.Date)
+                        var db = _context.Spawnings as IQueryable<Spawning>;
+                        if (psmb != 23) db = db.Where(tl => tl.Farm.Code == psmbs[psmb]);
+                        var list = await db.ToListAsync().ConfigureAwait(false);
+                        data = list.GroupBy(tl => tl.Date)
                         .OrderBy(g => g.Key)
                         .Select(g =>
                         {
-                            dynamic expando = new ExpandoObject();
-                            expando.date = g.Key.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                            var expando = new AmData
+                            {
+                                Date = g.Key.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
+                            };
                             var cs = g.Where(gg => gg.Id != 0).Select(m => s.Value == 70 ? m.FemaleProportion : m.MaleProportion);
-                            ((IDictionary<string, object>)expando)
-                            .Add($"{a}_{psmb}_{sp}_{s.Value}", cs.Any() ? (double?)Math.Round(cs.Average()) : null);
-                            return (ExpandoObject)expando;
-                        });
+                            if (!cs.Any()) return null;
+                            expando.Value = Math.Round(cs.Average());
+                            return expando;
+                        }).Where(d => d != null).ToList();
                     }
                     break;
                 case 17:
-                    var date7 = Enumerable.Range(0, 1 + f.Subtract(i).Days)
-                    .Select(offset => new SpecieSeed { Seed = new Seed { Date = i.AddDays(offset) } });
-                    var ensayos7 = _context.SpecieSeeds
-                    .Include(ss => ss.Seed)
-                    .Where(tl =>
-                    (psmb == 23 || tl.Seed.FarmId == psmbs[psmb])
-                    && (sp == 34 || tl.SpecieId == sps[sp]))
-                    .ToList();
-                    ensayos7.AddRange(date7);
-                    data = ensayos7
-                    .GroupBy(tl => tl.Seed.Date.Date)
-                    .OrderBy(g => g.Key)
-                    .Select(g =>
+                    if (true)
                     {
-                        dynamic expando = new ExpandoObject();
-                        expando.date = g.Key.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-                        var cs = g.Where(gg => gg.Id != 0).Select(m => m.Proportion);
-                        ((IDictionary<string, object>)expando)
-                        .Add($"{a}_{psmb}_{sp}", cs.Any() ? (double?)Math.Round(cs.Average()) : null);
-                        return (ExpandoObject)expando;
-                    });
+                        var db = _context.SpecieSeeds
+                        .Include(ss => ss.Seed) as IQueryable<SpecieSeed>;
+                        if (psmb == 23) db = db.Where(tl => tl.Seed.Farm.Code == psmbs[psmb]);
+                        if (psmb == 23) db = db.Where(tl => tl.SpecieId == sps[sp]);
+                        var list = await db.ToListAsync().ConfigureAwait(false);
+                        data = list.GroupBy(tl => tl.Seed.Date)
+                        .OrderBy(g => g.Key)
+                        .Select(g =>
+                        {
+                            var expando = new AmData
+                            {
+                                Date = g.Key.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
+                            };
+                            var cs = g.Where(gg => gg.Id != 0).Select(m => m.Proportion);
+                            if (!cs.Any()) return null;
+                            expando.Value = Math.Round(cs.Average());
+                            return expando;
+                        }).Where(d => d != null).ToList();
+                    }
                     break;
             }
             return Json(data);
@@ -324,189 +309,188 @@ namespace BiblioMit.Controllers
         public JsonResult TLList() =>
             Json(new List<object>
             {
-                new
+                new ChoicesGroup
                 {
-                    label = "Análisis",
-                    id = 1,
-                    choices = new List<object>{
-                        new {
-                            value = "14",
-                            label = "Captura por Especie"
+                    Label = _localizer["Analysis"],
+                    Id = 1,
+                    Choices = new List<ChoicesItem>{
+                        new ChoicesItem{
+                            Value = "14",
+                            Label = _localizer["Capture per Species"]
                         },
-                        new {
-                            value = "17",
-                            label = "% Especie"
+                        new ChoicesItem{
+                            Value = "17",
+                            Label = _localizer["% Species"]
                         },
-                        new {
-                            value = "11",
-                            label = "% Talla por Especie"
+                        new ChoicesItem{
+                            Value = "11",
+                            Label = _localizer["% Size per Species"]
                         },
-                        new {
-                            value = "12",
-                            label = "Larvas"
+                        new ChoicesItem{
+                            Value = "12",
+                            Label = _localizer["Larvae"]
                         },
-                        new {
-                            value = "13",
-                            label = "IG Reproductores"
+                        new ChoicesItem{
+                            Value = "13",
+                            Label = _localizer["IG Reproductores"]
                         },
-                        new {
-                            value = "15",
-                            label = "% Estado Reproductivo"
+                        new ChoicesItem{
+                            Value = "15",
+                            Label = _localizer["% Reproductive Stage"]
                         },
-                        new {
-                            value = "16",
-                            label = "% Sexo"
+                        new ChoicesItem{
+                            Value = "16",
+                            Label = _localizer["% Sex"]
                         }
                     }
                 },
-                new
+                new ChoicesGroup
                 {
-                    label = "PSMBs",
-                    id = 2,
-                    choices = new List<object>{
-                        new {
-                            value = "20",
-                            label = "10219 Quetalco"
+                    Label = "PSMBs",
+                    Id = 2,
+                    Choices = new List<ChoicesItem>{
+                        new ChoicesItem{
+                            Value = "20",
+                            Label = "10219 Quetalco"
                         },
-                        new {
-                            value = "21",
-                            label = "10220 Vilipulli"
+                        new ChoicesItem{
+                            Value = "21",
+                            Label = "10220 Vilipulli"
                         },
-                        new {
-                            value = "22",
-                            label = "10431 Carahue"
+                        new ChoicesItem{
+                            Value = "22",
+                            Label = "10431 Carahue"
                         },
-                        new {
-                            value = "23",
-                            label = "Todos los PSMBs"
+                        new ChoicesItem{
+                            Value = "23",
+                            Label = _localizer["All PSMBs"]
                         }
                     }
                 },
-                new
+                new ChoicesGroup
                 {
-                    label = "Especies",
-                    id = 3,
-                    choices = new List<object>{
-                        new {
-                            value = "31",
-                            label = "Chorito (<i>Mytilus chilensis</i>)"
+                    Label = _localizer["Species"],
+                    Id = 3,
+                    Choices = new List<ChoicesItem>{
+                        new ChoicesItem{
+                            Value = "31",
+                            Label = "Chorito (<i>Mytilus chilensis</i>)"
                         },
-                        new {
-                            value = "32",
-                            label = "Cholga (<i>Aulacomya atra</i>)"
+                        new ChoicesItem{
+                            Value = "32",
+                            Label = "Cholga (<i>Aulacomya atra</i>)"
                         },
-                        new {
-                            value = "33",
-                            label = "Choro (<i>Choromytilus chorus</i>)"
+                        new ChoicesItem{
+                            Value = "33",
+                            Label = "Choro (<i>Choromytilus chorus</i>)"
                         },
-                        new {
-                            value = "33",
-                            label = "Todas las especies"
+                        new ChoicesItem{
+                            Value = "33",
+                            Label = _localizer["All Species"]
                         }
                     }
                 },
-                new
+                new ChoicesGroup
                 {
-                    label = "Tallas (%)",
-                    id = 4,
-                    choices = new List<object>{
-                        new {
-                            value = "40",
-                            label = "0 - 1 (mm)"
+                    Label = _localizer["Size (%)"],
+                    Id = 4,
+                    Choices = new List<ChoicesItem>{
+                        new ChoicesItem{
+                            Value = "40",
+                            Label = "0 - 1 (mm)"
                         },
-                        new {
-                            value = "41",
-                            label = "1 - 2 (mm)"
+                        new ChoicesItem{
+                            Value = "41",
+                            Label = "1 - 2 (mm)"
                         },
-                        new {
-                            value = "42",
-                            label = "2 - 5 (mm)"
+                        new ChoicesItem{
+                            Value = "42",
+                            Label = "2 - 5 (mm)"
                         },
-                        new {
-                            value = "43",
-                            label = "5 - 10 (mm)"
+                        new ChoicesItem{
+                            Value = "43",
+                            Label = "5 - 10 (mm)"
                         },
-                        new {
-                            value = "44",
-                            label = "10 - 15 (mm)"
+                        new ChoicesItem{
+                            Value = "44",
+                            Label = "10 - 15 (mm)"
                         },
-                        new {
-                            value = "45",
-                            label = "15 - 20 (mm)"
+                        new ChoicesItem{
+                            Value = "45",
+                            Label = "15 - 20 (mm)"
                         },
-                        new {
-                            value = "46",
-                            label = "20 - 25 (mm)"
+                        new ChoicesItem{
+                            Value = "46",
+                            Label = "20 - 25 (mm)"
                         },
-                        new {
-                            value = "47",
-                            label = "25 - 30 (mm)"
+                        new ChoicesItem{
+                            Value = "47",
+                            Label = "25 - 30 (mm)"
                         },
-                        new {
-                            value = "48",
-                            label = "Todas las tallas"
+                        new ChoicesItem{
+                            Value = "48",
+                            Label = _localizer["Todas las tallas"]
                         },
-
                     }
                 },
-                new
+                new ChoicesGroup
                 {
-                    label = "Tipo de Larva (conteo)",
-                    id = 5,
-                    choices = new List<object>{
-                        new {
-                            value = "50",
-                            label = "Larva D (D)"
+                    Label = _localizer["Larva Type (count)"],
+                    Id = 5,
+                    Choices = new List<ChoicesItem>{
+                        new ChoicesItem{
+                            Value = "50",
+                            Label = _localizer["D-Larva"]
                         },
-                        new {
-                            value = "51",
-                            label = "Larva umbonada (U)"
+                        new ChoicesItem{
+                            Value = "51",
+                            Label = _localizer["Umbanate Larva"]
                         },
-                        new {
-                            value = "52",
-                            label = "Larva con ojo (O)"
+                        new ChoicesItem{
+                            Value = "52",
+                            Label = _localizer["Eyed Larva"]
                         },
-                        new {
-                            value = "53",
-                            label = "Larvas Totales"
+                        new ChoicesItem{
+                            Value = "53",
+                            Label = _localizer["Total Larvae"]
                         }
                     }
                 },
-                new
+                new ChoicesGroup
                 {
-                    label = "Estado reproductivo (%)",
-                    id = 6,
-                    choices = new List<object>{
-                        new {
-                            value = "60",
-                            label = "En madurez"
+                    Label = _localizer["Estado reproductivo (%)"],
+                    Id = 6,
+                    Choices = new List<ChoicesItem>{
+                        new ChoicesItem{
+                            Value = "60",
+                            Label = _localizer["Maturing"]
                         },
-                        new {
-                            value = "61",
-                            label = "Maduro"
+                        new ChoicesItem{
+                            Value = "61",
+                            Label = _localizer["Mature"]
                         },
-                        new {
-                            value = "62",
-                            label = "Desovado"
+                        new ChoicesItem{
+                            Value = "62",
+                            Label = _localizer["Spawned"]
                         },
-                        new {
-                            value = "63",
-                            label = "En desove"
+                        new ChoicesItem{
+                            Value = "63",
+                            Label = _localizer["Spawning"]
                         }
                     }
                 },
-                new
+                new ChoicesGroup
                 {
-                    label = "Sexo",
-                    id = 7,
-                    choices = new List<object>{
-                        new {
-                            value = "70",
-                            label = "Hembra"
+                    Label = _localizer["Sex"],
+                    Id = 7,
+                    Choices = new List<ChoicesItem>{
+                        new ChoicesItem{
+                            Value = "70",
+                            Label = _localizer["Female"]
                         },
-                        new {
-                            value = "71",
-                            label = "Macho"
+                        new ChoicesItem{
+                            Value = "71",
+                            Label = _localizer["Male"]
                         }
                     }
                 }
@@ -604,48 +588,45 @@ namespace BiblioMit.Controllers
             { 
                 Date = g.Key.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
             };
-            if (g.Count() > 1)
+            if (fito)
             {
-                if (fito)
+                var tmp = g.Where(m => m.Phytoplanktons != null);
+                if (tmp.Any())
                 {
-                    var tmp = g.Where(m => m.Phytoplanktons != null);
-                    if (tmp.Any())
+                    bool phy = var == "phy";
+                    if (!phy)
+                        tmp = tmp.Where(m => m.Phytoplanktons
+                        .Any(p => p.Species.Genus.Group.NormalizedName
+                        .Equals(var, StringComparison.Ordinal)));
+                    if (phy || tmp.Any())
                     {
-                        bool phy = var == "phy";
-                        if (!phy)
-                            tmp = tmp.Where(m => m.Phytoplanktons
-                            .Any(p => p.Species.Genus.Group.NormalizedName
-                            .Equals(var, StringComparison.Ordinal)));
-                        if (phy || tmp.Any())
+                        var cs = phy ?
+                            tmp.SelectMany(m => m.Phytoplanktons.Select(p => p.C))
+                            : tmp.SelectMany(m => m.Phytoplanktons
+                            .Where(p => p.Species.Genus.Group.NormalizedName
+                            .Equals(var, StringComparison.Ordinal)).Select(p => p.C));
+                        if (cs.Any())
                         {
-                            var cs = phy ?
-                                tmp.SelectMany(m => m.Phytoplanktons.Select(p => p.C))
-                                : tmp.SelectMany(m => m.Phytoplanktons
-                                .Where(p => p.Species.Genus.Group.NormalizedName
-                                .Equals(var, StringComparison.Ordinal)).Select(p => p.C));
-                            if (cs.Any())
-                            {
-                                response.Value = Math.Round(cs.Average(), 2);
-                                return response;
-                            }
+                            response.Value = Math.Round(cs.Average(), 2);
+                            return response;
                         }
                     }
                 }
-                else
+            }
+            else
+            {
+                string attr = var switch
                 {
-                    string attr = var switch
-                    {
-                        "t" => "Temperature",
-                        "ph" => "Ph",
-                        "sal" => "Salinity",
-                        "o2" => "Oxigen",
-                        _ => ""
-                    };
-                    if(g.Any(m => m[attr] != null))
-                    {
-                        response.Value = Math.Round(g.Average(m => (double?)m[attr]).Value, 2);
-                        return response;
-                    }
+                    "t" => "Temperature",
+                    "ph" => "Ph",
+                    "sal" => "Salinity",
+                    "o2" => "Oxigen",
+                    _ => ""
+                };
+                if(g.Any(m => m[attr] != null))
+                {
+                    response.Value = Math.Round(g.Average(m => (double?)m[attr]).Value, 2);
+                    return response;
                 }
             }
             return null;

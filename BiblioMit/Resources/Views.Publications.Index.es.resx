@@ -138,6 +138,9 @@
   <data name="Date" xml:space="preserve">
     <value>Fecha</value>
   </data>
+  <data name="Default" xml:space="preserve">
+    <value>Predeterminado</value>
+  </data>
   <data name="Descendent" xml:space="preserve">
     <value>Descendiente</value>
   </data>
@@ -158,6 +161,9 @@
   </data>
   <data name="Projects" xml:space="preserve">
     <value>Proyectos</value>
+  </data>
+  <data name="Results in" xml:space="preserve">
+    <value>Resultados en</value>
   </data>
   <data name="Results per page" xml:space="preserve">
     <value>Resultados por página</value>

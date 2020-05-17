@@ -42,11 +42,26 @@ try {
 } catch (e) { }
 //CHART
 var chart: any = am4core.create("chartdiv", am4charts.XYChart);
-am4core.ready(async function () {
+$("#legenddiv").bind('DOMSubtreeModified', function (_e) {
+    document.getElementById("legenddiv").style.height = chart.legend.contentHeight + "px";
+});
+am4core.ready(function () {
     am4core.useTheme(am4themes_kelly);
     if (esp) chart.language.locale = am4lang_es_ES;
     var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
     dateAxis.dataFields.category = 'date';
+    //var sd = $('#start').val();
+    //var ed = $('#end').val();
+    //var dataSource = chart.dataSource;
+    //dataSource.url = `/ambiental/graphdata?area=1&var=t&start=${sd}&end=${ed}`;
+    //var ser = chart.series.push(new am4charts.LineSeries());
+    //ser.dataFields.valueY = "value";
+    //chart.dataSource.parser = am4core.JSONParser;
+    chart.scrollbarX = new am4core.Scrollbar();
+    //var dateslider = am4core.create("sliderdiv", am4core.Container);
+    //chart.scrollbarX.parent = dateslider;
+    //chart.scrollbarY = new am4core.Scrollbar();
+    //chart.scrollbarY.parent = chart.leftAxesContainer;
     //dateAxis.dateFormats.setKey("day", "MM");
     //dateAxis.dateFormats.setKey("month", "MMM");
     dateAxis.dateFormats.setKey('year', 'yy');
@@ -55,6 +70,12 @@ am4core.ready(async function () {
     dateAxis.renderer.minGridDistance = 40;
     chart.yAxes.push(new am4charts.ValueAxis());
     chart.legend = new am4charts.Legend();
+    var legendContainer = am4core.create("legenddiv", am4core.Container);
+    legendContainer.width = am4core.percent(100);
+    legendContainer.height = am4core.percent(100);
+    chart.legend.parent = legendContainer;
+    //chart.events.on("datavalidated", resizeLegend);
+    //chart.events.on("maxsizechanged", resizeLegend);
     chart.cursor = new am4charts.XYCursor();
     chart.exporting.menu = new am4core.ExportMenu();
     if (!logged) {
@@ -159,89 +180,85 @@ choiceOps.placeholderValue = esp ? 'Seleccione variables' : 'Select Variables';
 const variables = new Choices(evariable, choiceOps);
 variables.setChoices(async () => await getList('variable'));
 //SEMAFORO select
-function getParam(a:string, x:any) {
+function getParam(a:number, x:any) {
     switch (a) {
-        case '11':
+        case 11:
             return `&t=${x.value.slice(1, 2)}`;
-        case '12':
+        case 12:
             return `&l=${x.value}`;
-        case '13':
-        case '16':
+        case 13:
+        case 16:
             return `&s=${x.value}`;
-        case '15':
+        case 15:
             return `&rs=${x.value}`;
         default:
             return '';
     };
 }
+function callDatas(a: any, sd: any, ed: any, psmbs: any, sps: any, tls: any, groupId:number)
+{
+    var promises = groupId == 0 ?
+        psmbs.map((psmb: any) =>
+        sps.map((sp: any) => {
+            var tag = [a.value, psmb.value, sp.value].join('_');
+            var name = [a.label, psmb.label, sp.label].join(' ');
+            var url = `/ambiental/tldata?a=${a.value}&psmb=${psmb.value}&sp=${sp.value}&start=${sd}&end=${ed}`;
+            return fetchData(url, tag, name);
+        })) :
+        tls.filter((x: any) => x.groupId === groupId).map((x: any) =>
+            psmbs.map((psmb: any) =>
+                sps.map((sp: any) => {
+                    var tag = [a.value, psmb.value, sp.value, x.value].join('_');
+                    var name = [a.label, psmb.label, sp.label, x.label].join(' ');
+                    var url = `/ambiental/tldata?a=${a.value}&psmb=${psmb.value}&sp=${sp.value}${getParam(a.value, x)}&start=${sd}&end=${ed}`;
+                    return fetchData(url, tag, name);
+                })));
+    return Promise.all(promises).then(r => r);
+}
 if (semaforo) {
-    etl.addEventListener('addItem', (event:any) => {
-        if (event.detail.groupValue === 'Análisis' || event.detail.groupValue === 'Analysis') {
-            var a = event.detail.value;
-            var tls = tl.getValue();
-            var psmbs = tls.filter((x:any) => x.groupId === 2);
-            var sps = tls.filter((x: any) => x.groupId === 3);
-            if (psmbs.length !== 0 && sps.length !== 0) {
-                var id = event.detail.id;
-                var nm = event.detail.groupValue;
-                console.log(event.detail);
-                var xs = id == 0 ?
-                    { value: '', name: '' }
-                    : tls.filter((x: any) => x.groupId === id);
-                var xs = tls.filter((x: any) => x.groupId === id);
-                if (xs.length !== 0) {
-                    psmb.disable();
-                    variables.disable();
-                    tl.disable();
-                    var sd = $('#start').val();
-                    var ed = $('#end').val();
-                    var promises = psmbs.map((psmb: any) =>
-                        sps.map((sp: any) =>
-                            xs.map((x: any) => {
-                                var tag = [a, psmb.value, sp.value, x.value].join('_');
-                                var name = [event.detail.name, psmb.name, sp.name, x.name].join(' ');
-                                var url = `/ambiental/tldata?a=${a}&psmb=${psmb.value}&sp=${sp.value}${getParam(a, x)}&start=${sd}&end=${ed}`;
-                                return fetchData(url, tag, name);
-                            })));
-                    Promise.all(promises).then(r => {
-                        chart.invalidateData();
-                        psmb.enable();
-                        variables.enable();
-                        tl.enable();
-                    });
-                } else {
-                    var msg = esp ? "no seleccionada, seleccione requerimientos y luego análisis" : "not selected, select requirements and then analysis";
-                    alert(`${nm} ${msg}`);
-                }
-            } else {
-                tl.removeActiveItemsByValue(a);
-                var msg = esp ? "PSMB y especie no seleccionados, seleccione requerimientos y luego análisis" : "PSMB and species not selected, select requirements and then analysis";
-                alert(msg);
-            }
-        }
-    }, supportsPassiveOption ? { passive: true } : false);
-    etl.addEventListener('removeItem', (event: any) => {
-        if (event.detail.groupValue === 'Análisis' || event.detail.groupValue === 'Analysis') {
-            var a = event.detail.value;
-            var tls = tl.getValue();
+    etl.addEventListener('addItem', (_e: any) => {
+        var tls = tl.getValue();
+        var analyses = tls.filter((x: any) => x.groupId === 1);
+        if (analyses.length !== 0) {
             var psmbs = tls.filter((x: any) => x.groupId === 2);
             var sps = tls.filter((x: any) => x.groupId === 3);
             if (psmbs.length !== 0 && sps.length !== 0) {
                 psmb.disable();
                 variables.disable();
                 tl.disable();
-                var id = a - 7;
-                var xs = tls.filter((x: any) => x.groupId === id);
-                if (xs.length !== 0) {
-                    psmbs.forEach((psmb:any) =>
-                        sps.forEach((sp:any) =>
-                            xs.forEach((x: any) => {
-                                var name = [a, psmb.value, sp.value, x.value].join('_');
-                                chart.series.removeIndex(chart.series.indexOf(series[name])).dispose();
-                            })));
-                }
+                var sd = $('#start').val();
+                var ed = $('#end').val();
+                analyses.forEach((a: any) => {
+                    switch (a.value) {
+                        case '14':
+                        case '17':
+                            return callDatas(a, sd, ed, psmbs, sps, null, 0);
+                        case '11':
+                            return callDatas(a, sd, ed, psmbs, sps, tls, 4);
+                        case '12':
+                            return callDatas(a, sd, ed, psmbs, sps, tls, 5);
+                        case '13':
+                        case '16':
+                            return callDatas(a, sd, ed, psmbs, sps, tls, 7);
+                        case '15':
+                            return callDatas(a, sd, ed, psmbs, sps, tls, 6);
+                        default:
+                            return;
+                    }
+                });
+                chart.invalidateData();
+                psmb.enable();
+                variables.enable();
+                tl.enable();
             }
         }
+    }, supportsPassiveOption ? { passive: true } : false);
+    etl.addEventListener('removeItem', (event: any) => {
+        var id = event.detail.value;
+        Object.keys(series).forEach(k => {
+            if (k.match(/^[1-7][0-8]_[1-7][0-8]_[1-7][0-8](_[1-7][0-8])?$/g) && k.includes(id))
+                chart.series.removeIndex(chart.series.indexOf(series[k])).dispose();
+        });
     }, supportsPassiveOption ? { passive: true } : false);
     tl.setChoices(async () => await getList('tl'));
 }

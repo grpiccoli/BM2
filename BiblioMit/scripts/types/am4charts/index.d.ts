@@ -1,10 +1,12 @@
 ﻿declare class am4core {
+    static Container: any;
     static Scrollbar: any;
     static useTheme: any;
     static ready: any;
     scrollbarX: any;
     scrollbarY: any;
     static create: any;
+    static percent: any;
     static ExportMenu: any;
     language: any;
     dataSource: any;

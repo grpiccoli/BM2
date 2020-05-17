@@ -77,36 +77,38 @@ try {
 }
 catch (e) { }
 var chart = am4core.create("chartdiv", am4charts.XYChart);
+$("#legenddiv").bind('DOMSubtreeModified', function (_e) {
+    document.getElementById("legenddiv").style.height = chart.legend.contentHeight + "px";
+});
 am4core.ready(function () {
-    return __awaiter(this, void 0, void 0, function () {
-        var dateAxis;
-        return __generator(this, function (_a) {
-            am4core.useTheme(am4themes_kelly);
-            if (esp)
-                chart.language.locale = am4lang_es_ES;
-            dateAxis = chart.xAxes.push(new am4charts.DateAxis());
-            dateAxis.dataFields.category = 'date';
-            dateAxis.dateFormats.setKey('year', 'yy');
-            dateAxis.periodChangeDateFormats.setKey('month', 'MMM yy');
-            dateAxis.tooltipDateFormat = 'dd MMM, yyyy';
-            dateAxis.renderer.minGridDistance = 40;
-            chart.yAxes.push(new am4charts.ValueAxis());
-            chart.legend = new am4charts.Legend();
-            chart.cursor = new am4charts.XYCursor();
-            chart.exporting.menu = new am4core.ExportMenu();
-            if (!logged) {
-                chart.exporting.formatOptions.getKey("png").disabled = true;
-                chart.exporting.formatOptions.getKey("svg").disabled = true;
-                chart.exporting.formatOptions.getKey("pdf").disabled = true;
-                chart.exporting.formatOptions.getKey("json").disabled = true;
-                chart.exporting.formatOptions.getKey("csv").disabled = true;
-                chart.exporting.formatOptions.getKey("xlsx").disabled = true;
-                chart.exporting.formatOptions.getKey("html").disabled = true;
-                chart.exporting.formatOptions.getKey("pdfdata").disabled = true;
-            }
-            return [2];
-        });
-    });
+    am4core.useTheme(am4themes_kelly);
+    if (esp)
+        chart.language.locale = am4lang_es_ES;
+    var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+    dateAxis.dataFields.category = 'date';
+    chart.scrollbarX = new am4core.Scrollbar();
+    dateAxis.dateFormats.setKey('year', 'yy');
+    dateAxis.periodChangeDateFormats.setKey('month', 'MMM yy');
+    dateAxis.tooltipDateFormat = 'dd MMM, yyyy';
+    dateAxis.renderer.minGridDistance = 40;
+    chart.yAxes.push(new am4charts.ValueAxis());
+    chart.legend = new am4charts.Legend();
+    var legendContainer = am4core.create("legenddiv", am4core.Container);
+    legendContainer.width = am4core.percent(100);
+    legendContainer.height = am4core.percent(100);
+    chart.legend.parent = legendContainer;
+    chart.cursor = new am4charts.XYCursor();
+    chart.exporting.menu = new am4core.ExportMenu();
+    if (!logged) {
+        chart.exporting.formatOptions.getKey("png").disabled = true;
+        chart.exporting.formatOptions.getKey("svg").disabled = true;
+        chart.exporting.formatOptions.getKey("pdf").disabled = true;
+        chart.exporting.formatOptions.getKey("json").disabled = true;
+        chart.exporting.formatOptions.getKey("csv").disabled = true;
+        chart.exporting.formatOptions.getKey("xlsx").disabled = true;
+        chart.exporting.formatOptions.getKey("html").disabled = true;
+        chart.exporting.formatOptions.getKey("pdfdata").disabled = true;
+    }
 });
 function fetchData(url, tag, name) {
     return __awaiter(this, void 0, void 0, function () {
@@ -229,94 +231,86 @@ variables.setChoices(function () { return __awaiter(_this, void 0, void 0, funct
 }); }); });
 function getParam(a, x) {
     switch (a) {
-        case '11':
+        case 11:
             return "&t=" + x.value.slice(1, 2);
-        case '12':
+        case 12:
             return "&l=" + x.value;
-        case '13':
-        case '16':
+        case 13:
+        case 16:
             return "&s=" + x.value;
-        case '15':
+        case 15:
             return "&rs=" + x.value;
         default:
             return '';
     }
     ;
 }
+function callDatas(a, sd, ed, psmbs, sps, tls, groupId) {
+    var promises = groupId == 0 ?
+        psmbs.map(function (psmb) {
+            return sps.map(function (sp) {
+                var tag = [a.value, psmb.value, sp.value].join('_');
+                var name = [a.label, psmb.label, sp.label].join(' ');
+                var url = "/ambiental/tldata?a=" + a.value + "&psmb=" + psmb.value + "&sp=" + sp.value + "&start=" + sd + "&end=" + ed;
+                return fetchData(url, tag, name);
+            });
+        }) :
+        tls.filter(function (x) { return x.groupId === groupId; }).map(function (x) {
+            return psmbs.map(function (psmb) {
+                return sps.map(function (sp) {
+                    var tag = [a.value, psmb.value, sp.value, x.value].join('_');
+                    var name = [a.label, psmb.label, sp.label, x.label].join(' ');
+                    var url = "/ambiental/tldata?a=" + a.value + "&psmb=" + psmb.value + "&sp=" + sp.value + getParam(a.value, x) + "&start=" + sd + "&end=" + ed;
+                    return fetchData(url, tag, name);
+                });
+            });
+        });
+    return Promise.all(promises).then(function (r) { return r; });
+}
 if (semaforo) {
-    etl.addEventListener('addItem', function (event) {
-        if (event.detail.groupValue === 'Análisis' || event.detail.groupValue === 'Analysis') {
-            var a = event.detail.value;
-            var tls = tl.getValue();
-            var psmbs = tls.filter(function (x) { return x.groupId === 2; });
-            var sps = tls.filter(function (x) { return x.groupId === 3; });
-            if (psmbs.length !== 0 && sps.length !== 0) {
-                var id = event.detail.id;
-                var nm = event.detail.groupValue;
-                console.log(event.detail);
-                var xs = id == 0 ?
-                    { value: '', name: '' }
-                    : tls.filter(function (x) { return x.groupId === id; });
-                var xs = tls.filter(function (x) { return x.groupId === id; });
-                if (xs.length !== 0) {
-                    psmb.disable();
-                    variables.disable();
-                    tl.disable();
-                    var sd = $('#start').val();
-                    var ed = $('#end').val();
-                    var promises = psmbs.map(function (psmb) {
-                        return sps.map(function (sp) {
-                            return xs.map(function (x) {
-                                var tag = [a, psmb.value, sp.value, x.value].join('_');
-                                var name = [event.detail.name, psmb.name, sp.name, x.name].join(' ');
-                                var url = "/ambiental/tldata?a=" + a + "&psmb=" + psmb.value + "&sp=" + sp.value + getParam(a, x) + "&start=" + sd + "&end=" + ed;
-                                return fetchData(url, tag, name);
-                            });
-                        });
-                    });
-                    Promise.all(promises).then(function (r) {
-                        chart.invalidateData();
-                        psmb.enable();
-                        variables.enable();
-                        tl.enable();
-                    });
-                }
-                else {
-                    var msg = esp ? "no seleccionada, seleccione requerimientos y luego análisis" : "not selected, select requirements and then analysis";
-                    alert(nm + " " + msg);
-                }
-            }
-            else {
-                tl.removeActiveItemsByValue(a);
-                var msg = esp ? "PSMB y especie no seleccionados, seleccione requerimientos y luego análisis" : "PSMB and species not selected, select requirements and then analysis";
-                alert(msg);
-            }
-        }
-    }, supportsPassiveOption ? { passive: true } : false);
-    etl.addEventListener('removeItem', function (event) {
-        if (event.detail.groupValue === 'Análisis' || event.detail.groupValue === 'Analysis') {
-            var a = event.detail.value;
-            var tls = tl.getValue();
+    etl.addEventListener('addItem', function (_e) {
+        var tls = tl.getValue();
+        var analyses = tls.filter(function (x) { return x.groupId === 1; });
+        if (analyses.length !== 0) {
             var psmbs = tls.filter(function (x) { return x.groupId === 2; });
             var sps = tls.filter(function (x) { return x.groupId === 3; });
             if (psmbs.length !== 0 && sps.length !== 0) {
                 psmb.disable();
                 variables.disable();
                 tl.disable();
-                var id = a - 7;
-                var xs = tls.filter(function (x) { return x.groupId === id; });
-                if (xs.length !== 0) {
-                    psmbs.forEach(function (psmb) {
-                        return sps.forEach(function (sp) {
-                            return xs.forEach(function (x) {
-                                var name = [a, psmb.value, sp.value, x.value].join('_');
-                                chart.series.removeIndex(chart.series.indexOf(series[name])).dispose();
-                            });
-                        });
-                    });
-                }
+                var sd = $('#start').val();
+                var ed = $('#end').val();
+                analyses.forEach(function (a) {
+                    switch (a.value) {
+                        case '14':
+                        case '17':
+                            return callDatas(a, sd, ed, psmbs, sps, null, 0);
+                        case '11':
+                            return callDatas(a, sd, ed, psmbs, sps, tls, 4);
+                        case '12':
+                            return callDatas(a, sd, ed, psmbs, sps, tls, 5);
+                        case '13':
+                        case '16':
+                            return callDatas(a, sd, ed, psmbs, sps, tls, 7);
+                        case '15':
+                            return callDatas(a, sd, ed, psmbs, sps, tls, 6);
+                        default:
+                            return;
+                    }
+                });
+                chart.invalidateData();
+                psmb.enable();
+                variables.enable();
+                tl.enable();
             }
         }
+    }, supportsPassiveOption ? { passive: true } : false);
+    etl.addEventListener('removeItem', function (event) {
+        var id = event.detail.value;
+        Object.keys(series).forEach(function (k) {
+            if (k.match(/^[1-7][0-8]_[1-7][0-8]_[1-7][0-8](_[1-7][0-8])?$/g) && k.includes(id))
+                chart.series.removeIndex(chart.series.indexOf(series[k])).dispose();
+        });
     }, supportsPassiveOption ? { passive: true } : false);
     tl.setChoices(function () { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
         switch (_a.label) {

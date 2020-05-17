@@ -4,7 +4,7 @@
     ViewData["Title"] = "Agenda de Ciencia y Tecnología";
 }
 
-<partial name="_Libs" model='new HashSet<string> { "bootstrap-select", "bibliomit", "bibico" }' />
+<partial name="_Libs" model='new HashSet<string> { "bootstrap-select", "bibliomit", "bibico", "bootstrap-select-localize" }' />
 
 <div class="row">
     <div class="col-lg-9 col-md-12">
@@ -15,16 +15,16 @@
 
 <form id="form" asp-action="Agenda" method="get" class="form-inline">
     <div class="col-12 col-md-4">
-        <select id="fondos" name="fund" class="selectpicker form-control" multiple="" data-live-search="true" 
+        <select id="fondos" name="fund" class="selectpicker form-control w-100" multiple data-live-search="true" 
                 tabindex="-98" data-actions-box="true" value="@ViewData["fund"]" title="Seleccionar Fondos …"
                 data-selected-text-format="count > 4" data-size="5">
             <optgroup label="Fondos CONICYT &mdash; Comisión Nacional de Investigación Científica y Tecnológica">
-                @foreach (var item in ((Dictionary<string, string>)ViewData["conicyt1"]).Keys)
+                @foreach (var item in ((Dictionary<string, Uri>)ViewData["conicyt1"]).Keys)
                 {
                     <option data-icon="bib-conicyt-mono" data-tokens="conicyt" selected="@(((string[])ViewData["fund"]).Contains(item))" 
                             data-subtext="@item" value="@item">@item.ToUpper()</option>
                 }
-                @foreach (var item in ((Dictionary<string, string>)ViewData["conicyt2"]).Keys)
+                @foreach (var item in ((Dictionary<string, Uri>)ViewData["conicyt2"]).Keys)
                 {
                     <option data-icon="bib-conicyt-mono" data-tokens="conicyt" selected="@(((string[])ViewData["fund"]).Contains(item))" 
                             data-subtext="@item" value="@item">@item.ToUpper()</option>

@@ -118,10 +118,11 @@ namespace BiblioMit.Controllers
         }
 
         [HttpPost]
-		public IActionResult Translate(string text, string to)
+        [ValidateAntiForgeryToken]
+		public string Translate(string text, string to)
         {
             var translated = _nodeService.Run("./wwwroot/js/translate.js", new string[] { text, to });
-            return Json(translated);
+            return translated;
         }
 		
         [HttpGet]

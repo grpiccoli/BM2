@@ -155,10 +155,10 @@ namespace BiblioMit.Controllers
                     var pubs = await GetPubsAsync(src, q, rpp, pg, sort_by, order, srt_uach, ggl).ConfigureAwait(false);
                     var Publications = pubs.SelectMany(x => x.Item1);
 
-                    var NoResults = pubs.Where(x => x.Item1.Any() && x.Item1.First().Typep == Typep.Tesis).ToDictionary(x => x.Item2, x => x.Item3);
-                    var NoArticles = pubs.Where(x => x.Item1.Any() && x.Item1.First().Typep == Typep.Articulo).ToDictionary(x => x.Item2, x => x.Item3);
-                    var NoPatents = pubs.Where(x => x.Item1.Any() && x.Item1.First().Typep == Typep.Patente).ToDictionary(x => x.Item2, x => x.Item3);
-                    var NoProjs = pubs.Where(x => x.Item1.Any() && x.Item1.First().Typep == Typep.Proyecto).ToDictionary(x => x.Item2, x => x.Item3);
+                    var NoResults = pubs.Where(x => x.Item1.Any() && x.Item1.First().Typep == Typep.Thesis).ToDictionary(x => x.Item2, x => x.Item3);
+                    var NoArticles = pubs.Where(x => x.Item1.Any() && x.Item1.First().Typep == Typep.Article).ToDictionary(x => x.Item2, x => x.Item3);
+                    var NoPatents = pubs.Where(x => x.Item1.Any() && x.Item1.First().Typep == Typep.Patent).ToDictionary(x => x.Item2, x => x.Item3);
+                    var NoProjs = pubs.Where(x => x.Item1.Any() && x.Item1.First().Typep == Typep.Project).ToDictionary(x => x.Item2, x => x.Item3);
                     var nor = NoResults.Count;
                     var nop = NoProjs.Count;
                     var noa = NoArticles.Count;
@@ -713,7 +713,7 @@ string dateSelect, int rpp, string acronym)
                             Source = acronym,
                             Uri = GetUri(n.QuerySelector(quriSelect)),
                             Title = t?.Substring(t.LastIndexOf(']') + 1),
-                            Typep = Typep.Articulo,
+                            Typep = Typep.Article,
                             Company = co,
                             Date = GetDateGS(n, dateSelect),
                             Authors = GetAuthorsGS(n, dateSelect)
@@ -745,7 +745,7 @@ string authorSelect, string dateSelect, string abstractSelect)
                             Source = acronym,
                             Uri = GetUri(url, t),
                             Title = t?.TextContent,
-                            Typep = Typep.Proyecto,
+                            Typep = Typep.Project,
                             Company = co,
                             Date = GetDate(n, dateSelect),
                             Authors = GetAuthorsCorfo(n, authorSelect),
@@ -775,7 +775,7 @@ Uri url, string NoResultsSelect, int NoResultsPos, string nodeSelect)
                         {
                             Source = acronym,
                             Title = n.TextContent,
-                            Typep = Typep.Proyecto,
+                            Typep = Typep.Project,
                             Uri = GetUri(new Uri("http://www.subpesca.cl/fipa/613/w3-article-88970.html"), n),
                             Company = co,
                         }, acronym, GetNoResults(doc, NoResultsSelect, NoResultsPos));
@@ -835,7 +835,7 @@ string acronym, string parameter, int rpp, string sortBy, string order, int? pg,
 {
 Source = acronym,
 Title = n.QuerySelector("h4.title-list")?.TextContent,
-Typep = Typep.Proyecto,
+Typep = Typep.Project,
 Uri = GetUri(url, n.QuerySelector("div.artifact-description > a")),
 Authors = GetAuthors(n, "span.ds-dc_contributor_author-authority"),
 Date = GetDate(n, "span.date"),
@@ -868,7 +868,7 @@ string dateSelect, string authorSelect)
                             {
                                 Source = acronym,
                                 Title = t?.InnerText,
-                                Typep = Typep.Tesis,
+                                Typep = Typep.Thesis,
                                 Uri = GetUri(url, t),
                                 Authors = GetAuthors(n, authorSelect),
                                 Date = GetDate(n, dateSelect),
@@ -898,7 +898,7 @@ string quriSelect, string quriSelectAlt, string titleSelect, string authorSelect
                         let date = n.QuerySelector(dateSelect)?.Text()
                         select new PublicationVM()
                         {
-                            Typep = Typep.Tesis,
+                            Typep = Typep.Thesis,
                             Source = acronym,
                             Title = n.QuerySelector(titleSelect)?.TextContent,
                             Uri = GetUri(url, n.QuerySelector(quriSelect), n.QuerySelector(quriSelectAlt)),
@@ -930,7 +930,7 @@ from n in doc.QuerySelectorAll(nodeSelect)
 let m = n.QuerySelector(quriSelect)
 select new PublicationVM()
 {
-Typep = Typep.Tesis,
+Typep = Typep.Thesis,
 Source = acronym,
 Title = m?.TextContent,
 Uri = GetUri(url, m),
@@ -964,7 +964,7 @@ Date = GetDate(n, dateSelect)
                     Title = n.QuerySelector(titleSelect)?.TextContent,
                     Uri = GetUri(url, n.QuerySelector(quriSelect)),
                     Authors = GetAuthors(n, authorSelect),
-                    Typep = Typep.Tesis,
+                    Typep = Typep.Thesis,
                     Company = co,
                     Date = GetDate(n, dateSelect)
                 }), acronym, GetNoResults(doc, NoResultsSelect, NoResultsPos));
@@ -997,7 +997,7 @@ let d = n.QuerySelector(dateSelect)?.TextContent
 select new PublicationVM()
 {
                             //otros
-                            Typep = Typep.Tesis,
+                            Typep = Typep.Thesis,
 Source = acronym,
 Title = m?.TextContent,
 Uri = GetUri(url, m),
@@ -1038,7 +1038,7 @@ Source = acronym,
 Title = m?.TextContent,
 Uri = GetUri(url, m),
 Authors = GetAuthors(n, authorSelect),
-Typep = Typep.Tesis,
+Typep = Typep.Thesis,
 Company = co,
 Date = GetDate(n, dateSelect)
 }, acronym, GetNoResults(doc, NoResultsSelect, NoResultsPos));
@@ -1069,7 +1069,7 @@ Date = GetDate(n, dateSelect)
                             Title = m?.TextContent,
                             Uri = GetUri(url, m),
                             Authors = GetAuthors(n, authorSelect),
-                            Typep = Typep.Tesis,
+                            Typep = Typep.Thesis,
                             Company = co,
                             Date = GetDate(n, dateSelect)
                         }, acronym, GetNoResults(doc, NoResultsSelect, NoResultsPos));
@@ -1099,7 +1099,7 @@ Date = GetDate(n, dateSelect)
                     Uri = GetUri(url, n.QuerySelector(quriSelect)),
                     Authors = GetAuthors(n, authorSelect),
                     //Typep = GetTypep(n.QuerySelector("span.tipo_obra").Text().ToLower()),
-                    Typep = Typep.Tesis,
+                    Typep = Typep.Thesis,
                     Company = co,
                     Date = GetDate(n, dateSelect)
                 }), acronym, GetNoResults(doc, NoResultsSelect, NoResultsPos));
@@ -1125,7 +1125,7 @@ Date = GetDate(n, dateSelect)
                     var num = doc.QuerySelectorAll(nodeSelect);
                     return (num.Skip(rpp * (pg.Value - 1)).Take(rpp).Select(n => new PublicationVM()
                     {
-                        Typep = Typep.Tesis,
+                        Typep = Typep.Thesis,
                         Source = acronym,
                         Title = n.QuerySelector(quriSelect).TextContent,
                         Uri = GetUri(url, n.QuerySelector(quriSelect)),
@@ -1182,9 +1182,9 @@ Date = GetDate(n, dateSelect)
         {
             return type switch
             {
-                "tesis" => Typep.Tesis,
-                "artículo" => Typep.Articulo,
-                _ => Typep.Desconocido
+                "tesis" => Typep.Thesis,
+                "artículo" => Typep.Article,
+                _ => Typep.Unknown
             };
         }
 

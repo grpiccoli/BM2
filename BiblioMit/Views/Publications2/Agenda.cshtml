@@ -1,7 +1,7 @@
 @model IEnumerable<BiblioMit.Models.VM.AgendaVM>
 
 @{
-    ViewData["Title"] = "Agenda de Ciencia y Tecnología";
+    ViewData["Title"] = Localizer["Agenda de Ciencia y Tecnología"].Value;
 }
 
 <partial name="_Libs" model='new HashSet<string> { "bootstrap-select", "bibliomit", "bibico" }' />
@@ -9,7 +9,7 @@
 <div class="row">
     <div class="col-lg-9 col-md-12">
         <h2>@ViewData["Title"]</h2>
-        <h4>Fondos Concursables de financiamiento Ciencia y Tecnología</h4>
+        <h4>@Localizer["Fondos Concursables de financiamiento Ciencia y Tecnología"]</h4>
     </div>
 </div>
 

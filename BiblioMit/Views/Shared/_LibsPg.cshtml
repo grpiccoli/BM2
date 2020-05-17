@@ -1,7 +1,7 @@
 ﻿@model HashSet<string>
 @{ 
     var pageName = ViewContext.RouteData.Values.ContainsKey("action") ?
-        ViewContext.RouteData.Values["action"].ToString() :
+        ViewContext.RouteData.Values["action"].ToString().Replace("_", "") :
         ViewContext.RouteData.Values.ContainsKey("page") ?
         ViewContext.RouteData.Values["page"].ToString().Split("/").Last() :
         null;

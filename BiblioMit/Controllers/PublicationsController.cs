@@ -49,7 +49,6 @@ namespace BiblioMit.Controllers
             //string[] val, //array of filter:value
             string[] src, //List of engines to search
             string q //search value
-            //[FromServices] INodeServices nodeServices
             )
         {
             Stopwatch stopWatch = new Stopwatch();
@@ -67,11 +66,10 @@ namespace BiblioMit.Controllers
             ViewData[nameof(q)] = q;
             ViewData[nameof(asc)] = asc;
             ViewData[nameof(trpp)] = trpp;
-            ViewData["any"] = false;
             IEnumerable<PublicationVM> publications = new List<PublicationVM>();
             #endregion
             #region universities dictionary
-            var ues = new Dictionary<string, string>()
+            var ues = new Dictionary<string, string>
                 {
                     {"uchile", "Universidad de Chile"},
                     {"ula", "Universidad Los Lagos"},
@@ -87,7 +85,7 @@ namespace BiblioMit.Controllers
                 };
             #endregion
             #region diccionario Proyectos conicyt
-            var conicyt = new Dictionary<string, string>()
+            var conicyt = new Dictionary<string, string>
                 {
                     {"FONDECYT","Fondo Nacional de Desarrollo Cient\u00EDfico y Tecnol\u00F3gico"},
                     {"FONDEF","Fondo de Fomento al Desarrollo Cient\u00EDfico y Tecnol\u00F3gico"},
@@ -118,20 +116,17 @@ namespace BiblioMit.Controllers
             ViewData[nameof(proj)] = proj;
             ViewData[nameof(gs)] = gs;
             ViewData[nameof(gp)] = gp;
-
+            var repos = ues.Concat(proj).Concat(gs).Concat(gp).ToDictionary(x => x.Key, x => x.Value);
             if (src != null && src.Any())
             {
                 ViewData["srcs"] = src;
-                if (src[0].Contains(',', StringComparison.InvariantCultureIgnoreCase)) src = src[0].Split(',');
+                if (src[0].Contains(',', StringComparison.Ordinal)) src = src[0].Split(',');
                 ViewData[nameof(src)] = src;
 
                 if (!string.IsNullOrWhiteSpace(q))
                 {
-                    var tot = src.Length;
-                    var rpp = (int)Math.Ceiling((double)trpp.Value / tot);
-                    var srt_utal = srt;
-                    string sort_by, srt_uach;
-                    int ggl;
+                    int ggl, rpp = (int)Math.Ceiling((double)trpp.Value / src.Length);
+                    string sort_by, srt_uach, srt_utal = srt;
 
                     switch (srt)
                     {
@@ -154,119 +149,49 @@ namespace BiblioMit.Controllers
                     }
                     var pubs = await GetPubsAsync(src, q, rpp, pg, sort_by, order, srt_uach, ggl).ConfigureAwait(false);
                     var Publications = pubs.SelectMany(x => x.Item1);
+                    //repositories where any results
+                    Dictionary<Typep, Dictionary<string, int>> Results = pubs.Where(x => x.Item1.Any())
+                        //group by type of result
+                        .GroupBy(x => x.Item1.First().Typep)
+                        //select groupped dictionaries of acronym + total results per repository
+                        .Select(x => new KeyValuePair<Typep, Dictionary<string, int>>(x.Key, x.ToDictionary(x => x.Item2, x => x.Item3)))
+                        .ToDictionary(x => x.Key, x => x.Value);
 
-                    var NoResults = pubs.Where(x => x.Item1.Any() && x.Item1.First().Typep == Typep.Tesis).ToDictionary(x => x.Item2, x => x.Item3);
-                    var NoArticles = pubs.Where(x => x.Item1.Any() && x.Item1.First().Typep == Typep.Articulo).ToDictionary(x => x.Item2, x => x.Item3);
-                    var NoPatents = pubs.Where(x => x.Item1.Any() && x.Item1.First().Typep == Typep.Patente).ToDictionary(x => x.Item2, x => x.Item3);
-                    var NoProjs = pubs.Where(x => x.Item1.Any() && x.Item1.First().Typep == Typep.Proyecto).ToDictionary(x => x.Item2, x => x.Item3);
-                    var nor = NoResults.Count;
-                    var nop = NoProjs.Count;
-                    var noa = NoArticles.Count;
-                    var nopat = NoPatents.Count;
-                    var NoTot = NoResults.Concat(NoProjs).Concat(NoArticles).Concat(NoPatents)
-                    .GroupBy(d => d.Key).ToDictionary(d => d.Key, d => d.First().Value);
-
-                    int tesiscnt = 0, projcnt = 0, artscnt = 0, patscnt = 0, low1, NoPages;
-
-                    var tesisGradient = GetGradients(Color.DarkGreen, Color.LightGreen, nor);
-                    var proyectosGradient = GetGradients(Color.DarkRed, Color.Pink, nop);
-                    var articulosGradient = GetGradients(Color.DarkBlue, Color.LightBlue, noa);
-                    var patentesGradient = GetGradients(Color.Brown, Color.Yellow, nopat);
-
-                    List<object> tesisData = new List<object> { },
-                        projData = new List<object> { },
-                        globalData = new List<object> { },
-                        artsData = new List<object> { },
-                        patsData = new List<object> { };
-                    var l = new List<int>() { nor, nop, noa, nopat };
-
-                    var repos = new List<Dictionary<string, string>> { ues, proj, gs, gp }.SelectMany(d => d).ToDictionary(d => d.Key, d => d.Value);
-
-                    if (nor > 0)
+                    var chartData = new List<List<ChartResultsItem>>();
+                    Dictionary<Typep, int> counts = new Dictionary<Typep, int>();
+                    foreach (var r in Results)
                     {
-                        foreach (var n in NoResults.Select((value, i) => new { i, value }))
+                        IEnumerable<Color> gradient = GetGradients(Color.DarkGreen, Color.LightGreen, r.Value.Count);
+                        counts.Add(r.Key, 0);
+                        var t = r.Value.Select((value, i) =>
                         {
-                            object tmp = new
+                            counts[r.Key] += value.Value;
+                            var name = "";
+                            if (ues.ContainsKey(value.Key))
                             {
-                                repositorio = $@"{ues[n.value.Key]
-                                .Replace("Universidad", "U.", StringComparison.InvariantCultureIgnoreCase)
-                                .Replace("Católica", "C.", StringComparison.InvariantCultureIgnoreCase)} ({n.value.Key})",
-                                resultados = n.value.Value,
-                                color = ColorToHex(tesisGradient.ElementAt(n.i))
-                            };
-                            tesisData.Add(tmp);
-                            tesiscnt += n.value.Value;
-                        }
-                        globalData.AddRange(tesisData);
-                    }
-                    if (nop > 0)
-                    {
-                        foreach (var n in NoProjs.Select((value, i) => new { i, value }))
-                        {
-                            object tmp = new
+                                name = ues[value.Key]
+                                    .Replace("Universidad", "U.", StringComparison.Ordinal)
+                                    .Replace("Católica", "C.", StringComparison.Ordinal);
+                            }
+                            else if (repos.ContainsKey(value.Key))
                             {
-                                repositorio = $"{n.value.Key}",
-                                resultados = n.value.Value,
-                                color = ColorToHex(proyectosGradient.ElementAt(n.i))
-                            };
-                            projData.Add(tmp);
-                            projcnt += n.value.Value;
-                        }
-                        globalData.AddRange(projData);
-                    }
-                    if (noa > 0)
-                    {
-                        foreach (var n in NoArticles.Select((value, i) => new { i, value }))
-                        {
-                            object tmp = new
+                                name = repos[value.Key];
+                            }
+                            return new ChartResultsItem
                             {
-                                repositorio = $"{n.value.Key}",
-                                resultados = n.value.Value,
-                                color = ColorToHex(articulosGradient.ElementAt(n.i))
+                                Repositorio = $"{name} ({value.Key})",
+                                Resultados = value.Value,
+                                Color = ColorToHex(gradient.ElementAt(i))
                             };
-                            artsData.Add(tmp);
-                            artscnt += n.value.Value;
-                        }
-                        globalData.AddRange(artsData);
+                        }).ToList();
+                        if(chartData.Any()) chartData[0].AddRange(t);
+                        chartData.Add(t);
                     }
-                    if (nopat > 0)
-                    {
-                        foreach (var n in NoPatents.Select((value, i) => new { i, value }))
-                        {
-                            object tmp = new
-                            {
-                                repositorio = $"{n.value.Key}",
-                                resultados = n.value.Value,
-                                color = ColorToHex(patentesGradient.ElementAt(n.i))
-                            };
-                            patsData.Add(tmp);
-                            patscnt += n.value.Value;
-                        }
-                        globalData.AddRange(patsData);
-                    }
+                    int low1, NoPages;
+                    ViewData["NoPages"] = NoPages = Results.Any() ?
+                        (int)Math.Ceiling(Results.Values.Sum(v => (double)v.Values.Aggregate((b, r) => b > r ? b : r) / rpp)) : 1;
 
-                    var chartData = new List<List<object>> { globalData, artsData, tesisData, projData, patsData };
-
-                    ViewData["NoPages"] = NoPages = NoTot.Any() ? (int)Math.Ceiling((double)NoTot.Aggregate((b, r) => b.Value > r.Value ? b : r).Value / rpp) : 1;
-
-                    ViewData["any"] = tot > 0;
-                    ViewData["multiple"] = tot > l.Max();
-                    ViewData["tesis"] = tesiscnt > 0;
-                    ViewData[nameof(tot)] = tot;
-                    ViewData["projects"] = projcnt > 0;
-                    ViewData["articles"] = artscnt > 0;
-                    ViewData["patents"] = patscnt > 0;
-                    ViewData["couple"] = tot > 1;
-                    var sum = projcnt + tesiscnt + artscnt + patscnt;
-                    ViewData["all"] = string.Format(CultureInfo.InvariantCulture, "{0:n0}", sum);
-                    ViewData[nameof(artscnt)] = string.Format(CultureInfo.InvariantCulture, "{0:n0}", artscnt);
-                    ViewData[nameof(tesiscnt)] = string.Format(CultureInfo.InvariantCulture, "{0:n0}", tesiscnt);
-                    ViewData[nameof(projcnt)] = string.Format(CultureInfo.InvariantCulture, "{0:n0}", projcnt);
-                    ViewData[nameof(patscnt)] = string.Format(CultureInfo.InvariantCulture, "{0:n0}", patscnt);
-                    ViewData["%arts"] = sum == 0 ? sum : artscnt * 100 / sum;
-                    ViewData["%tesis"] = sum == 0 ? sum : tesiscnt * 100 / sum;
-                    ViewData["%proj"] = sum == 0 ? sum : projcnt * 100 / sum;
-                    ViewData["%pats"] = sum == 0 ? sum : patscnt * 100 / sum;
+                    ViewData["counts"] = counts;
                     ViewData["chartData"] = JsonConvert.SerializeObject(chartData);
                     ViewData["arrow"] = asc.Value ? "&#x25BC;" : "&#x25B2;";
                     ViewData["prevDisabled"] = pg == 1 ? "disabled" : "";
@@ -301,7 +226,6 @@ namespace BiblioMit.Controllers
             ViewData["interval"] = Convert.ToInt32(stopWatch.ElapsedMilliseconds / 500);
             return View(publications);
         }
-
         [Authorize(Roles = "Administrador")]
         public IActionResult Translate(string text, string lang)
         {
@@ -451,7 +375,7 @@ namespace BiblioMit.Controllers
                 foreach (string fondo in corfo_funds)
                 {
                     var corfo = "https://www.corfo.cl/sites/cpp/programas-y-convocatorias?p=1456407859853-1456408533016-1456408024098-1456408533181&at=&et=&e=&o=&buscar_resultado=&bus=&r=";
-                    var num = fondo.Replace("corfo", "", StringComparison.InvariantCulture);
+                    var num = fondo.Replace("corfo", "", StringComparison.Ordinal);
                     using HttpClient bc = new HttpClient();
                     using HttpResponseMessage bc_result = await bc.GetAsync(new Uri(corfo + num)).ConfigureAwait(false);
                     HtmlDocument bc_doc = new HtmlDocument();
@@ -459,15 +383,15 @@ namespace BiblioMit.Controllers
                     HtmlNodeCollection bc_entrys = bc_doc.DocumentNode.SelectNodes("//div[contains(@class, 'col-sm-12') and contains(@class, 'areas')]/a");
                     foreach (HtmlNode entry in bc_entrys)
                     {
-                        if (entry.InnerHtml.Contains("Cerradas", StringComparison.InvariantCulture))
+                        if (entry.InnerHtml.Contains("Cerradas", StringComparison.Ordinal))
                         {
                             if (stt == "abierto" || stt == "proximo")
                             {
                                 continue;
                             }
 
-                            if ((entry.InnerHtml.Contains("En Evaluación", StringComparison.InvariantCulture) && stt != "evaluacion")
-                                || (!entry.InnerHtml.Contains("En Evaluación", StringComparison.InvariantCulture) && stt == "evaluacion"))
+                            if ((entry.InnerHtml.Contains("En Evaluación", StringComparison.Ordinal) && stt != "evaluacion")
+                                || (!entry.InnerHtml.Contains("En Evaluación", StringComparison.Ordinal) && stt == "evaluacion"))
                             {
                                 continue;
                             }
@@ -501,7 +425,7 @@ namespace BiblioMit.Controllers
             ViewData["conicyt1"] = conicyt1;
             ViewData["conicyt2"] = conicyt2;
             ViewData["stt"] = string.IsNullOrEmpty(stt) ? "" : stt.ToString(CultureInfo.InvariantCulture);
-            ViewData["regiones"] = from c in _context.Regions select c;
+            ViewData["regiones"] = _context.Regions.ToList();
             //render
             stopWatch.Stop();
             ViewData["runtime"] = stopWatch.ElapsedMilliseconds.ToString(CultureInfo.InvariantCulture);
@@ -652,7 +576,7 @@ namespace BiblioMit.Controllers
                 //sort_by   dc.title_sort
                 //group_by=none
                 new Uri("http://repositoriodigital.corfo.cl/discover?query=" +
-                    $"{q}&rpp={rpp}&page={pg}&group_by=none&etal=0&sort_by={sortBy.Replace(".issued", "", StringComparison.InvariantCultureIgnoreCase)}&order={order.ToUpperInvariant()}"),
+                    $"{q}&rpp={rpp}&page={pg}&group_by=none&etal=0&sort_by={sortBy.Replace(".issued", "", StringComparison.Ordinal)}&order={order.ToUpperInvariant()}"),
                 "p.pagination-info", 2,
                 "div.artifact-description", "a",
                 "span.author > small",
@@ -712,7 +636,7 @@ string dateSelect, int rpp, string acronym)
                             Source = acronym,
                             Uri = GetUri(n.QuerySelector(quriSelect)),
                             Title = t?.Substring(t.LastIndexOf(']') + 1),
-                            Typep = Typep.Articulo,
+                            Typep = Typep.Article,
                             Company = co,
                             Date = GetDateGS(n, dateSelect),
                             Authors = GetAuthorsGS(n, dateSelect)
@@ -744,7 +668,7 @@ string authorSelect, string dateSelect, string abstractSelect)
                             Source = acronym,
                             Uri = GetUri(url, t),
                             Title = t?.TextContent,
-                            Typep = Typep.Proyecto,
+                            Typep = Typep.Project,
                             Company = co,
                             Date = GetDate(n, dateSelect),
                             Authors = GetAuthorsCorfo(n, authorSelect),
@@ -774,7 +698,7 @@ Uri url, string NoResultsSelect, int NoResultsPos, string nodeSelect)
                         {
                             Source = acronym,
                             Title = n.TextContent,
-                            Typep = Typep.Proyecto,
+                            Typep = Typep.Project,
                             Uri = GetUri(new Uri("http://www.subpesca.cl/fipa/613/w3-article-88970.html"), n),
                             Company = co,
                         }, acronym, GetNoResults(doc, NoResultsSelect, NoResultsPos));
@@ -834,7 +758,7 @@ string acronym, string parameter, int rpp, string sortBy, string order, int? pg,
 {
 Source = acronym,
 Title = n.QuerySelector("h4.title-list")?.TextContent,
-Typep = Typep.Proyecto,
+Typep = Typep.Project,
 Uri = GetUri(url, n.QuerySelector("div.artifact-description > a")),
 Authors = GetAuthors(n, "span.ds-dc_contributor_author-authority"),
 Date = GetDate(n, "span.date"),
@@ -867,7 +791,7 @@ string dateSelect, string authorSelect)
                             {
                                 Source = acronym,
                                 Title = t?.InnerText,
-                                Typep = Typep.Tesis,
+                                Typep = Typep.Thesis,
                                 Uri = GetUri(url, t),
                                 Authors = GetAuthors(n, authorSelect),
                                 Date = GetDate(n, dateSelect),
@@ -897,7 +821,7 @@ string quriSelect, string quriSelectAlt, string titleSelect, string authorSelect
                         let date = n.QuerySelector(dateSelect)?.Text()
                         select new PublicationVM()
                         {
-                            Typep = Typep.Tesis,
+                            Typep = Typep.Thesis,
                             Source = acronym,
                             Title = n.QuerySelector(titleSelect)?.TextContent,
                             Uri = GetUri(url, n.QuerySelector(quriSelect), n.QuerySelector(quriSelectAlt)),
@@ -930,7 +854,7 @@ from n in doc.QuerySelectorAll(nodeSelect)
 let m = n.QuerySelector(quriSelect)
 select new PublicationVM()
 {
-Typep = Typep.Tesis,
+Typep = Typep.Thesis,
 Source = acronym,
 Title = m?.TextContent,
 Uri = GetUri(url, m),
@@ -964,7 +888,7 @@ Date = GetDate(n, dateSelect)
                     Title = n.QuerySelector(titleSelect)?.TextContent,
                     Uri = GetUri(url, n.QuerySelector(quriSelect)),
                     Authors = GetAuthors(n, authorSelect),
-                    Typep = Typep.Tesis,
+                    Typep = Typep.Thesis,
                     Company = co,
                     Date = GetDate(n, dateSelect)
                 }), acronym, GetNoResults(doc, NoResultsSelect, NoResultsPos));
@@ -997,14 +921,14 @@ let d = n.QuerySelector(dateSelect)?.TextContent
 select new PublicationVM()
 {
                             //otros
-                            Typep = Typep.Tesis,
+                            Typep = Typep.Thesis,
 Source = acronym,
 Title = m?.TextContent,
 Uri = GetUri(url, m),
 Journal = j,
 Authors = GetAuthors(n, authorSelect, regex),
 Company = co,
-Date = GetDate(d, j.LastIndexOf(",", StringComparison.InvariantCultureIgnoreCase) + 2)
+Date = GetDate(d, j.LastIndexOf(",", StringComparison.Ordinal) + 2)
 }, acronym, GetNoResults(doc, NoResultsSelect, NoResultsPos));
                 }
                 catch (DomException de)
@@ -1038,7 +962,7 @@ Source = acronym,
 Title = m?.TextContent,
 Uri = GetUri(url, m),
 Authors = GetAuthors(n, authorSelect),
-Typep = Typep.Tesis,
+Typep = Typep.Thesis,
 Company = co,
 Date = GetDate(n, dateSelect)
 }, acronym, GetNoResults(doc, NoResultsSelect, NoResultsPos));
@@ -1069,7 +993,7 @@ Date = GetDate(n, dateSelect)
                             Title = m?.TextContent,
                             Uri = GetUri(url, m),
                             Authors = GetAuthors(n, authorSelect),
-                            Typep = Typep.Tesis,
+                            Typep = Typep.Thesis,
                             Company = co,
                             Date = GetDate(n, dateSelect)
                         }, acronym, GetNoResults(doc, NoResultsSelect, NoResultsPos));
@@ -1099,7 +1023,7 @@ Date = GetDate(n, dateSelect)
                     Uri = GetUri(url, n.QuerySelector(quriSelect)),
                     Authors = GetAuthors(n, authorSelect),
                     //Typep = GetTypep(n.QuerySelector("span.tipo_obra").Text().ToLower()),
-                    Typep = Typep.Tesis,
+                    Typep = Typep.Thesis,
                     Company = co,
                     Date = GetDate(n, dateSelect)
                 }), acronym, GetNoResults(doc, NoResultsSelect, NoResultsPos));
@@ -1125,7 +1049,7 @@ Date = GetDate(n, dateSelect)
                     var num = doc.QuerySelectorAll(nodeSelect);
                     return (num.Skip(rpp * (pg.Value - 1)).Take(rpp).Select(n => new PublicationVM()
                     {
-                        Typep = Typep.Tesis,
+                        Typep = Typep.Thesis,
                         Source = acronym,
                         Title = n.QuerySelector(quriSelect).TextContent,
                         Uri = GetUri(url, n.QuerySelector(quriSelect)),
@@ -1152,7 +1076,7 @@ Date = GetDate(n, dateSelect)
                     if (indexes.Count == 3)
                     {
                         return (QueryHelpers.ParseQuery(titls[indexes[0]..indexes[1]])["rft_id"],
-                        doi + QueryHelpers.ParseQuery(titls[indexes[1]..indexes[2]])["rft_id"].ToString().Replace("doi: ", "", StringComparison.InvariantCultureIgnoreCase));
+                        doi + QueryHelpers.ParseQuery(titls[indexes[1]..indexes[2]])["rft_id"].ToString().Replace("doi: ", "", StringComparison.Ordinal));
                     }
                     return (null, null);
                 default:
@@ -1182,9 +1106,9 @@ Date = GetDate(n, dateSelect)
         {
             return type switch
             {
-                "tesis" => Typep.Tesis,
-                "artículo" => Typep.Articulo,
-                _ => Typep.Desconocido
+                "tesis" => Typep.Thesis,
+                "artículo" => Typep.Article,
+                _ => Typep.Unknown
             };
         }
 
@@ -1270,7 +1194,7 @@ Date = GetDate(n, dateSelect)
             if(doc != null)
             {
                 Regex res = new Regex(@"([0-9]+,)*[0-9]+");
-                var parsed = int.TryParse(res.Match(doc.QuerySelector(selector).TextContent).Value.Replace(",", "", StringComparison.InvariantCultureIgnoreCase), out int result);
+                var parsed = int.TryParse(res.Match(doc.QuerySelector(selector).TextContent).Value.Replace(",", "", StringComparison.Ordinal), out int result);
                 if (parsed) return result;
             }
             return 0;
@@ -1286,7 +1210,6 @@ Date = GetDate(n, dateSelect)
             }
             return 0;
         }
-
         public static int GetNoResults(HtmlDocument doc, string selector, int pos)
         {
             Regex res = new Regex(@"[\d\.,]+");
@@ -1426,4 +1349,11 @@ Date = GetDate(n, dateSelect)
                 });
         }
     }
+    public class ChartResultsItem
+    {
+        public string Repositorio { get; set; }
+        public int Resultados { get; set; }
+        public string Color { get; set; }
+    }
+
 }

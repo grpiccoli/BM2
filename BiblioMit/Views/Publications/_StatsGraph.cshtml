@@ -1,9 +1,11 @@
-﻿<partial name="_AmCharts" model="3" />
+﻿@using BiblioMit.Models.VM
+@model Dictionary<Typep, int>
+
+
+<partial name="_Pg" />
+
 @this.Block("Scripts", @<script>
     var chart;
-
-    var chartData = @Html.Raw(ViewData["chartData"]);
-
     var titles = [
         "@ViewData["all"] Total",
         "@ViewData["artscnt"] Artículos",
@@ -42,4 +44,4 @@
         chart.validateData();
         $("#chartdiv tspan").html(titles[i]);
     }
-                    </script>)
+</script>)

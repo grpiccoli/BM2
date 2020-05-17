@@ -33,6 +33,24 @@
     ]
   },
   {
+    "outputFileName": "wwwroot/js/bootstrap-select-localize.min.js",
+    "inputFiles": [
+      "scripts/bootstrap-select-localize.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/clock.min.js",
+    "inputFiles": [
+      "scripts/clock.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/tippyTranslate.min.js",
+    "inputFiles": [
+      "scripts/tippyTranslate.js"
+    ]
+  },
+  {
     "outputFileName": "wwwroot/js/tablePopover.min.js",
     "inputFiles": [
       "scripts/tablePopover.js"

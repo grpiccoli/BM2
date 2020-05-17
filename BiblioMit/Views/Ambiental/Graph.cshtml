@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Plataforma Ambiental";
+    ViewData["Title"] = Localizer["Environmental Platform"].Value;
 }
 
 @*tested with:
@@ -8,20 +8,26 @@
 <partial name="_GMaps" />
 <partial name="_ValidationScriptsPartial" />
 <partial name="_AmCharts" />
-<partial name="_LibsPg" model='new HashSet<string> { "@google/markerclustererplus", "choices.js", "@popperjs/core", "tippy.js", "moment.js", "bootstrap-datepicker", "tippy" }' />
+<partial name="_LibsPg" model='new HashSet<string> { "@google/markerclustererplus",
+    "choices.js", "@popperjs/core", "tippy.js", "moment.js", "bootstrap-datepicker", "tippy" }' />
 
 <div class="container-fluid">
     <div class="row">
         <div class="col-4">
-            <div class="row">
+            <h2>@Localizer["Parameters"]</h2>
+            <div id="parameters" class="row">
                 <div class="input-group input-daterange">
-                    <input id="start" type="text" class="form-control actual_range" value="@ViewData["start"]">
+                    <input id="start" type="text"
+                           class="form-control actual_range"
+                           value="@ViewData["start"]">
                     <div class="input-group-append">
                         <div class="input-group-text">
                             a
                         </div>
                     </div>
-                    <input id="end" type="text" class="form-control actual_range" value="@ViewData["end"]">
+                    <input id="end" type="text"
+                           class="form-control actual_range"
+                           value="@ViewData["end"]">
                 </div>
             </div>
             <div class="row">
@@ -44,7 +50,9 @@
                         </div>
                         <div class="row">
                             <button id="infobtn" class="btn btn-sm">
-                                <i class="fas fa-question-circle fa-tw"> tabla de ayuda semáforo</i>
+                                <i class="fas fa-question-circle fa-tw">
+                                    @Localizer["help table for traffic light analysis"]
+                                </i>
                             </button>
                         </div>
                     </div>
@@ -52,11 +60,19 @@
             </div>
         </div>
         <div class="col-8">
+            <h2>@Localizer["Map"]</h2>
             <div class="w-100" id="map" style="height:275px;"></div>
         </div>
     </div>
     <div class="row">
-        <div class="chartdiv w-100" style="height:300px;"></div>
+        <h2>@Localizer["Chart"]</h2>
+        <div id="chartdiv"></div>
+    </div>
+    <div class="row">
+        <h2>Series</h2>
+        <div id="legendwrapper">
+            <div id="legenddiv"></div>
+        </div>
     </div>
 </div>
 @if (User.Identity.IsAuthenticated)
@@ -64,25 +80,16 @@
     <div id="infotable" class="d-none" style="float:right;">
         <table class="small table-striped text-center w-100">
             <tr>
-                <th>Análisis</th>
+                <th>@Localizer["Analysis"]</th>
                 <th>PSMB</th>
-                <th>Especie</th>
-                <th>Talla</th>
-                <th>Larva</th>
-                <th>Est.Repr.</th>
-                <th>Sexo</th>
+                <th>@Localizer["Species"]</th>
+                <th>@Localizer["Size"]</th>
+                <th>@Localizer["Larvae"]</th>
+                <th>@Localizer["Rep. Stg."]</th>
+                <th>@Localizer["Sex"]</th>
             </tr>
             <tr>
-                <th class="text-left">Captura por Especie</th>
-                <td>&#x2713;</td>
-                <td>&#x2713;</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <th class="text-left">% Especie</th>
+                <th class="text-left">@Localizer["Capture per Species"]</th>
                 <td>&#x2713;</td>
                 <td>&#x2713;</td>
                 <td></td>
@@ -91,7 +98,16 @@
                 <td></td>
             </tr>
             <tr>
-                <th class="text-left">% Talla por Especie</th>
+                <th class="text-left">@Localizer["% Species"]</th>
+                <td>&#x2713;</td>
+                <td>&#x2713;</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <th class="text-left">@Localizer["% Size per Species"]</th>
                 <td>&#x2713;</td>
                 <td>&#x2713;</td>
                 <td>&#x2713;</td>
@@ -100,7 +116,7 @@
                 <td></td>
             </tr>
             <tr>
-                <th class="text-left">Prom Larvas por Especie</th>
+                <th class="text-left">@Localizer["Ave Larvae per Species"]</th>
                 <td>&#x2713;</td>
                 <td>&#x2713;</td>
                 <td></td>
@@ -118,7 +134,7 @@
                 <td>&#x2713;</td>
             </tr>
             <tr>
-                <th class="text-left">% Est.Repr.</th>
+                <th class="text-left">% @Localizer["Rep. Stg."]</th>
                 <td>&#x2713;</td>
                 <td>&#x2713;</td>
                 <td></td>
@@ -127,7 +143,7 @@
                 <td></td>
             </tr>
             <tr>
-                <th class="text-left">% Sexo</th>
+                <th class="text-left">@Localizer["% Sex"]</th>
                 <td>&#x2713;</td>
                 <td>&#x2713;</td>
                 <td></td>

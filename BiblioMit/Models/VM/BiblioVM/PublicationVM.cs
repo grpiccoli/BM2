@@ -6,7 +6,18 @@ namespace BiblioMit.Models.VM
 {
     public enum Typep
     {
-        Tesis, Articulo, Libro, Desconocido, Patente, Proyecto
+        [Display(Name = "Thesis")]
+        Thesis,
+        [Display(Name = "Article")]
+        Article,
+        [Display(Name = "Book")]
+        Book,
+        [Display(Name = "Unknown")]
+        Unknown,
+        [Display(Name = "Patent")]
+        Patent,
+        [Display(Name = "Project")]
+        Project
     }
     public class PublicationVM
     {

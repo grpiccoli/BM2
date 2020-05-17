@@ -36,7 +36,7 @@ namespace BiblioMit.Extensions
                 }),
                 Filters != null
                 && Filters.ContainsKey(typeof(TEnum).ToString()) ? Filters[typeof(TEnum).ToString()] : null);
-        public static IEnumerable<ChoicesGroup> Enum2ChoicesGroup<TEnum>(this TEnum @enum)
+        public static IEnumerable<ChoicesGroup> Enum2ChoicesGroup<TEnum>(this TEnum @enum, string prefix = null)
             where TEnum : struct, IConvertible, IFormattable =>
             ((TEnum[])Enum.GetValues(typeof(TEnum))).GroupBy(e => e.GetAttrGroupName())
             .OrderBy(g => g.Key)
@@ -47,7 +47,7 @@ namespace BiblioMit.Extensions
                     Choices = g.Select(t => new ChoicesItem 
                     { 
                         Label = $"{t.GetAttrName()} ({t.GetAttrPrompt()})", 
-                        Value = t.ToString()
+                        Value = prefix + t.ToString()
                     })
                 });
     public static MultiSelectList Name2MultiSelect<TEnum>(this TEnum @enum,

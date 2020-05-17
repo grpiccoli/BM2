@@ -1,23 +1,9 @@
-﻿<partial name="_Libs" model='new HashSet<string> { "angular", "angular-flip-clock" }' />
-
-<environment include="Development">
-    @this.Block("Scripts", @<script>
-            angular
-                .module('myApp', ['dyFlipClock'])
-                .run(function ($rootScope, $interval) {
-                    $rootScope.time = 0;
-                    $interval(function () {
-                        $rootScope.time += @((int)ViewData["interval"]);
-                    }, 1, 500);
-                });
-    </script>)
-</environment>
-<environment exclude="Development">
-    @this.Block("Scripts", @<script>angular.module('myApp', ['dyFlipClock']).run(function ($rootScope, $interval) {$rootScope.time = 0;$interval(function () {$rootScope.time += @((int)ViewData["interval"]);}, 1, 500);});</script>)
-</environment>
+﻿<partial name="_Libs" model='new HashSet<string> { "angular", "angular-flip-clock", "clock" }' />
 
 <div class="myApp" ng-app="myApp">
     <div class="m-auto">
         <dy-flip-clock time="{{time}}"></dy-flip-clock>
     </div>
 </div>
+
+<input id="interval" value="@((int)ViewData["interval"])" class="d-none"/>

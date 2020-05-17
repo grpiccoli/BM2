@@ -182,9 +182,14 @@
   </ItemGroup>
   
   <ItemGroup>
+    <Content Remove="wwwroot\js\clock.min.js" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <None Remove="scripts\bibliomit.ts" />
     <None Remove="scripts\charts.ts" />
     <None Remove="scripts\chat.ts" />
+    <None Remove="scripts\clock.js" />
     <None Remove="scripts\dashboard.ts" />
     <None Remove="scripts\dinamicTable.ts" />
     <None Remove="scripts\dontSendFormOnEnter.ts" />
@@ -201,6 +206,10 @@
     <None Remove="scripts\translate.ts" />
     <None Remove="scripts\validate-localization.ts" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\js\clock.min.js" />
+  </ItemGroup>
     
   <ItemGroup>
     <Content Include="scripts\entry.ts" />
@@ -214,6 +223,7 @@
   
   <ItemGroup>
     <TypeScriptCompile Include="scripts\bibliomit.ts" />
+    <TypeScriptCompile Include="scripts\clock.js" />
     <TypeScriptCompile Include="scripts\validate-localization.ts" />
   </ItemGroup>
   
@@ -250,10 +260,24 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\js\clock.min.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="Resources\Blazor.Variable.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Blazor.Variable.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\Models.Entities.Semaforo.LarvaType.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Models.Entities.Semaforo.LarvaType.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\Models.Entities.Semaforo.Stage.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Models.Entities.Semaforo.Stage.resx</DependentUpon>
     </Compile>
   </ItemGroup>
 
@@ -264,6 +288,14 @@
     <EmbeddedResource Update="Resources\Blazor.Variable.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Blazor.Variable.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Models.Entities.Semaforo.LarvaType.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Models.Entities.Semaforo.LarvaType.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Models.Entities.Semaforo.Stage.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Models.Entities.Semaforo.Stage.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 
