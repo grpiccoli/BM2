@@ -50,10 +50,10 @@ namespace BiblioMit.Views
         private IQueryable<DeclarationDate> GetDates(DeclarationType tp, int reg)
         {
             var dates = _context.DeclarationDates
-                .Include(c => c.SernapescaDeclaration)
-                .ThenInclude(d => d.OriginPsmb)
-                .ThenInclude(o => o.Commune)
-                    .ThenInclude(c => c.Province)
+                .Include(d => d.SernapescaDeclaration)
+                    .ThenInclude(d => d.OriginPsmb)
+                        .ThenInclude(o => o.Commune)
+                            .ThenInclude(c => c.Province)
                 .Where(a =>
                 a.SernapescaDeclaration.Discriminator == tp
                 && a.SernapescaDeclaration.OriginPsmb.Commune.Province.RegionId == reg);
@@ -108,7 +108,7 @@ namespace BiblioMit.Views
             DateTime.TryParseExact($"{DateTime.DaysInMonth(year, end)} {end} {year}", "d M yyyy", CultureInfo.GetCultureInfo("en-GB"), DateTimeStyles.None, out var end_dt);
             return new Config
             {
-                Reg = 10,
+                Reg = 110,
                 Year = year,
                 Start = start_dt,
                 End = end_dt

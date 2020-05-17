@@ -235,18 +235,6 @@
     </Compile>
   </ItemGroup>-->
 
-  <ItemGroup>
-    <Content Update="BiblioMit-cb7f4de3a209.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Update="client_secret.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
   <!--<ItemGroup>
     <EmbeddedResource Update="Resources\EnumResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
