@@ -68,21 +68,6 @@ $("#search").submit(function (_) {
     else
         true;
 });
-$(document).ready(function () {
-    $(".title").tooltip(function () {
-        $.post("/home/translate?text=" + $(this).html(), {}, function (response) {
-            $(this)
-                .tooltip('hide')
-                .attr('data-original-title', response)
-                .tooltip('fixTitle')
-                .tooltip('show');
-        });
-    });
-    $(".title").mouseout(function () {
-        $(this).tooltip();
-        $('.ui-tooltip').hide();
-    });
-});
 function empty() {
     var x = $("#fondos").val();
     if (x === "") {
