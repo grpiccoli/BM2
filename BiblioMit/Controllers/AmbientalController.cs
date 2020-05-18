@@ -63,7 +63,7 @@ namespace BiblioMit.Controllers
             {
                 var psmbLst = await _context.PsmbAreas
                     .Include(p => p.Commune)
-                    .Where(p => p.PolygonId.HasValue && p.Commune.CatchmentAreaId.HasValue)
+                    .Where(p => p.PlanktonAssays.Count > 0 && p.PolygonId.HasValue && p.Commune.CatchmentAreaId.HasValue)
                     .ToListAsync().ConfigureAwait(false);
                 var psmbs = psmbLst.GroupBy(p => p.Commune)
                         .Select(c => new ChoicesGroup 
@@ -546,7 +546,7 @@ namespace BiblioMit.Controllers
                         .ThenInclude(p => p.Province)
                     .Include(p => p.Polygon)
                         .ThenInclude(p => p.Vertices)
-                    .Where(c => c.Commune.CatchmentAreaId.HasValue && c.PolygonId.HasValue).Select(c => new GMapPolygon
+                    .Where(c => c.PlanktonAssays.Count > 0 && c.PolygonId.HasValue && c.Commune.CatchmentAreaId.HasValue).Select(c => new GMapPolygon
                     {
                         Id = c.Id,
                         Name = $"{c.Code} {c.Name}",
