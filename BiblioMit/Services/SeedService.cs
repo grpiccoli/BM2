@@ -185,7 +185,9 @@ namespace BiblioMit.Services
                     await Insert<Larvae>(tsvPath).ConfigureAwait(false);
                 if (!_context.Larvas.Any())
                     await Insert<Larva>(tsvPath).ConfigureAwait(false);
-                await AddBulkFiles().ConfigureAwait(false);
+                var path = "UNSYNC/bibliomit/DB";
+                if(Directory.Exists(path))
+                    await AddBulkFiles(path).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -377,10 +379,10 @@ END";
                     .ConfigureAwait(false);
             }
         }
-        public async Task<Task> AddBulkFiles()
+        public async Task<Task> AddBulkFiles(string path)
         {
             DirectoryInfo basePathInfo = Directory.GetParent(_environment.ContentRootPath).Parent;
-            string pwd = Path.Combine(basePathInfo.FullName, "UNSYNC/bibliomit/DB");
+            string pwd = Path.Combine(basePathInfo.FullName, path);
             try
             {
                 return await _import.AddFilesAsync(pwd).ConfigureAwait(false);
