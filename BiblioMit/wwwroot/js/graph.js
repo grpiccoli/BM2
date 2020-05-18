@@ -79,36 +79,6 @@ var chart = am4core.create("chartdiv", am4charts.XYChart);
 $("#legenddiv").bind('DOMSubtreeModified', function (_e) {
     document.getElementById("legenddiv").style.height = chart.legend.contentHeight + "px";
 });
-am4core.ready(function () {
-    am4core.useTheme(am4themes_kelly);
-    if (esp)
-        chart.language.locale = am4lang_es_ES;
-    var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
-    dateAxis.dataFields.category = 'date';
-    chart.scrollbarX = new am4core.Scrollbar();
-    dateAxis.dateFormats.setKey('year', 'yy');
-    dateAxis.periodChangeDateFormats.setKey('month', 'MMM yy');
-    dateAxis.tooltipDateFormat = 'dd MMM, yyyy';
-    dateAxis.renderer.minGridDistance = 40;
-    chart.yAxes.push(new am4charts.ValueAxis());
-    chart.legend = new am4charts.Legend();
-    var legendContainer = am4core.create("legenddiv", am4core.Container);
-    legendContainer.width = am4core.percent(100);
-    legendContainer.height = am4core.percent(100);
-    chart.legend.parent = legendContainer;
-    chart.cursor = new am4charts.XYCursor();
-    chart.exporting.menu = new am4core.ExportMenu();
-    if (!logged) {
-        chart.exporting.formatOptions.getKey("png").disabled = true;
-        chart.exporting.formatOptions.getKey("svg").disabled = true;
-        chart.exporting.formatOptions.getKey("pdf").disabled = true;
-        chart.exporting.formatOptions.getKey("json").disabled = true;
-        chart.exporting.formatOptions.getKey("csv").disabled = true;
-        chart.exporting.formatOptions.getKey("xlsx").disabled = true;
-        chart.exporting.formatOptions.getKey("html").disabled = true;
-        chart.exporting.formatOptions.getKey("pdfdata").disabled = true;
-    }
-});
 function fetchData(url, tag, name) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -333,9 +303,9 @@ if (semaforo) {
         }
     }); }); });
 }
-function Area(path) {
+var Area = function (path) {
     return (google.maps.geometry.spherical.computeArea(path) / 10000).toFixed(2);
-}
+};
 var selected = 'red';
 function addListenerOnPolygon(e) {
     if ($.isEmptyObject(e)) {
@@ -355,7 +325,7 @@ function addListenerOnPolygon(e) {
     }
 }
 ;
-function flatten(items) {
+var flatten = function (items) {
     var flat = [];
     items.forEach(function (item) {
         if (Array.isArray(item)) {
@@ -366,12 +336,12 @@ function flatten(items) {
         }
     });
     return flat;
-}
-function getBounds(positions) {
+};
+var getBounds = function (positions) {
     var bounds = new google.maps.LatLngBounds();
     flatten(positions).forEach(function (p) { return bounds.extend(p); });
     return bounds;
-}
+};
 var map = new google.maps.Map(document.getElementById('map'), {
     mapTypeId: 'terrain'
 });
@@ -383,7 +353,7 @@ var table = [];
 var titles = esp ?
     ["Código", "Comuna", "Provincia", "Región", "Área", "Fuentes"] :
     ["Code", "Commune", "Province", "Region", "Area", "Sources"];
-function showInfo(_e) {
+var showInfo = function (_e) {
     var id = this.zIndex;
     var content = "<h4>" + table[id].name + "</h4><table class=\"table\"><tr><th scope=\"row\">" + titles[0] + "</th><td align=\"right\">" + table[id].code + "</td></tr>";
     if (table[id].comuna !== null)
@@ -396,7 +366,39 @@ function showInfo(_e) {
         "<tr><th scope=\"row\">" + titles[3] + "</th><td align=\"right\">Los Lagos</td>\n</tr><tr><th scope=\"row\">" + titles[4] + " (ha)</th>\n<td align=\"right\">" + Area(polygons[id].getPath().getArray()) + "</td>\n</tr>\n<tr><th scope=\"row\">" + titles[5] + "</th><td></td></tr>\n<tr><td>Sernapesca</td>\n<td align=\"right\">\n<a target=\"_blank\" href=\"https://www.sernapesca.cl\">\n<img src=\"../images/ico/sernapesca.svg\" height=\"20\" /></a></td></tr>\n<tr><td>PER Mit\u00EDlidos</td>\n<td align=\"right\">\n<a target=\"_blank\" href=\"https://www.mejillondechile.cl\">\n<img src=\"../images/ico/mejillondechile.min.png\" height=\"20\" /></a></td></tr>\n<tr><td>Subpesca</td>\n<td align=\"right\">\n<a target=\"_blank\" href=\"https://www.subpesca.cl\">\n<img src=\"../images/ico/subpesca.png\" height=\"20\" /></a></td></tr>";
     infowindow.setContent(content);
     infowindow.open(map, this);
-}
+};
+am4core.ready(function () {
+    am4core.useTheme(am4themes_kelly);
+    chart.language.locale = esp ? am4lang_es_ES : am4lang_en_US;
+    chart.scrollbarY = new am4core.Scrollbar();
+    chart.scrollbarX = new am4core.Scrollbar();
+    chart.zoomOutButton.align = "left";
+    chart.zoomOutButton.valign = "bottom";
+    var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+    dateAxis.dataFields.category = 'date';
+    var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+    dateAxis.dateFormats.setKey('year', 'yy');
+    dateAxis.periodChangeDateFormats.setKey('month', 'MMM yy');
+    dateAxis.tooltipDateFormat = 'dd MMM, yyyy';
+    dateAxis.renderer.minGridDistance = 40;
+    chart.legend = new am4charts.Legend();
+    var legendContainer = am4core.create("legenddiv", am4core.Container);
+    legendContainer.width = am4core.percent(100);
+    legendContainer.height = am4core.percent(100);
+    chart.legend.parent = legendContainer;
+    chart.cursor = new am4charts.XYCursor();
+    chart.exporting.menu = new am4core.ExportMenu();
+    if (!logged) {
+        chart.exporting.formatOptions.getKey("png").disabled = true;
+        chart.exporting.formatOptions.getKey("svg").disabled = true;
+        chart.exporting.formatOptions.getKey("pdf").disabled = true;
+        chart.exporting.formatOptions.getKey("json").disabled = true;
+        chart.exporting.formatOptions.getKey("csv").disabled = true;
+        chart.exporting.formatOptions.getKey("xlsx").disabled = true;
+        chart.exporting.formatOptions.getKey("html").disabled = true;
+        chart.exporting.formatOptions.getKey("pdfdata").disabled = true;
+    }
+});
 window.onload = function initMap() {
     return __awaiter(this, void 0, void 0, function () {
         var bnds;
@@ -436,8 +438,6 @@ window.onload = function initMap() {
                             loadDates();
                             variables.setChoiceByValue('t');
                             psmb.setChoiceByValue('1');
-                            if (logged)
-                                chart.exporting.menu = new am4core.ExportMenu();
                         })];
                 case 1:
                     _a.sent();
@@ -455,6 +455,7 @@ function loadDates() {
         chart.data.push({ date: current.format('yyyy-MM-DD') });
         current.add(1, 'days');
     }
+    return chart.data;
 }
 $('.input-daterange').datepicker({
     inputs: $('.actual_range'),

@@ -41,50 +41,9 @@ try {
 } catch (e) { }
 //CHART
 var chart: any = am4core.create("chartdiv", am4charts.XYChart);
+
 $("#legenddiv").bind('DOMSubtreeModified', function (_e) {
     document.getElementById("legenddiv").style.height = chart.legend.contentHeight + "px";
-});
-am4core.ready(function () {
-    am4core.useTheme(am4themes_kelly);
-    if (esp) chart.language.locale = am4lang_es_ES;
-    var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
-    dateAxis.dataFields.category = 'date';
-    //var sd = $('#start').val();
-    //var ed = $('#end').val();
-    //var dataSource = chart.dataSource;
-    //dataSource.url = `/ambiental/graphdata?area=1&var=t&start=${sd}&end=${ed}`;
-    //var ser = chart.series.push(new am4charts.LineSeries());
-    //ser.dataFields.valueY = "value";
-    //chart.dataSource.parser = am4core.JSONParser;
-    chart.scrollbarX = new am4core.Scrollbar();
-    //var dateslider = am4core.create("sliderdiv", am4core.Container);
-    //chart.scrollbarX.parent = dateslider;
-    //chart.scrollbarY = new am4core.Scrollbar();
-    //chart.scrollbarY.parent = chart.leftAxesContainer;
-    //dateAxis.dateFormats.setKey("day", "MM");
-    //dateAxis.dateFormats.setKey("month", "MMM");
-    dateAxis.dateFormats.setKey('year', 'yy');
-    dateAxis.periodChangeDateFormats.setKey('month', 'MMM yy');
-    dateAxis.tooltipDateFormat = 'dd MMM, yyyy';
-    dateAxis.renderer.minGridDistance = 40;
-    chart.yAxes.push(new am4charts.ValueAxis());
-    chart.legend = new am4charts.Legend();
-    var legendContainer = am4core.create("legenddiv", am4core.Container);
-    legendContainer.width = am4core.percent(100);
-    legendContainer.height = am4core.percent(100);
-    chart.legend.parent = legendContainer;
-    chart.cursor = new am4charts.XYCursor();
-    chart.exporting.menu = new am4core.ExportMenu();
-    if (!logged) {
-        chart.exporting.formatOptions.getKey("png").disabled = true;
-        chart.exporting.formatOptions.getKey("svg").disabled = true;
-        chart.exporting.formatOptions.getKey("pdf").disabled = true;
-        chart.exporting.formatOptions.getKey("json").disabled = true;
-        chart.exporting.formatOptions.getKey("csv").disabled = true;
-        chart.exporting.formatOptions.getKey("xlsx").disabled = true;
-        chart.exporting.formatOptions.getKey("html").disabled = true;
-        chart.exporting.formatOptions.getKey("pdfdata").disabled = true;
-    }
 });
 //LOAD DATA
 async function fetchData(url:string, tag:string, name:string) {
@@ -275,7 +234,7 @@ if (semaforo) {
     tl.setChoices(async () => await getList('tl'));
 }
 //MAP
-function Area(path: google.maps.LatLng[] | google.maps.MVCArray<google.maps.LatLng>) {
+var Area = function (path: google.maps.LatLng[] | google.maps.MVCArray<google.maps.LatLng>) {
     return (google.maps.geometry.spherical.computeArea(path) / 10000).toFixed(2);
 }
 const selected = 'red';
@@ -294,7 +253,7 @@ function addListenerOnPolygon(e:any) {
         }
     }
 };
-function flatten(items:any[]) {
+var flatten = function (items:any[]) {
     const flat:any[] = [];
     items.forEach(item => {
         if (Array.isArray(item)) {
@@ -305,7 +264,7 @@ function flatten(items:any[]) {
     });
     return flat;
 }
-function getBounds(positions:any[]) {
+var getBounds = function (positions:any[]) {
     var bounds = new google.maps.LatLngBounds();
     flatten(positions).forEach(p => bounds.extend(p));
     return bounds;
@@ -321,7 +280,7 @@ var table: any = [];
 var titles = esp ?
     ["Código", "Comuna", "Provincia", "Región", "Área", "Fuentes"] :
     ["Code", "Commune", "Province", "Region", "Area", "Sources"];
-function showInfo(_e: any) {
+var showInfo = function (_e: any) {
     var id = this.zIndex;
     var content =
         `<h4>${table[id].name}</h4><table class="table"><tr><th scope="row">${titles[0]}</th><td align="right">${table[id].code}</td></tr>`;
@@ -352,6 +311,45 @@ function showInfo(_e: any) {
     infowindow.setContent(content);
     infowindow.open(map, this);
 }
+am4core.ready(function () {
+    am4core.useTheme(am4themes_kelly);
+    chart.language.locale = esp ? am4lang_es_ES : am4lang_en_US;
+    chart.scrollbarY = new am4core.Scrollbar();
+    chart.scrollbarX = new am4core.Scrollbar();
+    chart.zoomOutButton.align = "left";
+    chart.zoomOutButton.valign = "bottom";
+    //dateAxis.dateFormats.setKey("day", "MM");
+    //dateAxis.dateFormats.setKey("month", "MMM");
+    //chart.zoomOutButton.background.cornerRadius(5, 5, 5, 5);
+    //chart.zoomOutButton.background.fill = am4core.color("#25283D");
+    //chart.zoomOutButton.icon.stroke = am4core.color("#EFD9CE");
+    //chart.zoomOutButton.icon.strokeWidth = 2;
+    //chart.zoomOutButton.background.states.getKey("hover").properties.fill = am4core.color("#606271");
+    var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+    dateAxis.dataFields.category = 'date';
+    var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+    dateAxis.dateFormats.setKey('year', 'yy');
+    dateAxis.periodChangeDateFormats.setKey('month', 'MMM yy');
+    dateAxis.tooltipDateFormat = 'dd MMM, yyyy';
+    dateAxis.renderer.minGridDistance = 40;
+    chart.legend = new am4charts.Legend();
+    var legendContainer = am4core.create("legenddiv", am4core.Container);
+    legendContainer.width = am4core.percent(100);
+    legendContainer.height = am4core.percent(100);
+    chart.legend.parent = legendContainer;
+    chart.cursor = new am4charts.XYCursor();
+    chart.exporting.menu = new am4core.ExportMenu();
+    if (!logged) {
+        chart.exporting.formatOptions.getKey("png").disabled = true;
+        chart.exporting.formatOptions.getKey("svg").disabled = true;
+        chart.exporting.formatOptions.getKey("pdf").disabled = true;
+        chart.exporting.formatOptions.getKey("json").disabled = true;
+        chart.exporting.formatOptions.getKey("csv").disabled = true;
+        chart.exporting.formatOptions.getKey("xlsx").disabled = true;
+        chart.exporting.formatOptions.getKey("html").disabled = true;
+        chart.exporting.formatOptions.getKey("pdfdata").disabled = true;
+    }
+});
 window.onload = async function initMap() {
     var bnds: google.maps.LatLngBounds = new google.maps.LatLngBounds();
     await fetch('/ambiental/mapdata')
@@ -386,7 +384,6 @@ window.onload = async function initMap() {
             loadDates();
             variables.setChoiceByValue('t');
             psmb.setChoiceByValue('1');
-            if (logged) chart.exporting.menu = new am4core.ExportMenu();
         });
 };
 function loadDates() {
@@ -398,6 +395,7 @@ function loadDates() {
         chart.data.push({ date: current.format('yyyy-MM-DD') });
         current.add(1, 'days');
     }
+    return chart.data;
 }
 //DATES
 $('.input-daterange').datepicker({

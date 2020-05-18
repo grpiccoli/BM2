@@ -63,7 +63,7 @@ namespace BiblioMit.Controllers
             {
                 var psmbLst = await _context.PsmbAreas
                     .Include(p => p.Commune)
-                    .Where(p => p.Commune.CatchmentAreaId.HasValue && p.PolygonId.HasValue)
+                    .Where(p => p.PolygonId.HasValue && p.Commune.CatchmentAreaId.HasValue)
                     .ToListAsync().ConfigureAwait(false);
                 var psmbs = psmbLst.GroupBy(p => p.Commune)
                         .Select(c => new ChoicesGroup 

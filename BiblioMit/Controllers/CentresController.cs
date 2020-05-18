@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -39,6 +40,7 @@ namespace BiblioMit.Controllers
                         Comuna = f.Commune.Name,
                         Provincia = f.Commune.Province.Name,
                         Region = f.Commune.Province.Region.Name,
+                        Code = f.Code.ToString(CultureInfo.InvariantCulture),
                         Position = new[]{f.Polygon.Vertices.OrderBy(o => o.Order).Select(o =>
                         new GMapCoordinate
                         {

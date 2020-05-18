@@ -6,6 +6,7 @@
     scrollbarX: any;
     scrollbarY: any;
     static create: any;
+    static color: any;
     static percent: any;
     static ExportMenu: any;
     language: any;
@@ -26,6 +27,7 @@ declare class am4charts {
 }
 
 declare const am4lang_es_ES: any;
+declare const am4lang_en_US: any;
 
 declare const am4themes_kelly: any;
 
