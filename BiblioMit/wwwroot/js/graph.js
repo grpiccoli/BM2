@@ -37,9 +37,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var _this = this;
 var lang = $("html").attr("lang");
 var esp = lang === 'es';
-var series = new Object();
 var choiceOps = {
-    maxItemCount: 10,
+    maxItemCount: 50,
     removeItemButton: true,
     duplicateItemsAllowed: false,
     paste: false,
@@ -124,12 +123,12 @@ function fetchData(url, tag, name) {
                                 counter++;
                             }
                         });
-                        series[tag] = chart.series.push(new am4charts.LineSeries());
-                        series[tag].dataFields.valueY = tag;
-                        series[tag].dataFields.dateX = 'date';
-                        series[tag].name = name;
-                        series[tag].tooltipText = '{name}: [bold]{valueY}[/]';
-                        series[tag].showOnInit = false;
+                        var serie = chart.series.push(new am4charts.LineSeries());
+                        serie.dataFields.valueY = tag;
+                        serie.dataFields.dateX = 'date';
+                        serie.name = name;
+                        serie.tooltipText = '{name}: [bold]{valueY}[/]';
+                        serie.showOnInit = false;
                     })];
                 case 1: return [2, _a.sent()];
             }
@@ -180,6 +179,7 @@ function clickMap(e) {
     if (e !== undefined && polygons[e.detail.value] !== undefined)
         google.maps.event.trigger(polygons[e.detail.value], 'click', {});
 }
+var eall = document.querySelector('select.choice');
 var epsmb = document.getElementById('psmb');
 epsmb.addEventListener('addItem', function (event) {
     loadData(variables.getValue(), event.detail, true);
@@ -188,7 +188,10 @@ epsmb.addEventListener('addItem', function (event) {
 epsmb.addEventListener('removeItem', function (event) {
     variables.getValue(true).forEach(function (e) {
         var name = e + "_" + event.detail.value;
-        chart.series.removeIndex(chart.series.indexOf(series[name])).dispose();
+        chart.series._values.forEach(function (v, i) {
+            if (v.dataFields.valueY === name)
+                chart.series.removeIndex(i).dispose();
+        });
     });
     clickMap(event);
 }, supportsPassiveOption ? { passive: true } : false);
@@ -218,7 +221,10 @@ evariable.addEventListener('addItem', function (event) {
 evariable.addEventListener('removeItem', function (event) {
     psmb.getValue(true).forEach(function (e) {
         var name = event.detail.value + "_" + e;
-        chart.series.removeIndex(chart.series.indexOf(series[name])).dispose();
+        chart.series._values.forEach(function (v, i) {
+            if (v.dataFields.valueY === name)
+                chart.series.removeIndex(i).dispose();
+        });
     });
 }, supportsPassiveOption ? { passive: true } : false);
 choiceOps.placeholderValue = esp ? 'Seleccione variables' : 'Select Variables';
@@ -229,39 +235,46 @@ variables.setChoices(function () { return __awaiter(_this, void 0, void 0, funct
         case 1: return [2, _a.sent()];
     }
 }); }); });
-function getParam(a, x) {
+function getParam(a) {
     switch (a) {
-        case 11:
-            return "&t=" + x.value.slice(1, 2);
-        case 12:
-            return "&l=" + x.value;
-        case 13:
-        case 16:
-            return "&s=" + x.value;
-        case 15:
-            return "&rs=" + x.value;
+        case '11':
+            return 't';
+        case '12':
+            return 'l';
+        case '13':
+        case '16':
+            return 's';
+        case '15':
+            return 'rs';
         default:
             return '';
     }
     ;
 }
 function callDatas(a, sd, ed, psmbs, sps, tls, groupId) {
-    var promises = groupId == 0 ?
+    var nogroup = groupId === 0;
+    var promises = nogroup ?
         psmbs.map(function (psmb) {
             return sps.map(function (sp) {
                 var tag = [a.value, psmb.value, sp.value].join('_');
-                var name = [a.label, psmb.label, sp.label].join(' ');
-                var url = "/ambiental/tldata?a=" + a.value + "&psmb=" + psmb.value + "&sp=" + sp.value + "&start=" + sd + "&end=" + ed;
-                return fetchData(url, tag, name);
+                if (!chart.series._values.some(function (v) { return tag === v.dataFields.valueY; })) {
+                    var name = [a.label, psmb.label, sp.label.replace("<i>", "[bold font-style: italic]").replace("</i>", "[/]")].join(' ');
+                    var url = "/ambiental/tldata?a=" + a.value + "&psmb=" + psmb.value + "&sp=" + sp.value + "&start=" + sd + "&end=" + ed;
+                    return fetchData(url, tag, name);
+                }
             });
         }) :
         tls.filter(function (x) { return x.groupId === groupId; }).map(function (x) {
             return psmbs.map(function (psmb) {
                 return sps.map(function (sp) {
                     var tag = [a.value, psmb.value, sp.value, x.value].join('_');
-                    var name = [a.label, psmb.label, sp.label, x.label].join(' ');
-                    var url = "/ambiental/tldata?a=" + a.value + "&psmb=" + psmb.value + "&sp=" + sp.value + getParam(a.value, x) + "&start=" + sd + "&end=" + ed;
-                    return fetchData(url, tag, name);
+                    if (!chart.series._values.some(function (v) { return tag === v.dataFields.valueY; })) {
+                        var name = [a.label, psmb.label, sp.label.replace("<i>", "[bold font-style: italic]").replace("</i>", "[/]"), x.label].join(' ');
+                        var m = getParam(a.value);
+                        console.log('hi');
+                        var url = "/ambiental/tldata?a=" + a.value + "&psmb=" + psmb.value + "&sp=" + sp.value + "&" + m + "=" + x.value + "&start=" + sd + "&end=" + ed;
+                        return fetchData(url, tag, name);
+                    }
                 });
             });
         });
@@ -289,11 +302,11 @@ if (semaforo) {
                             return callDatas(a, sd, ed, psmbs, sps, tls, 4);
                         case '12':
                             return callDatas(a, sd, ed, psmbs, sps, tls, 5);
+                        case '15':
+                            return callDatas(a, sd, ed, psmbs, sps, tls, 6);
                         case '13':
                         case '16':
                             return callDatas(a, sd, ed, psmbs, sps, tls, 7);
-                        case '15':
-                            return callDatas(a, sd, ed, psmbs, sps, tls, 6);
                         default:
                             return;
                     }
@@ -307,9 +320,10 @@ if (semaforo) {
     }, supportsPassiveOption ? { passive: true } : false);
     etl.addEventListener('removeItem', function (event) {
         var id = event.detail.value;
-        Object.keys(series).forEach(function (k) {
+        chart.series._values.forEach(function (v, i) {
+            var k = v.dataFields.valueY;
             if (k.match(/^[1-7][0-8]_[1-7][0-8]_[1-7][0-8](_[1-7][0-8])?$/g) && k.includes(id))
-                chart.series.removeIndex(chart.series.indexOf(series[k])).dispose();
+                chart.series.removeIndex(i).dispose();
         });
     }, supportsPassiveOption ? { passive: true } : false);
     tl.setChoices(function () { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
@@ -365,16 +379,31 @@ var infowindow = new google.maps.InfoWindow({
     maxWidth: 500
 });
 var polygons = {};
+var table = [];
+var titles = esp ?
+    ["Código", "Comuna", "Provincia", "Región", "Área", "Fuentes"] :
+    ["Code", "Commune", "Province", "Region", "Area", "Sources"];
+function showInfo(_e) {
+    var id = this.zIndex;
+    var content = "<h4>" + table[id].name + "</h4><table class=\"table\"><tr><th scope=\"row\">" + titles[0] + "</th><td align=\"right\">" + table[id].code + "</td></tr>";
+    if (table[id].comuna !== null)
+        content +=
+            "<tr><th scope=\"row\">" + titles[1] + "</th><td align=\"right\">" + table[id].comuna + "</td></tr>";
+    if (table[id].provincia !== null)
+        content +=
+            "<tr><th scope=\"row\">" + titles[2] + "</th><td align=\"right\">" + table[id].provincia + "</td></tr>";
+    content +=
+        "<tr><th scope=\"row\">" + titles[3] + "</th><td align=\"right\">Los Lagos</td>\n</tr><tr><th scope=\"row\">" + titles[4] + " (ha)</th>\n<td align=\"right\">" + Area(polygons[id].getPath().getArray()) + "</td>\n</tr>\n<tr><th scope=\"row\">" + titles[5] + "</th><td></td></tr>\n<tr><td>Sernapesca</td>\n<td align=\"right\">\n<a target=\"_blank\" href=\"https://www.sernapesca.cl\">\n<img src=\"../images/ico/sernapesca.svg\" height=\"20\" /></a></td></tr>\n<tr><td>PER Mit\u00EDlidos</td>\n<td align=\"right\">\n<a target=\"_blank\" href=\"https://www.mejillondechile.cl\">\n<img src=\"../images/ico/mejillondechile.min.png\" height=\"20\" /></a></td></tr>\n<tr><td>Subpesca</td>\n<td align=\"right\">\n<a target=\"_blank\" href=\"https://www.subpesca.cl\">\n<img src=\"../images/ico/subpesca.png\" height=\"20\" /></a></td></tr>";
+    infowindow.setContent(content);
+    infowindow.open(map, this);
+}
 window.onload = function initMap() {
     return __awaiter(this, void 0, void 0, function () {
-        var bnds, titles;
+        var bnds;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     bnds = new google.maps.LatLngBounds();
-                    titles = esp ?
-                        ["Código", "Comuna", "Provincia", "Región", "Área", "Fuentes"] :
-                        ["Code", "Commune", "Province", "Region", "Area", "Sources"];
                     return [4, fetch('/ambiental/mapdata')
                             .then(function (r) { return r.json(); })
                             .then(function (data) { return data.map(function (dato) {
@@ -390,23 +419,16 @@ window.onload = function initMap() {
                                 bnds.extend(center);
                             var marker = new google.maps.Marker({
                                 position: center,
-                                title: dato.name + " " + dato.id
+                                title: dato.name + " " + dato.id,
+                                zIndex: dato.id
                             });
-                            marker.addListener('click', (function (marker) {
-                                return function () {
-                                    var content = "<h4>" + dato.name + "</h4><table class=\"table\"><tr><th scope=\"row\">" + titles[0] + "</th><td align=\"right\">" + dato.id + "</td></tr>";
-                                    if (dato.comuna !== null)
-                                        content +=
-                                            "<tr><th scope=\"row\">" + titles[1] + "</th><td align=\"right\">" + dato.comuna + "</td></tr>";
-                                    if (dato.provincia !== null)
-                                        content +=
-                                            "<tr><th scope=\"row\">" + titles[2] + "</th><td align=\"right\">" + dato.provincia + "</td></tr>";
-                                    content +=
-                                        "<tr><th scope=\"row\">" + titles[3] + "</th><td align=\"right\">" + dato.region + "</td>\n</tr><tr><th scope=\"row\">" + titles[4] + " (ha)</th>\n<td align=\"right\">" + Area(consessionPolygon.getPath().getArray()) + "</td>\n</tr>\n<tr><th scope=\"row\">" + titles[5] + "</th><td></td></tr>\n<tr><td>Sernapesca</td>\n<td align=\"right\">\n<a target=\"_blank\" href=\"https://www.sernapesca.cl\">\n<img src=\"../images/ico/sernapesca.svg\" height=\"20\" /></a></td></tr>\n<tr><td>PER Mit\u00EDlidos</td>\n<td align=\"right\">\n<a target=\"_blank\" href=\"https://www.mejillondechile.cl\">\n<img src=\"../images/ico/mejillondechile.min.png\" height=\"20\" /></a></td></tr>\n<tr><td>Subpesca</td>\n<td align=\"right\">\n<a target=\"_blank\" href=\"https://www.subpesca.cl\">\n<img src=\"../images/ico/subpesca.png\" height=\"20\" /></a></td></tr>";
-                                    infowindow.setContent(content);
-                                    infowindow.open(map, marker);
-                                };
-                            })(marker));
+                            table[dato.id] = {
+                                name: dato.name,
+                                comuna: dato.comuna,
+                                provincia: dato.provincia,
+                                code: dato.code
+                            };
+                            marker.addListener('click', showInfo);
                             return marker;
                         }); }).then(function (m) { return new MarkerClusterer(map, m, { imagePath: '/images/markers/m' }); }).then(function (_) {
                             map.fitBounds(bnds);
@@ -443,8 +465,15 @@ $('.input-daterange').datepicker({
 }).on('changeDate', function (_) {
     var vars = variables.getValue(true);
     variables.removeActiveItems();
+    if (semaforo) {
+        var tls = tl.getValue(true);
+        tl.removeActiveItems();
+    }
     chart.data = [];
     loadDates();
     vars.forEach(function (v) { return variables.setChoiceByValue(v); });
+    if (semaforo) {
+        tls.forEach(function (v) { return tl.setChoiceByValue(v); });
+    }
 });
 //# sourceMappingURL=graph.js.map

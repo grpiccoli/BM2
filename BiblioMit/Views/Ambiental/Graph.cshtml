@@ -13,42 +13,36 @@
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-4">
+        <div class="col-12 col-md-4">
             <h2>@Localizer["Parameters"]</h2>
             <div id="parameters" class="row">
-                <div class="input-group input-daterange">
-                    <input id="start" type="text"
-                           class="form-control actual_range"
-                           value="@ViewData["start"]">
-                    <div class="input-group-append">
-                        <div class="input-group-text">
-                            a
-                        </div>
-                    </div>
-                    <input id="end" type="text"
-                           class="form-control actual_range"
-                           value="@ViewData["end"]">
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <select class="form-control" id="variable" multiple></select>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <select class="form-control" id="psmb" multiple></select>
-                </div>
-            </div>
-            <div id="semaforo" class="row @(User.Identity.IsAuthenticated ? "" : "d-none")">
-                <div class="col">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col">
-                                <select class="form-control" id="tl" multiple></select>
+                <div class="col-12">
+                    <div class="input-group input-daterange">
+                        <input id="start" type="text"
+                               class="form-control actual_range"
+                               value="@ViewData["start"]">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                a
                             </div>
                         </div>
-                        <div class="row">
+                        <input id="end" type="text"
+                               class="form-control actual_range"
+                               value="@ViewData["end"]">
+                    </div>
+                </div>
+                <div class="col-12">
+                    <select id="variable" class="choice" multiple></select>
+                </div>
+                <div class="col-12">
+                    <select class="choice" id="psmb" multiple></select>
+                </div>
+                <div id="semaforo" class="col @(User.Identity.IsAuthenticated ? "" : "d-none")">
+                    <div class="row">
+                        <div class="col-12">
+                            <select class="choice" id="tl" multiple></select>
+                        </div>
+                        <div class="col-12">
                             <button id="infobtn" class="btn btn-sm">
                                 <i class="fas fa-question-circle fa-tw">
                                     @Localizer["help table for traffic light analysis"]
@@ -59,7 +53,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-8">
+        <div class="col-12 col-md-8">
             <h2>@Localizer["Map"]</h2>
             <div class="w-100" id="map" style="height:275px;"></div>
         </div>

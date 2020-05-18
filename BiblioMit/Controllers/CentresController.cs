@@ -30,8 +30,7 @@ namespace BiblioMit.Controllers
                 _ => await GetEntitiesAsync<Psmb>(c, i, true).ConfigureAwait(false)
             };
             return Json(list.Select(f =>
-                {
-                    var r = new GMapPolygonCentre
+                    new GMapPolygonCentre
                     {
                         Id = f.Code,
                         Name = f.Name,
@@ -39,16 +38,14 @@ namespace BiblioMit.Controllers
                         Rut = f.Company.GetRUT(),
                         Comuna = f.Commune.Name,
                         Provincia = f.Commune.Province.Name,
-                        Region = f.Commune.Province.Region.Name
-                    };
-                    r.Position.Add(f.Polygon.Vertices.OrderBy(o => o.Order).Select(o =>
+                        Region = f.Commune.Province.Region.Name,
+                        Position = new[]{f.Polygon.Vertices.OrderBy(o => o.Order).Select(o =>
                         new GMapCoordinate
                         {
                             Lat = o.Latitude,
                             Lng = o.Longitude
-                        }));
-                    return r;
-                }));
+                        }) }
+                    }));
         }
         private async Task<IEnumerable<Psmb>> GetPsmbs<TEntity>(int[] c, int[] i) 
             where TEntity : Psmb

@@ -19,12 +19,13 @@ namespace BiblioMit.Models.VM
     }
     public class GMapPolygon
     {
-        public List<IEnumerable<GMapCoordinate>> Position { get; } = new List<IEnumerable<GMapCoordinate>>();
+        public IEnumerable<IEnumerable<GMapCoordinate>> Position { get; set; }
         public int Id { get; set; }
         public string Name { get; set; }
         public string Comuna { get; set; }
         public string Provincia { get; set; }
         public string Region { get; set; }
+        public string Code { get; set; }
     }
     public class IExport
     {

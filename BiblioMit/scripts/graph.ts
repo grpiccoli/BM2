@@ -1,9 +1,8 @@
 ﻿//out vars
 var lang = $("html").attr("lang");
 var esp = lang === 'es';
-var series: any = new Object();
 var choiceOps:any = {
-    maxItemCount: 10,
+    maxItemCount: 50,
     removeItemButton: true,
     duplicateItemsAllowed: false,
     paste: false,
@@ -74,8 +73,6 @@ am4core.ready(function () {
     legendContainer.width = am4core.percent(100);
     legendContainer.height = am4core.percent(100);
     chart.legend.parent = legendContainer;
-    //chart.events.on("datavalidated", resizeLegend);
-    //chart.events.on("maxsizechanged", resizeLegend);
     chart.cursor = new am4charts.XYCursor();
     chart.exporting.menu = new am4core.ExportMenu();
     if (!logged) {
@@ -101,12 +98,12 @@ async function fetchData(url:string, tag:string, name:string) {
                     counter++;
                 }
             });
-            series[tag] = chart.series.push(new am4charts.LineSeries());
-            series[tag].dataFields.valueY = tag;
-            series[tag].dataFields.dateX = 'date';
-            series[tag].name = name;
-            series[tag].tooltipText = '{name}: [bold]{valueY}[/]';
-            series[tag].showOnInit = false;
+            var serie = chart.series.push(new am4charts.LineSeries());
+            serie.dataFields.valueY = tag;
+            serie.dataFields.dateX = 'date';
+            serie.name = name;
+            serie.tooltipText = '{name}: [bold]{valueY}[/]';
+            serie.showOnInit = false;
         });
 }
 async function loadData(values: any, event: any, boolpsmb: boolean) {
@@ -145,6 +142,7 @@ function clickMap(e:any) {
         google.maps.event.trigger(polygons[e.detail.value], 'click', {});
 }
 //PSMB SELECT
+const eall = document.querySelector('select.choice');
 const epsmb = document.getElementById('psmb');
 epsmb.addEventListener('addItem', (event: any) => {
     loadData(variables.getValue(), event.detail, true);
@@ -153,7 +151,10 @@ epsmb.addEventListener('addItem', (event: any) => {
 epsmb.addEventListener('removeItem', (event: any) => {
     variables.getValue(true).forEach((e:any) => {
         var name = `${e}_${event.detail.value}`;
-        chart.series.removeIndex(chart.series.indexOf(series[name])).dispose();
+        chart.series._values.forEach((v: any, i: number) => {
+            if (v.dataFields.valueY === name)
+                chart.series.removeIndex(i).dispose();
+        });
     });
     clickMap(event);
 }, supportsPassiveOption ? { passive: true } : false);
@@ -173,45 +174,55 @@ evariable.addEventListener('addItem', (event:any) =>
 evariable.addEventListener('removeItem', (event: any) => {
     psmb.getValue(true).forEach((e:any) => {
         var name = `${event.detail.value}_${e}`;
-        chart.series.removeIndex(chart.series.indexOf(series[name])).dispose();
+        chart.series._values.forEach((v: any, i: number) => {
+            if (v.dataFields.valueY === name)
+                chart.series.removeIndex(i).dispose();
+        });
     });
 }, supportsPassiveOption ? { passive: true } : false);
 choiceOps.placeholderValue = esp ? 'Seleccione variables' : 'Select Variables';
 const variables = new Choices(evariable, choiceOps);
 variables.setChoices(async () => await getList('variable'));
 //SEMAFORO select
-function getParam(a:number, x:any) {
+function getParam(a: string) {
     switch (a) {
-        case 11:
-            return `&t=${x.value.slice(1, 2)}`;
-        case 12:
-            return `&l=${x.value}`;
-        case 13:
-        case 16:
-            return `&s=${x.value}`;
-        case 15:
-            return `&rs=${x.value}`;
+        case '11':
+            return 't';
+        case '12':
+            return 'l';
+        case '13':
+        case '16':
+            return 's';
+        case '15':
+            return 'rs';
         default:
             return '';
     };
 }
 function callDatas(a: any, sd: any, ed: any, psmbs: any, sps: any, tls: any, groupId:number)
 {
-    var promises = groupId == 0 ?
+    var nogroup = groupId === 0;
+    var promises = nogroup ?
         psmbs.map((psmb: any) =>
         sps.map((sp: any) => {
             var tag = [a.value, psmb.value, sp.value].join('_');
-            var name = [a.label, psmb.label, sp.label].join(' ');
-            var url = `/ambiental/tldata?a=${a.value}&psmb=${psmb.value}&sp=${sp.value}&start=${sd}&end=${ed}`;
-            return fetchData(url, tag, name);
+            if (!chart.series._values.some((v: any) => tag === v.dataFields.valueY)) {
+                var name = [a.label, psmb.label, sp.label.replace("<i>","[bold font-style: italic]").replace("</i>","[/]")].join(' ');
+                var url = `/ambiental/tldata?a=${a.value}&psmb=${psmb.value}&sp=${sp.value}&start=${sd}&end=${ed}`;
+                return fetchData(url, tag, name);
+            }
         })) :
         tls.filter((x: any) => x.groupId === groupId).map((x: any) =>
             psmbs.map((psmb: any) =>
                 sps.map((sp: any) => {
                     var tag = [a.value, psmb.value, sp.value, x.value].join('_');
-                    var name = [a.label, psmb.label, sp.label, x.label].join(' ');
-                    var url = `/ambiental/tldata?a=${a.value}&psmb=${psmb.value}&sp=${sp.value}${getParam(a.value, x)}&start=${sd}&end=${ed}`;
-                    return fetchData(url, tag, name);
+                    if (!chart.series._values.some((v: any) => tag === v.dataFields.valueY)) {
+                        var name = [a.label, psmb.label, sp.label.replace("<i>", "[bold font-style: italic]").replace("</i>", "[/]"), x.label].join(' ');
+                        var m = getParam(a.value);
+                        console.log('hi');
+                        var url = `/ambiental/tldata?a=${a.value}&psmb=${psmb.value}&sp=${sp.value}&${m}=${x.value}&start=${sd}&end=${ed}`;
+                        return fetchData(url, tag, name);
+                    }
                 })));
     return Promise.all(promises).then(r => r);
 }
@@ -237,11 +248,11 @@ if (semaforo) {
                             return callDatas(a, sd, ed, psmbs, sps, tls, 4);
                         case '12':
                             return callDatas(a, sd, ed, psmbs, sps, tls, 5);
+                        case '15':
+                            return callDatas(a, sd, ed, psmbs, sps, tls, 6);
                         case '13':
                         case '16':
                             return callDatas(a, sd, ed, psmbs, sps, tls, 7);
-                        case '15':
-                            return callDatas(a, sd, ed, psmbs, sps, tls, 6);
                         default:
                             return;
                     }
@@ -255,9 +266,10 @@ if (semaforo) {
     }, supportsPassiveOption ? { passive: true } : false);
     etl.addEventListener('removeItem', (event: any) => {
         var id = event.detail.value;
-        Object.keys(series).forEach(k => {
+        chart.series._values.forEach((v: any, i: number) => {
+            var k = v.dataFields.valueY;
             if (k.match(/^[1-7][0-8]_[1-7][0-8]_[1-7][0-8](_[1-7][0-8])?$/g) && k.includes(id))
-                chart.series.removeIndex(chart.series.indexOf(series[k])).dispose();
+            chart.series.removeIndex(i).dispose();
         });
     }, supportsPassiveOption ? { passive: true } : false);
     tl.setChoices(async () => await getList('tl'));
@@ -304,42 +316,25 @@ var map = new google.maps.Map(document.getElementById('map'), {
 var infowindow = new google.maps.InfoWindow({
     maxWidth: 500
 });
-var polygons:any = {};
-window.onload = async function initMap() {
-    var bnds: google.maps.LatLngBounds = new google.maps.LatLngBounds();
-    var titles = esp ?
-        ["Código", "Comuna", "Provincia", "Región", "Área", "Fuentes"] :
-        ["Code", "Commune", "Province", "Region", "Area", "Sources"]
-    await fetch('/ambiental/mapdata')
-        .then(r => r.json())
-        .then(data => data.map((dato:any) => {
-                var consessionPolygon = new google.maps.Polygon({
-                    paths: dato.position,
-                    zIndex: dato.id
-                });
-                consessionPolygon.setMap(map);
-                consessionPolygon.addListener('click', addListenerOnPolygon);
-                polygons[dato.id] = consessionPolygon;
-                var center = getBounds(dato.position).getCenter();
-                if(dato.id < 4) bnds.extend(center);
-                var marker = new google.maps.Marker({
-                    position: center,
-                    title: `${dato.name} ${dato.id}`
-                });
-                marker.addListener('click', (marker =>
-                    () => {
-                        var content =
-                            `<h4>${dato.name}</h4><table class="table"><tr><th scope="row">${titles[0]}</th><td align="right">${dato.id}</td></tr>`;
-                        if (dato.comuna !== null)
-                            content +=
-                                `<tr><th scope="row">${titles[1]}</th><td align="right">${dato.comuna}</td></tr>`;
-                        if (dato.provincia !== null)
-                            content +=
-                                `<tr><th scope="row">${titles[2]}</th><td align="right">${dato.provincia}</td></tr>`;
-                        content +=
-                            `<tr><th scope="row">${titles[3]}</th><td align="right">${dato.region}</td>
+var polygons: any = {};
+var table: any = [];
+var titles = esp ?
+    ["Código", "Comuna", "Provincia", "Región", "Área", "Fuentes"] :
+    ["Code", "Commune", "Province", "Region", "Area", "Sources"];
+function showInfo(_e: any) {
+    var id = this.zIndex;
+    var content =
+        `<h4>${table[id].name}</h4><table class="table"><tr><th scope="row">${titles[0]}</th><td align="right">${table[id].code}</td></tr>`;
+    if (table[id].comuna !== null)
+        content +=
+            `<tr><th scope="row">${titles[1]}</th><td align="right">${table[id].comuna}</td></tr>`;
+    if (table[id].provincia !== null)
+        content +=
+            `<tr><th scope="row">${titles[2]}</th><td align="right">${table[id].provincia}</td></tr>`;
+    content +=
+        `<tr><th scope="row">${titles[3]}</th><td align="right">Los Lagos</td>
 </tr><tr><th scope="row">${titles[4]} (ha)</th>
-<td align="right">${Area(consessionPolygon.getPath().getArray())}</td>
+<td align="right">${Area(polygons[id].getPath().getArray())}</td>
 </tr>
 <tr><th scope="row">${titles[5]}</th><td></td></tr>
 <tr><td>Sernapesca</td>
@@ -354,10 +349,36 @@ window.onload = async function initMap() {
 <td align="right">
 <a target="_blank" href="https://www.subpesca.cl">
 <img src="../images/ico/subpesca.png" height="20" /></a></td></tr>`;
-                        infowindow.setContent(content);
-                        infowindow.open(map, marker);
-                    })(marker));
-                return marker;
+    infowindow.setContent(content);
+    infowindow.open(map, this);
+}
+window.onload = async function initMap() {
+    var bnds: google.maps.LatLngBounds = new google.maps.LatLngBounds();
+    await fetch('/ambiental/mapdata')
+        .then(r => r.json())
+        .then(data => data.map((dato:any) => {
+            var consessionPolygon = new google.maps.Polygon({
+                paths: dato.position,
+                zIndex: dato.id
+            });
+            consessionPolygon.setMap(map);
+            consessionPolygon.addListener('click', addListenerOnPolygon);
+            polygons[dato.id] = consessionPolygon;
+            var center = getBounds(dato.position).getCenter();
+            if(dato.id < 4) bnds.extend(center);
+            var marker = new google.maps.Marker({
+                position: center,
+                title: `${dato.name} ${dato.id}`,
+                zIndex: dato.id
+            });
+            table[dato.id] = {
+                name: dato.name,
+                comuna: dato.comuna,
+                provincia: dato.provincia,
+                code: dato.code
+            }
+            marker.addListener('click', showInfo);
+            return marker;
             })).then(m => new MarkerClusterer(map, m, { imagePath: '/images/markers/m' })
         ).then(_ => {
             map.fitBounds(bnds);
@@ -366,8 +387,6 @@ window.onload = async function initMap() {
             variables.setChoiceByValue('t');
             psmb.setChoiceByValue('1');
             if (logged) chart.exporting.menu = new am4core.ExportMenu();
-            //chart.scrollbarX = new am4core.Scrollbar();
-            //chart.scrollbarY = new am4core.Scrollbar();
         });
 };
 function loadDates() {
@@ -390,7 +409,14 @@ $('.input-daterange').datepicker({
 }).on('changeDate', (_:any) => {
     var vars = variables.getValue(true);
     variables.removeActiveItems();
+    if (semaforo) {
+        var tls = tl.getValue(true);
+        tl.removeActiveItems();
+    }
     chart.data = [];
     loadDates();
-    vars.forEach((v:any) => variables.setChoiceByValue(v));
+    vars.forEach((v: any) => variables.setChoiceByValue(v));
+    if (semaforo) {
+        tls.forEach((v: any) => tl.setChoiceByValue(v));
+    }
 });

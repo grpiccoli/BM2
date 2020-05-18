@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Dynamic;
 using Range = BiblioMit.Models.Range;
 using System.Threading.Tasks;
 using BiblioMit.Models.Entities.Semaforo;
@@ -62,22 +61,20 @@ namespace BiblioMit.Controllers
                 }).ToListAsync().ConfigureAwait(false));
             if (User.Identity.IsAuthenticated)
             {
-                var psmbLst = await _context.Communes
-                    .Include(p => p.Psmbs)
-                    .Where(p => p.CatchmentAreaId.HasValue)
+                var psmbLst = await _context.PsmbAreas
+                    .Include(p => p.Commune)
+                    .Where(p => p.Commune.CatchmentAreaId.HasValue && p.PolygonId.HasValue)
                     .ToListAsync().ConfigureAwait(false);
-                var psmbs = psmbLst
+                var psmbs = psmbLst.GroupBy(p => p.Commune)
                         .Select(c => new ChoicesGroup 
                         { 
-                            Id = c.Id,
-                            Label = c.Name,
-                            Choices = c.Psmbs
-                            .Where(p => p.PolygonId.HasValue 
-                            && p.Discriminator == Models.Entities.Centres.PsmbType.PsmbArea)
+                            Id = c.Key.Id,
+                            Label = c.Key.Name,
+                            Choices = c
                             .Select(p => new ChoicesItem 
                             {
                                 Value = p.Id.ToString(CultureInfo.InvariantCulture),
-                                Label = $"{p.Code} {p.Name} {c.Name}"
+                                Label = $"{p.Code} {p.Name} {c.Key.Name}"
                             })
                         });
                 areas.AddRange(psmbs);
@@ -89,6 +86,7 @@ namespace BiblioMit.Controllers
         public JsonResult VariableList()
         {
             var result = Variable.t.Enum2ChoicesGroup();
+            var group = _localizer["Group"];
             var groups = new ChoicesGroup 
             {
                 Label = _localizer["Phylogenetic Groups (Cel/mL)"],
@@ -96,19 +94,21 @@ namespace BiblioMit.Controllers
                 Choices = _context.PhylogeneticGroups.Select(p => new ChoicesItem
                 {
                     Value = p.Id.ToString(CultureInfo.InvariantCulture),
-                    Label = p.Name
+                    Label = $"{p.Name} ({group})"
                 })
             };
+            var genus = _localizer["Genus"];
             var orders = new ChoicesGroup
             {
-                Label = _localizer["Genus (Cel/mL)"],
+                Label = _localizer["Genera (Cel/mL)"],
                 Id = 4,
                 Choices = _context.GenusPhytoplanktons.Select(p => new ChoicesItem
                 {
                     Value = p.Id.ToString(CultureInfo.InvariantCulture),
-                    Label = p.Name
+                    Label = $"{p.Name} ({genus})"
                 })
             };
+            var sp = _localizer["Species"];
             var species = new ChoicesGroup
             {
                 Label = _localizer["Species (Cel/mL)"],
@@ -118,7 +118,7 @@ namespace BiblioMit.Controllers
                 .Select(p => new ChoicesItem
                 {
                     Value = p.Id.ToString(CultureInfo.InvariantCulture),
-                    Label = p.GetName()
+                    Label = $"{p.GetName()} ({sp})"
                 })
             };
             return Json(result.Concat(new List<ChoicesGroup> { groups, orders, species }));
@@ -147,10 +147,11 @@ namespace BiblioMit.Controllers
                 case 11:
                     if (t.HasValue)
                     {
+                        var range = t.Value % 10;
                         var db = _context.Tallas
                         .Include(tl => tl.SpecieSeed)
-                        .ThenInclude(ss => ss.Seed)
-                        .Where(tl => tl.Range == (Range)(t.Value % 10));
+                        .ThenInclude(ss => ss.Seed) as IQueryable<Talla>;
+                        if(range != 8) db = db.Where(tl => tl.Range == (Range)range);
                         if (psmb != 23) db = db.Where(tl => tl.SpecieSeed.Seed.Farm.Code == psmbs[psmb]);
                         if (sp != 34) db = db.Where(tl => tl.SpecieSeed.SpecieId == sps[sp]);
                         var list = await db.ToListAsync().ConfigureAwait(false);
@@ -172,9 +173,10 @@ namespace BiblioMit.Controllers
                 case 12:
                     if (l.HasValue)
                     {
+                        var type = l.Value % 10;
                         var db = _context.Larvas
-                        .Include(tl => tl.Larvae)
-                        .Where(tl => tl.LarvaType == (LarvaType)(l.Value % 10));
+                        .Include(tl => tl.Larvae) as IQueryable<Larva>;
+                        if (type != 3) db = db.Where(tl => tl.LarvaType == (LarvaType)type);
                         if (psmb != 23) db = db.Where(tl => tl.Larvae.Farm.Code == psmbs[psmb]);
                         if (sp != 34) db = db.Where(tl => tl.SpecieId == sps[sp]);
                         var list = await db.ToListAsync().ConfigureAwait(false);
@@ -240,8 +242,9 @@ namespace BiblioMit.Controllers
                 case 15:
                     if (rs.HasValue)
                     {
+                        var stage = rs.Value % 10;
                         var db = _context.ReproductiveStages
-                        .Where(tl => tl.Stage == (Stage)(rs.Value % 10));
+                        .Where(tl => tl.Stage == (Stage)stage);
                         if (psmb != 23) db = db.Where(tl => tl.Spawning.Farm.Code == psmbs[psmb]);
                         var list = await db.ToListAsync().ConfigureAwait(false);
                         data = list.GroupBy(tl => tl.Spawning.Date)
@@ -499,83 +502,64 @@ namespace BiblioMit.Controllers
         // GET: Arrivals
         public async Task<IActionResult> MapData()
         {
-            var cuencas = await _context.CatchmentAreas
+            var cuenca = _localizer["Catchment Area"];
+            var com = _localizer["Commune"];
+            var map = await _context.CatchmentAreas
                 .Include(c => c.Polygon)
                     .ThenInclude(p => p.Vertices)
-                    .ToListAsync().ConfigureAwait(false);
-            var map = cuencas
-                .Select(c =>
-                {
-                    var pol = new GMapPolygon
+                    .Select(c => new GMapPolygon
                     {
                         Id = c.Id,
-                        Name = $"{_localizer["Catchment Area"]} {c.Name}",
-                        Region = "Los Lagos"
-                    };
-                    pol.Position.Add(c.Polygon.Vertices.OrderBy(o => o.Order).Select(o =>
+                        Name = $"{cuenca} {c.Name}",
+                        Code = c.Id.ToString(CultureInfo.InvariantCulture),
+                        Position = new[]{c.Polygon.Vertices.Select(o =>
                         new GMapCoordinate
                         {
                             Lat = o.Latitude,
                             Lng = o.Longitude
-                        }));
-                    return pol;
-                });
-
-            var comuna = await _context.Communes
+                        })}
+                    })
+                    .ToListAsync().ConfigureAwait(false);
+            map.AddRange(await _context.Communes
                 .Include(c => c.Province)
                 .Include(c => c.Polygons)
                     .ThenInclude(c => c.Vertices)
-                    .Where(c => c.CatchmentAreaId.HasValue)
-                    .ToListAsync().ConfigureAwait(false);
-
-            map = map.Concat(comuna.Select(c =>
-            {
-                var pol = new GMapPolygon
+                    .Where(c => c.CatchmentAreaId.HasValue).Select(c =>
+                new GMapPolygon
                 {
                     Id = c.Id,
-                    Name = $"{_localizer["Commune"]} {c.Name}",
+                    Name = $"{com} {c.Name}",
                     Provincia = c.Province.Name,
-                    Region = "Los Lagos"
-                };
-                pol.Position.AddRange(c.Polygons
-                    .Select(p => p.Vertices.OrderBy(o => o.Order).Select(o =>
+                    Code = c.GetCUT(),
+                    Position = c.Polygons
+                    .Select(p => p.Vertices.Select(o =>
                     new GMapCoordinate
                     {
                         Lat = o.Latitude,
                         Lng = o.Longitude
-                    })).ToList());
-                return pol;
-            }));
+                    }))
+                }).ToListAsync().ConfigureAwait(false));
             if (User.Identity.IsAuthenticated)
             {
-                var psmb = await _context.PsmbAreas
+                map.AddRange(await _context.PsmbAreas
                     .Include(p => p.Commune)
                         .ThenInclude(p => p.Province)
                     .Include(p => p.Polygon)
                         .ThenInclude(p => p.Vertices)
-                    .Where(c => c.Commune.CatchmentAreaId.HasValue && c.PolygonId.HasValue
-                    && c.PlanktonAssays.Any())
-                    .ToListAsync().ConfigureAwait(false);
-                map = map.Concat(psmb
-                    .Select(c =>
+                    .Where(c => c.Commune.CatchmentAreaId.HasValue && c.PolygonId.HasValue).Select(c => new GMapPolygon
                     {
-                        var pol = new GMapPolygon
-                        {
-                            Id = c.Id,
-                            Name = $"{c.Code} {c.Name}",
-                            Comuna = c.Commune.Name,
-                            Provincia = c.Commune.Province.Name,
-                            Region = "Los Lagos"
-                        };
-                        pol.Position.Add(c.Polygon
-                        .Vertices.OrderBy(o => o.Order).Select(o =>
-                        new GMapCoordinate
-                        {
-                            Lat = o.Latitude,
-                            Lng = o.Longitude
-                        }));
-                        return pol;
-                    }));
+                        Id = c.Id,
+                        Name = $"{c.Code} {c.Name}",
+                        Comuna = c.Commune.Name,
+                        Provincia = c.Commune.Province.Name,
+                        Code = c.Code.ToString(CultureInfo.InvariantCulture),
+                        Position = new[]{c.Polygon
+                        .Vertices.Select(o => new GMapCoordinate
+                            {
+                                Lat = o.Latitude,
+                                Lng = o.Longitude
+                            }) }
+                    }).ToListAsync().ConfigureAwait(false));
             }
             return Json(map);
         }

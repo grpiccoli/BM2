@@ -162,8 +162,14 @@
   <data name="Female" xml:space="preserve">
     <value>Hembra</value>
   </data>
-  <data name="Genus" xml:space="preserve">
+  <data name="Genera" xml:space="preserve">
     <value>Géneros</value>
+  </data>
+  <data name="Genus" xml:space="preserve">
+    <value>Género</value>
+  </data>
+  <data name="Group" xml:space="preserve">
+    <value>Grupo</value>
   </data>
   <data name="Image" xml:space="preserve">
     <value>Imagen</value>
