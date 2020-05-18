@@ -27,7 +27,7 @@ namespace BiblioMit.Controllers
     [Authorize]
     public class PhotosController : Controller
     {
-        private static readonly char[] InvalidFilenameChars = Path.GetInvalidFileNameChars();
+        //private static readonly char[] InvalidFilenameChars = Path.GetInvalidFileNameChars();
         private readonly ApplicationDbContext _context;
         //private readonly string _accessKey;
         //private readonly string _secretKey;
