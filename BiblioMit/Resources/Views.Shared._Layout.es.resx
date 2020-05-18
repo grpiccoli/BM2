@@ -123,6 +123,12 @@
   <data name="en_GB" xml:space="preserve">
     <value>es_LA</value>
   </data>
+  <data name="Hi! How can we assist you?" xml:space="preserve">
+    <value>¡Hola! ¿Cómo podemos ayudarte?</value>
+  </data>
+  <data name="Thank you for chatting with us" xml:space="preserve">
+    <value>Gracias por chatear con nostros</value>
+  </data>
   <data name="User Manual" xml:space="preserve">
     <value>Manual de uso</value>
   </data>
