@@ -381,7 +381,15 @@ END";
         {
             DirectoryInfo basePathInfo = Directory.GetParent(_environment.ContentRootPath).Parent;
             string pwd = Path.Combine(basePathInfo.FullName, "UNSYNC/bibliomit/DB");
-            return await _import.AddFilesAsync(pwd).ConfigureAwait(false);
+            try
+            {
+                return await _import.AddFilesAsync(pwd).ConfigureAwait(false);
+            }
+            catch(DirectoryNotFoundException ex)
+            {
+                _logger.LogError(ex, _localizer["There has been an error while seeding the database."]);
+                throw;
+            }
         }
     }
 }
