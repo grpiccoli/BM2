@@ -16,7 +16,7 @@ namespace BiblioMit.Models
             TextInfo text = CultureInfo.InvariantCulture.TextInfo;
             Name = text.ToLower(value);
         }
-        public string GetName()
+        public string GetFullName()
         {
             var n = string.IsNullOrWhiteSpace(Name) ? "sp" : Name;
             return $"{Genus.Name} {n}";

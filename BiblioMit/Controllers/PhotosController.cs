@@ -162,50 +162,51 @@ namespace BiblioMit.Controllers
         // POST: Photos/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IndividualId,File,Comment,Magnification")] UploadPhotoViewModel uploadPhoto)
-        {
-            if (uploadPhoto == null) return NotFound();
-            //var client = new AmazonS3Client(_accessKey, _secretKey, Amazon.RegionEndpoint.SAEast1);
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Create([Bind("IndividualId,File,Comment,Magnification")] UploadPhotoViewModel uploadPhoto)
+        //{
+        //    if (uploadPhoto == null) return NotFound();
+        //    //var client = new AmazonS3Client(_accessKey, _secretKey, Amazon.RegionEndpoint.SAEast1);
 
-            //var contentDisposition = ContentDispositionHeaderValue.Parse(uploadPhoto.File.ContentDisposition);
+        //    //var contentDisposition = ContentDispositionHeaderValue.Parse(uploadPhoto.File.ContentDisposition);
 
-            //var filename = contentDisposition.FileName.Trim('"');
+        //    //var filename = contentDisposition.FileName.Trim('"');
 
-            //var stream = uploadPhoto.File.OpenReadStream();
-            if (uploadPhoto.File.FileName.IndexOfAny(InvalidFilenameChars) >= 0)
-                return new StatusCodeResult((int)HttpStatusCode.BadRequest);
-            var path = Path.Combine(Directory.GetCurrentDirectory(),
-                        "DB", uploadPhoto.File.FileName);
-            using var stream = new FileStream(path, FileMode.Create);
-            await uploadPhoto.File.CopyToAsync(stream).ConfigureAwait(false);
-            //var request = new PutObjectRequest
-            //{
-            //    BucketName = _bucket,
-            //    Key = uploadPhoto.IndividualId.ToString()+"/"+filename,
-            //    InputStream = stream,
-            //    CannedACL = S3CannedACL.Private
-            //};
+        //    //var stream = uploadPhoto.File.OpenReadStream();
+        //    var file = uploadPhoto.File.FileName;
+        //    if (string.IsNullOrWhiteSpace(file) || file.IndexOfAny(InvalidFilenameChars) >= 0 || Path.GetFileName(file) != file)
+        //        return new StatusCodeResult((int)HttpStatusCode.BadRequest);
+        //    var path = Path.Combine(Directory.GetCurrentDirectory(),
+        //                "DB", uploadPhoto.File.FileName);
+        //    //using var stream = new StreamReader(path);
+        //    //var content = await stream.ReadToEndAsync().ConfigureAwait(false);
+        //    //var request = new PutObjectRequest
+        //    //{
+        //    //    BucketName = _bucket,
+        //    //    Key = uploadPhoto.IndividualId.ToString()+"/"+filename,
+        //    //    InputStream = stream,
+        //    //    CannedACL = S3CannedACL.Private
+        //    //};
 
-            //var response = await client.PutObjectAsync(request);
+        //    //var response = await client.PutObjectAsync(request);
 
-            var photo = new Photo
-            {
-                IndividualId = uploadPhoto.IndividualId,
-                Key = uploadPhoto.File.FileName,
-                Comment = uploadPhoto.Comment,
-                Magnification = uploadPhoto.Magnification
-            };
+        //    var photo = new Photo
+        //    {
+        //        IndividualId = uploadPhoto.IndividualId,
+        //        Key = uploadPhoto.File.FileName,
+        //        Comment = uploadPhoto.Comment,
+        //        Magnification = uploadPhoto.Magnification
+        //    };
 
-            if (ModelState.IsValid)
-            {
-                _context.Add(photo);
-                await _context.SaveChangesAsync().ConfigureAwait(false);
-                return RedirectToAction("Index");
-            }
-            return View(photo);
-        }
+        //    if (ModelState.IsValid)
+        //    {
+        //        _context.Add(photo);
+        //        await _context.SaveChangesAsync().ConfigureAwait(false);
+        //        return RedirectToAction("Index");
+        //    }
+        //    return View(photo);
+        //}
 
         //public IActionResult Tmp()
         //{

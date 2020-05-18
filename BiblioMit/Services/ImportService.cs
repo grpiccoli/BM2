@@ -169,11 +169,13 @@ namespace BiblioMit.Services
                     {
                         log.WriteLine($"File: {d}");
                         log.WriteLine($"DNE: {de}");
+                        throw;
                     }
                     catch (Exception e)
                     {
                         log.WriteLine($"File: {d}");
                         log.WriteLine($"E: {e}");
+                        throw;
                     }
                 }
             }

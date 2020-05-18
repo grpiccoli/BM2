@@ -118,7 +118,7 @@ namespace BiblioMit.Controllers
                 .Select(p => new ChoicesItem
                 {
                     Value = p.Id.ToString(CultureInfo.InvariantCulture),
-                    Label = $"{p.GetName()} ({sp})"
+                    Label = $"{p.GetFullName()} ({sp})"
                 })
             };
             return Json(result.Concat(new List<ChoicesGroup> { groups, orders, species }));
