@@ -2,6 +2,10 @@
 
 namespace BiblioMit.Models.VM
 {
+    public class AmDataEnv : AmData
+    {
+        public string Id { get; set; }
+    }
     public class AmData
     {
         public string Date { get; set; }

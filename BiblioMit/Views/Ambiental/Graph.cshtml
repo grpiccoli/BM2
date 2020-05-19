@@ -68,83 +68,94 @@
             <div id="legenddiv"></div>
         </div>
     </div>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <div class="row">
+            <div class="col-11">
+                <button class="form-control btn btn-sm" onclick="fetchPlankton()">@Localizer["Search Plankton Assays"]</button>
+            </div>
+            <div class="col-1">
+                <button class="form-control btn btn-sm" onclick="tableToExcel('newTable', 'Ensayos')"><i class="fa fa-arrow-down" aria-hidden="true"></i></button>
+            </div>
+        </div>
+        <div class="row">
+            <div id="results" class="col-12"></div>
+        </div>
+        <div id="infotable" class="d-none" style="float:right;">
+            <table class="small table-striped text-center w-100">
+                <tr>
+                    <th>@Localizer["Analysis"]</th>
+                    <th>PSMB</th>
+                    <th>@Localizer["Species"]</th>
+                    <th>@Localizer["Size"]</th>
+                    <th>@Localizer["Larvae"]</th>
+                    <th>@Localizer["Rep. Stg."]</th>
+                    <th>@Localizer["Sex"]</th>
+                </tr>
+                <tr>
+                    <th class="text-left">@Localizer["Capture per Species"]</th>
+                    <td>&#x2713;</td>
+                    <td>&#x2713;</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th class="text-left">@Localizer["% Species"]</th>
+                    <td>&#x2713;</td>
+                    <td>&#x2713;</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th class="text-left">@Localizer["% Size per Species"]</th>
+                    <td>&#x2713;</td>
+                    <td>&#x2713;</td>
+                    <td>&#x2713;</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th class="text-left">@Localizer["Ave Larvae per Species"]</th>
+                    <td>&#x2713;</td>
+                    <td>&#x2713;</td>
+                    <td></td>
+                    <td>&#x2713;</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th class="text-left">IG Reproductores</th>
+                    <td>&#x2713;</td>
+                    <td>&#x2713;</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>&#x2713;</td>
+                </tr>
+                <tr>
+                    <th class="text-left">% @Localizer["Rep. Stg."]</th>
+                    <td>&#x2713;</td>
+                    <td>&#x2713;</td>
+                    <td></td>
+                    <td></td>
+                    <td>&#x2713;</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th class="text-left">@Localizer["% Sex"]</th>
+                    <td>&#x2713;</td>
+                    <td>&#x2713;</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>&#x2713;</td>
+                </tr>
+            </table>
+        </div>
+    }
 </div>
-@if (User.Identity.IsAuthenticated)
-{
-    <div id="infotable" class="d-none" style="float:right;">
-        <table class="small table-striped text-center w-100">
-            <tr>
-                <th>@Localizer["Analysis"]</th>
-                <th>PSMB</th>
-                <th>@Localizer["Species"]</th>
-                <th>@Localizer["Size"]</th>
-                <th>@Localizer["Larvae"]</th>
-                <th>@Localizer["Rep. Stg."]</th>
-                <th>@Localizer["Sex"]</th>
-            </tr>
-            <tr>
-                <th class="text-left">@Localizer["Capture per Species"]</th>
-                <td>&#x2713;</td>
-                <td>&#x2713;</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <th class="text-left">@Localizer["% Species"]</th>
-                <td>&#x2713;</td>
-                <td>&#x2713;</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <th class="text-left">@Localizer["% Size per Species"]</th>
-                <td>&#x2713;</td>
-                <td>&#x2713;</td>
-                <td>&#x2713;</td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <th class="text-left">@Localizer["Ave Larvae per Species"]</th>
-                <td>&#x2713;</td>
-                <td>&#x2713;</td>
-                <td></td>
-                <td>&#x2713;</td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <th class="text-left">IG Reproductores</th>
-                <td>&#x2713;</td>
-                <td>&#x2713;</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>&#x2713;</td>
-            </tr>
-            <tr>
-                <th class="text-left">% @Localizer["Rep. Stg."]</th>
-                <td>&#x2713;</td>
-                <td>&#x2713;</td>
-                <td></td>
-                <td></td>
-                <td>&#x2713;</td>
-                <td></td>
-            </tr>
-            <tr>
-                <th class="text-left">@Localizer["% Sex"]</th>
-                <td>&#x2713;</td>
-                <td>&#x2713;</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>&#x2713;</td>
-            </tr>
-        </table>
-    </div>
-}

@@ -117,112 +117,19 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="% Reproductive Stage" xml:space="preserve">
-    <value>% Estado Reproductivo</value>
+  <data name="Name or Code" xml:space="preserve">
+    <value>Código o Nombre</value>
   </data>
-  <data name="% Sex" xml:space="preserve">
-    <value>% Sexo</value>
+  <data name="PSMB code or name of catchment area or commune" xml:space="preserve">
+    <value>Código de centro o nombre de comuna/cuenca</value>
   </data>
-  <data name="% Size per Species" xml:space="preserve">
-    <value>% Talla por Especie</value>
+  <data name="Search" xml:space="preserve">
+    <value>Buscar</value>
   </data>
-  <data name="% Species" xml:space="preserve">
-    <value>% Especie</value>
+  <data name="Search Plankton Assays" xml:space="preserve">
+    <value>Buscar Informes Plankton</value>
   </data>
-  <data name="All PSMBs" xml:space="preserve">
-    <value>Todos los PSMBs</value>
-  </data>
-  <data name="All Species" xml:space="preserve">
-    <value>Todas las especies</value>
-  </data>
-  <data name="Analysis" xml:space="preserve">
-    <value>Análisis</value>
-  </data>
-  <data name="Capture per Species" xml:space="preserve">
-    <value>Captura por Especie</value>
-  </data>
-  <data name="Catchment Area" xml:space="preserve">
-    <value>Cuenca</value>
-  </data>
-  <data name="Catchment Areas" xml:space="preserve">
-    <value>Cuencas</value>
-  </data>
-  <data name="Commune" xml:space="preserve">
-    <value>Comuna</value>
-  </data>
-  <data name="D-Larva" xml:space="preserve">
-    <value>Larva D</value>
-  </data>
-  <data name="Data" xml:space="preserve">
-    <value>Datos</value>
-  </data>
-  <data name="Eyed Larva" xml:space="preserve">
-    <value>Larva con ojo</value>
-  </data>
-  <data name="Female" xml:space="preserve">
-    <value>Hembra</value>
-  </data>
-  <data name="Genera (Cel/mL)" xml:space="preserve">
-    <value>Géneros (Cel/mL)</value>
-  </data>
-  <data name="Genus" xml:space="preserve">
-    <value>Género</value>
-  </data>
-  <data name="Group" xml:space="preserve">
-    <value>Grupo</value>
-  </data>
-  <data name="Image" xml:space="preserve">
-    <value>Imagen</value>
-  </data>
-  <data name="Larva Type (count)" xml:space="preserve">
-    <value>Tipo de Larva (conteo)</value>
-  </data>
-  <data name="Larvae" xml:space="preserve">
-    <value>Larvas</value>
-  </data>
-  <data name="Male" xml:space="preserve">
-    <value>Macho</value>
-  </data>
-  <data name="Mature" xml:space="preserve">
-    <value>Maduro</value>
-  </data>
-  <data name="Maturing" xml:space="preserve">
-    <value>En madurez</value>
-  </data>
-  <data name="Phylogenetic Groups" xml:space="preserve">
-    <value>Grupos filogenéticos</value>
-  </data>
-  <data name="Phylogenetic Groups (Cel/mL)" xml:space="preserve">
-    <value>Grupos Filogenéticos (Cel/mL)</value>
-  </data>
-  <data name="Print" xml:space="preserve">
-    <value>Imprimir</value>
-  </data>
-  <data name="Reproductive Stage (%)" xml:space="preserve">
-    <value>Estado reproductivo (%)</value>
-  </data>
-  <data name="Sex" xml:space="preserve">
-    <value>Sexo</value>
-  </data>
-  <data name="Size (%)" xml:space="preserve">
-    <value>Tallas (%)</value>
-  </data>
-  <data name="Spawned" xml:space="preserve">
-    <value>Desovado</value>
-  </data>
-  <data name="Spawning" xml:space="preserve">
-    <value>En desove</value>
-  </data>
-  <data name="Species" xml:space="preserve">
-    <value>Especies</value>
-  </data>
-  <data name="Species (Cel/mL)" xml:space="preserve">
-    <value>Especies (Cel/mL)</value>
-  </data>
-  <data name="Total Larvae" xml:space="preserve">
-    <value>Larvas Totales</value>
-  </data>
-  <data name="Umbanate Larva" xml:space="preserve">
-    <value>Larva Umbonada</value>
+  <data name="Type of area" xml:space="preserve">
+    <value>Tipo de área</value>
   </data>
 </root>

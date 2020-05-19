@@ -156,6 +156,9 @@
   <data name="Rep. Stg." xml:space="preserve">
     <value>Est. Rep.</value>
   </data>
+  <data name="Search Plankton Assays" xml:space="preserve">
+    <value>Buscar Informes Plankton</value>
+  </data>
   <data name="Size" xml:space="preserve">
     <value>Talla</value>
   </data>

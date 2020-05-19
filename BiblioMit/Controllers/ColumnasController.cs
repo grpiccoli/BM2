@@ -77,8 +77,9 @@ namespace BiblioMit.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<JsonResult> Editar(int id, string description, string headers, string conversion, int places, char separator, bool negative)
+        public async Task<JsonResult> Editar(int id, string description, string headers, string conversion, int places, string sep, bool negative)
         {
+            var separator = sep[0];
             var model = await _context.Registries
                 .FindAsync(id).ConfigureAwait(false);
             var heads = _context.Headers.Where(h => h.RegistryId == id);

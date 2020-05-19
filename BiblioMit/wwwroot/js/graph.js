@@ -35,6 +35,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 var _this = this;
+var build = new Event("buildChart");
+var cnt = 0;
 var lang = $("html").attr("lang");
 var esp = lang === 'es';
 var choiceOps = {
@@ -76,6 +78,38 @@ try {
 }
 catch (e) { }
 var chart = am4core.create("chartdiv", am4charts.XYChart);
+var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+dateAxis.dataFields.category = 'date';
+var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+etl.addEventListener("buildChart", function () {
+    am4core.useTheme(am4themes_kelly);
+    chart.language.locale = esp ? am4lang_es_ES : am4lang_en_US;
+    chart.scrollbarY = new am4core.Scrollbar();
+    chart.scrollbarX = new am4core.Scrollbar();
+    chart.zoomOutButton.align = "left";
+    chart.zoomOutButton.valign = "bottom";
+    dateAxis.dateFormats.setKey('year', 'yy');
+    dateAxis.periodChangeDateFormats.setKey('month', 'MMM yy');
+    dateAxis.tooltipDateFormat = 'dd MMM, yyyy';
+    dateAxis.renderer.minGridDistance = 40;
+    chart.legend = new am4charts.Legend();
+    var legendContainer = am4core.create("legenddiv", am4core.Container);
+    legendContainer.width = am4core.percent(100);
+    legendContainer.height = am4core.percent(100);
+    chart.legend.parent = legendContainer;
+    chart.cursor = new am4charts.XYCursor();
+    chart.exporting.menu = new am4core.ExportMenu();
+    if (!logged) {
+        chart.exporting.formatOptions.getKey("png").disabled = true;
+        chart.exporting.formatOptions.getKey("svg").disabled = true;
+        chart.exporting.formatOptions.getKey("pdf").disabled = true;
+        chart.exporting.formatOptions.getKey("json").disabled = true;
+        chart.exporting.formatOptions.getKey("csv").disabled = true;
+        chart.exporting.formatOptions.getKey("xlsx").disabled = true;
+        chart.exporting.formatOptions.getKey("html").disabled = true;
+        chart.exporting.formatOptions.getKey("pdfdata").disabled = true;
+    }
+}, false);
 $("#legenddiv").bind('DOMSubtreeModified', function (_e) {
     document.getElementById("legenddiv").style.height = chart.legend.contentHeight + "px";
 });
@@ -107,32 +141,28 @@ function fetchData(url, tag, name) {
 }
 function loadData(values, event, boolpsmb) {
     return __awaiter(this, void 0, void 0, function () {
-        var sd, ed, x, st, rd, grp, nd, promises;
+        var sd, ed, x, st, nd, promises;
         return __generator(this, function (_a) {
             psmb.disable();
             variables.disable();
             if (semaforo)
                 tl.disable();
             sd = $('#start').val(), ed = $('#end').val();
-            x = [], st = 0, rd = 0, grp = true;
+            x = [], st = 0;
             if (boolpsmb) {
-                x = [null, event.value, null, event.label, null];
-                rd = st + 4;
+                x = [null, event.value, null, event.label];
             }
             else {
-                x = [event.value, null, event.label, null, (event.groupValue === "Fitoplancton" || event.groupValue === "Phytoplankton") ? "fito" : "graph"];
+                x = [event.value, null, event.label, null];
                 st++;
-                grp = false;
             }
             nd = st + 2;
             promises = values.map(function (e) {
                 x[st] = e.value;
                 x[nd] = e.label;
-                if (grp)
-                    x[rd] = e.groupId === 2 ? "fito" : "graph";
                 var tag = x[0] + "_" + x[1];
                 var name = x[2] + " " + x[3];
-                var url = "/ambiental/" + x[4] + "data?area=" + x[1] + "&var=" + x[0] + "&start=" + sd + "&end=" + ed;
+                var url = "/ambiental/data?area=" + x[1] + "&var=" + x[0] + "&start=" + sd + "&end=" + ed;
                 return fetchData(url, tag, name);
             });
             Promise.all(promises).then(function (_) {
@@ -140,6 +170,10 @@ function loadData(values, event, boolpsmb) {
                 variables.enable();
                 if (semaforo)
                     tl.enable();
+                if (cnt === 0 && boolpsmb) {
+                    etl.dispatchEvent(build);
+                    cnt++;
+                }
             });
             return [2];
         });
@@ -234,14 +268,13 @@ function callDatas(a, sd, ed, psmbs, sps, tls, groupId) {
                 }
             });
         }) :
-        tls.filter(function (x) { return x.groupId === groupId; }).map(function (x) {
+        tls.filter(function (x) { return x.id % 10 === groupId; }).map(function (x) {
             return psmbs.map(function (psmb) {
                 return sps.map(function (sp) {
                     var tag = [a.value, psmb.value, sp.value, x.value].join('_');
                     if (!chart.series._values.some(function (v) { return tag === v.dataFields.valueY; })) {
                         var name = [a.label, psmb.label, sp.label.replace("<i>", "[bold font-style: italic]").replace("</i>", "[/]"), x.label].join(' ');
                         var m = getParam(a.value);
-                        console.log('hi');
                         var url = "/ambiental/tldata?a=" + a.value + "&psmb=" + psmb.value + "&sp=" + sp.value + "&" + m + "=" + x.value + "&start=" + sd + "&end=" + ed;
                         return fetchData(url, tag, name);
                     }
@@ -253,10 +286,10 @@ function callDatas(a, sd, ed, psmbs, sps, tls, groupId) {
 if (semaforo) {
     etl.addEventListener('addItem', function (_e) {
         var tls = tl.getValue();
-        var analyses = tls.filter(function (x) { return x.groupId === 1; });
+        var analyses = tls.filter(function (x) { return x.id % 10 === 1; });
         if (analyses.length !== 0) {
-            var psmbs = tls.filter(function (x) { return x.groupId === 2; });
-            var sps = tls.filter(function (x) { return x.groupId === 3; });
+            var psmbs = tls.filter(function (x) { return x.id % 10 === 2; });
+            var sps = tls.filter(function (x) { return x.id % 10 === 3; });
             if (psmbs.length !== 0 && sps.length !== 0) {
                 psmb.disable();
                 variables.disable();
@@ -367,38 +400,6 @@ var showInfo = function (_e) {
     infowindow.setContent(content);
     infowindow.open(map, this);
 };
-am4core.ready(function () {
-    am4core.useTheme(am4themes_kelly);
-    chart.language.locale = esp ? am4lang_es_ES : am4lang_en_US;
-    chart.scrollbarY = new am4core.Scrollbar();
-    chart.scrollbarX = new am4core.Scrollbar();
-    chart.zoomOutButton.align = "left";
-    chart.zoomOutButton.valign = "bottom";
-    var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
-    dateAxis.dataFields.category = 'date';
-    var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
-    dateAxis.dateFormats.setKey('year', 'yy');
-    dateAxis.periodChangeDateFormats.setKey('month', 'MMM yy');
-    dateAxis.tooltipDateFormat = 'dd MMM, yyyy';
-    dateAxis.renderer.minGridDistance = 40;
-    chart.legend = new am4charts.Legend();
-    var legendContainer = am4core.create("legenddiv", am4core.Container);
-    legendContainer.width = am4core.percent(100);
-    legendContainer.height = am4core.percent(100);
-    chart.legend.parent = legendContainer;
-    chart.cursor = new am4charts.XYCursor();
-    chart.exporting.menu = new am4core.ExportMenu();
-    if (!logged) {
-        chart.exporting.formatOptions.getKey("png").disabled = true;
-        chart.exporting.formatOptions.getKey("svg").disabled = true;
-        chart.exporting.formatOptions.getKey("pdf").disabled = true;
-        chart.exporting.formatOptions.getKey("json").disabled = true;
-        chart.exporting.formatOptions.getKey("csv").disabled = true;
-        chart.exporting.formatOptions.getKey("xlsx").disabled = true;
-        chart.exporting.formatOptions.getKey("html").disabled = true;
-        chart.exporting.formatOptions.getKey("pdfdata").disabled = true;
-    }
-});
 window.onload = function initMap() {
     return __awaiter(this, void 0, void 0, function () {
         var bnds;
@@ -436,7 +437,7 @@ window.onload = function initMap() {
                             map.fitBounds(bnds);
                             map.setCenter(bnds.getCenter());
                             loadDates();
-                            variables.setChoiceByValue('t');
+                            variables.setChoiceByValue('v0');
                             psmb.setChoiceByValue('1');
                         })];
                 case 1:
@@ -477,4 +478,55 @@ $('.input-daterange').datepicker({
         tls.forEach(function (v) { return tl.setChoiceByValue(v); });
     }
 });
+function CreateTableFromJSON(json) {
+    var col = [];
+    for (var i = 0; i < json.length; i++) {
+        for (var key in json[i]) {
+            if (col.indexOf(key) === -1) {
+                col.push(key);
+            }
+        }
+    }
+    var table = document.createElement("table");
+    table.className = "table";
+    table.id = "newTable";
+    var tr = table.insertRow(-1);
+    for (var i = 0; i < col.length; i++) {
+        var th = document.createElement("th");
+        th.innerHTML = col[i];
+        tr.appendChild(th);
+    }
+    for (var i = 0; i < json.length; i++) {
+        tr = table.insertRow(-1);
+        for (var j = 0; j < col.length; j++) {
+            var tabCell = tr.insertCell(-1);
+            tabCell.innerHTML = json[i][col[j]];
+        }
+    }
+    var divContainer = document.getElementById("results");
+    divContainer.appendChild(table);
+}
+function fetchPlankton() {
+    var sd = $('#start').val();
+    var ed = $('#end').val();
+    var promises = psmb.getValue(true).map(function (p) { return fetch('/ambiental/BuscarInformes', {
+        method: 'POST',
+        headers: new Headers({ 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }),
+        body: "id=" + p + "&start=" + sd + "&end=" + ed
+    }).then(function (r) { return r.json(); }); });
+    Promise.all(promises).then(function (j) {
+        var divContainer = document.getElementById("results");
+        divContainer.innerHTML = "";
+        j.forEach(function (i) { return CreateTableFromJSON(i); });
+    });
+}
+var tableToExcel = (function () {
+    var uri = 'data:application/vnd.ms-excel;base64,', template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>', base64 = function (s) { return window.btoa(unescape(encodeURIComponent(s))); }, format = function (s, c) { return s.replace(/{(\w+)}/g, function (_, p) { return c[p]; }); };
+    return function (table, name) {
+        if (!table.nodeType)
+            table = document.getElementById(table);
+        var ctx = { worksheet: name || 'Worksheet', table: table.innerHTML };
+        window.location.href = uri + base64(format(template, ctx));
+    };
+})();
 //# sourceMappingURL=graph.js.map

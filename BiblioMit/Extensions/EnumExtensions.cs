@@ -43,11 +43,11 @@ namespace BiblioMit.Extensions
             .Select((g, i) => new ChoicesGroup
                 {
                     Label = g.Key,
-                    Id = i,
+                    //Id = i,
                     Choices = g.Select(t => new ChoicesItem 
                     { 
                         Label = $"{t.GetAttrName()} ({t.GetAttrPrompt()})", 
-                        Value = prefix + t.ToString()
+                        Value = prefix + t.ToString("d", null)
                     })
                 });
     public static MultiSelectList Name2MultiSelect<TEnum>(this TEnum @enum,

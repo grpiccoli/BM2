@@ -85,15 +85,15 @@ namespace BiblioMit.Controllers
         [AllowAnonymous]
         public JsonResult VariableList()
         {
-            var result = Variable.t.Enum2ChoicesGroup();
+            var result = Variable.t.Enum2ChoicesGroup("v");
             var group = _localizer["Group"];
             var groups = new ChoicesGroup 
             {
                 Label = _localizer["Phylogenetic Groups (Cel/mL)"],
-                Id = 3,
+                //Id = 3,
                 Choices = _context.PhylogeneticGroups.Select(p => new ChoicesItem
                 {
-                    Value = p.Id.ToString(CultureInfo.InvariantCulture),
+                    Value = "f" + p.Id.ToString(CultureInfo.InvariantCulture),
                     Label = $"{p.Name} ({group})"
                 })
             };
@@ -101,10 +101,10 @@ namespace BiblioMit.Controllers
             var orders = new ChoicesGroup
             {
                 Label = _localizer["Genera (Cel/mL)"],
-                Id = 4,
+                //Id = 4,
                 Choices = _context.GenusPhytoplanktons.Select(p => new ChoicesItem
                 {
-                    Value = p.Id.ToString(CultureInfo.InvariantCulture),
+                    Value = "g" + p.Id.ToString(CultureInfo.InvariantCulture),
                     Label = $"{p.Name} ({genus})"
                 })
             };
@@ -112,12 +112,12 @@ namespace BiblioMit.Controllers
             var species = new ChoicesGroup
             {
                 Label = _localizer["Species (Cel/mL)"],
-                Id = 5,
+                //Id = 5,
                 Choices = _context.SpeciesPhytoplanktons
                 .Include(s => s.Genus)
                 .Select(p => new ChoicesItem
                 {
-                    Value = p.Id.ToString(CultureInfo.InvariantCulture),
+                    Value = "s" + p.Id.ToString(CultureInfo.InvariantCulture),
                     Label = $"{p.GetFullName()} ({sp})"
                 })
             };
@@ -563,37 +563,54 @@ namespace BiblioMit.Controllers
             }
             return Json(map);
         }
+        public IActionResult SearchPlanktonAssays() => View();
+        public IActionResult BuscarInformes(int id, string start, string end)
+        {
+            var i = Convert.ToDateTime(start, CultureInfo.InvariantCulture);
+            var f = Convert.ToDateTime(end, CultureInfo.InvariantCulture);
+            var plankton = _context.PlanktonAssays.Where(p => p.SamplingDate >= i && p.SamplingDate <= f);
+            if (id < 4)
+            {
+                plankton = plankton.Where(p => p.Psmb.Commune.CatchmentAreaId == id);
+            }
+            else if (id < 100_000)
+            {
+                plankton = plankton.Where(p => p.PsmbId == id);
+            }
+            else
+            {
+                plankton = plankton.Where(p => p.Psmb.CommuneId == id);
+            }
+            return Json(plankton.Select(p => new { p.Id, p.SamplingDate, p.Temperature, p.Oxigen, p.Ph, p.Salinity }));
+        }
         private static AmData SelectData(
             IGrouping<DateTime, PlanktonAssay> g,
-            string var, bool fito)
+            int var, char id)
         {
             if (g == null) return null;
-            var response = new AmData 
-            { 
+            var response = new AmData
+            {
                 Date = g.Key.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
             };
-            if (fito)
+            if (!(id == 'v' && var != 4))
             {
                 var tmp = g.Where(m => m.Phytoplanktons != null);
                 if (tmp.Any())
                 {
-                    bool phy = var == "phy";
-                    if (!phy)
-                        tmp = tmp.Where(m => m.Phytoplanktons
-                        .Any(p => p.Species.Genus.Group.NormalizedName
-                        .Equals(var, StringComparison.Ordinal)));
-                    if (phy || tmp.Any())
+                    var cs = id switch { 
+                        'f' => tmp.SelectMany(m => m.Phytoplanktons
+                        .Where(p => p.Species.Genus.GroupId == var).Select(p => p.C)),
+                        'g' => tmp.SelectMany(m => m.Phytoplanktons
+                        .Where(p => p.Species.GenusId == var).Select(p => p.C)),
+                        's' => tmp.SelectMany(m => m.Phytoplanktons
+                        .Where(p => p.SpeciesId == var).Select(p => p.C)),
+                        _ => tmp.SelectMany(m => m.Phytoplanktons.Select(p => p.C))
+                    };
+                    if (cs.Any())
                     {
-                        var cs = phy ?
-                            tmp.SelectMany(m => m.Phytoplanktons.Select(p => p.C))
-                            : tmp.SelectMany(m => m.Phytoplanktons
-                            .Where(p => p.Species.Genus.Group.NormalizedName
-                            .Equals(var, StringComparison.Ordinal)).Select(p => p.C));
-                        if (cs.Any())
-                        {
-                            response.Value = Math.Round(cs.Average(), 2);
-                            return response;
-                        }
+                        //response.Id = string.Join(", ", tmp.Select(m => m.Id));
+                        response.Value = Math.Round(cs.Average(), 2);
+                        return response;
                     }
                 }
             }
@@ -601,63 +618,67 @@ namespace BiblioMit.Controllers
             {
                 string attr = var switch
                 {
-                    "t" => "Temperature",
-                    "ph" => "Ph",
-                    "sal" => "Salinity",
-                    "o2" => "Oxigen",
+                    0 => "Temperature",
+                    1 => "Ph",
+                    2 => "Oxigen",
+                    3 => "Salinity",
                     _ => ""
                 };
                 if(g.Any(m => m[attr] != null))
                 {
+                    //response.Id = string.Join(", ", g.Select(m => m.Id));
                     response.Value = Math.Round(g.Average(m => (double?)m[attr]).Value, 2);
                     return response;
                 }
             }
             return null;
         }
-        private async Task<IEnumerable<AmData>> Data(int area, string var, string start, string end, bool fito = false)
+        [AllowAnonymous]
+        public async Task<IActionResult> Data(int area, string var, string start, string end)
         {
+            if(string.IsNullOrWhiteSpace(var)) throw new ArgumentException(_localizer["var doesn't contain id"]);
             var assays = _context.PlanktonAssays as IQueryable<PlanktonAssay>;
-            if(fito) assays = assays
+            var type = var[0];
+            var parsed = int.TryParse(var.Substring(1), out int id);
+            if (!parsed) throw new ArgumentException(_localizer["var doesn't contain id"]);
+            if (!(type == 'v' && id != 4)) assays = assays
                 .Include(e => e.Phytoplanktons)
                     .ThenInclude(f => f.Species)
-                        .ThenInclude(f => f.Genus)
-                            .ThenInclude(f => f.Group);
+                        .ThenInclude(f => f.Genus);
             if(area < 4)
             {
-                assays.Where(e => e.Psmb.Commune.CatchmentAreaId == area);
+                assays = assays.Where(e => e.Psmb.Commune.CatchmentAreaId == area);
             }
             else if(area < 100_000)
             {
-                assays.Where(e => e.PsmbId == area);
+                assays = assays.Where(e => e.PsmbId == area);
             }
             else
             {
-                assays.Where(e => e.Psmb.CommuneId == area);
+                assays = assays.Where(e => e.Psmb.CommuneId == area);
             }
             var i = Convert.ToDateTime(start, CultureInfo.InvariantCulture);
             var f = Convert.ToDateTime(end, CultureInfo.InvariantCulture);
             var ensayos = await assays
                 .Where(e => e.SamplingDate >= i && e.SamplingDate <= f)
                 .ToListAsync().ConfigureAwait(false);
-            return ensayos.GroupBy(e => e.SamplingDate.Date).OrderBy(g => g.Key).Select(g => SelectData(g, var, fito)).Where(d => d != null);
+            return Json(ensayos.GroupBy(e => e.SamplingDate.Date).OrderBy(g => g.Key).Select(g => SelectData(g, id, type)).Where(d => d != null));
         }
-        [AllowAnonymous]
-        public async Task<IActionResult> FitoData(int area, string var, string start, string end)
-        {
-            var data = await Data(area, var, start, end, true).ConfigureAwait(false);
-            return Json(data);
-        }
+        //public async Task<IActionResult> Data(int area, string var, string start, string end, int id)
+        //{
+        //    var data = await Data(area, var, start, end, id).ConfigureAwait(false);
+        //    return Json(data);
+        //}
         //[HttpPost]
-        [AllowAnonymous]
+        //[AllowAnonymous]
         //[ValidateAntiForgeryToken]
         //[ProducesResponseType(StatusCodes.Status404NotFound)]
         //[ProducesResponseType(typeof(JsonResult), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GraphData(int area, string var, string start, string end)
-        {
-            var data = await Data(area, var, start, end).ConfigureAwait(false);           
-            return Json(data);
-        }
+        //public async Task<IActionResult> GraphData(int area, string var, string start, string end)
+        //{
+        //    var data = await Data(area, var, start, end).ConfigureAwait(false);           
+        //    return Json(data);
+        //}
         [AllowAnonymous]
         public IActionResult Graph()
         {

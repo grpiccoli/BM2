@@ -1,4 +1,6 @@
 ﻿//out vars
+var build = new Event("buildChart");
+var cnt = 0;
 var lang = $("html").attr("lang");
 var esp = lang === 'es';
 var choiceOps:any = {
@@ -41,7 +43,40 @@ try {
 } catch (e) { }
 //CHART
 var chart: any = am4core.create("chartdiv", am4charts.XYChart);
-
+var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+dateAxis.dataFields.category = 'date';
+var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+etl.addEventListener("buildChart", function () {
+    am4core.useTheme(am4themes_kelly);
+    chart.language.locale = esp ? am4lang_es_ES : am4lang_en_US;
+    chart.scrollbarY = new am4core.Scrollbar();
+    chart.scrollbarX = new am4core.Scrollbar();
+    chart.zoomOutButton.align = "left";
+    chart.zoomOutButton.valign = "bottom";
+    //dateAxis.dateFormats.setKey("day", "MM");
+    //dateAxis.dateFormats.setKey("month", "MMM");
+    dateAxis.dateFormats.setKey('year', 'yy');
+    dateAxis.periodChangeDateFormats.setKey('month', 'MMM yy');
+    dateAxis.tooltipDateFormat = 'dd MMM, yyyy';
+    dateAxis.renderer.minGridDistance = 40;
+    chart.legend = new am4charts.Legend();
+    var legendContainer = am4core.create("legenddiv", am4core.Container);
+    legendContainer.width = am4core.percent(100);
+    legendContainer.height = am4core.percent(100);
+    chart.legend.parent = legendContainer;
+    chart.cursor = new am4charts.XYCursor();
+    chart.exporting.menu = new am4core.ExportMenu();
+    if (!logged) {
+        chart.exporting.formatOptions.getKey("png").disabled = true;
+        chart.exporting.formatOptions.getKey("svg").disabled = true;
+        chart.exporting.formatOptions.getKey("pdf").disabled = true;
+        chart.exporting.formatOptions.getKey("json").disabled = true;
+        chart.exporting.formatOptions.getKey("csv").disabled = true;
+        chart.exporting.formatOptions.getKey("xlsx").disabled = true;
+        chart.exporting.formatOptions.getKey("html").disabled = true;
+        chart.exporting.formatOptions.getKey("pdfdata").disabled = true;
+    }
+}, false);
 $("#legenddiv").bind('DOMSubtreeModified', function (_e) {
     document.getElementById("legenddiv").style.height = chart.legend.contentHeight + "px";
 });
@@ -70,30 +105,33 @@ async function loadData(values: any, event: any, boolpsmb: boolean) {
     variables.disable();
     if (semaforo) tl.disable();
     var sd = $('#start').val(), ed = $('#end').val();
-    var x:any = [], st = 0, rd = 0, grp = true;
+    var x:any = [], st = 0;
     if (boolpsmb) {
         //var tag, area tag, var name, area name, group value
-        x = [null, event.value, null, event.label, null];
-        rd = st + 4;
+        x = [null, event.value, null, event.label];
+        //rd = st + 4;
     } else {
-        x = [event.value, null, event.label, null, (event.groupValue === "Fitoplancton" || event.groupValue === "Phytoplankton") ? "fito" : "graph"];
+        x = [event.value, null, event.label, null];
         st++;
-        grp = false;
     }
     var nd = st + 2;
     var promises = values.map((e:any) => {
         x[st] = e.value;
         x[nd] = e.label;
-        if (grp) x[rd] = e.groupId === 2 ? "fito" : "graph";
+        //if (boolpsmb) x[rd] = e.groupId;
         var tag = `${x[0]}_${x[1]}`;
         var name = `${x[2]} ${x[3]}`;
-        var url = `/ambiental/${x[4]}data?area=${x[1]}&var=${x[0]}&start=${sd}&end=${ed}`;
+        var url = `/ambiental/data?area=${x[1]}&var=${x[0]}&start=${sd}&end=${ed}`;
         return fetchData(url, tag, name);
     });
     Promise.all(promises).then(_ => {
         psmb.enable();
         variables.enable();
         if (semaforo) tl.enable();
+        if (cnt === 0 && boolpsmb) {
+            etl.dispatchEvent(build);
+            cnt++;
+        }
     });
 }
 function clickMap(e:any) {
@@ -171,14 +209,13 @@ function callDatas(a: any, sd: any, ed: any, psmbs: any, sps: any, tls: any, gro
                 return fetchData(url, tag, name);
             }
         })) :
-        tls.filter((x: any) => x.groupId === groupId).map((x: any) =>
+        tls.filter((x: any) => x.id % 10 === groupId).map((x: any) =>
             psmbs.map((psmb: any) =>
                 sps.map((sp: any) => {
                     var tag = [a.value, psmb.value, sp.value, x.value].join('_');
                     if (!chart.series._values.some((v: any) => tag === v.dataFields.valueY)) {
                         var name = [a.label, psmb.label, sp.label.replace("<i>", "[bold font-style: italic]").replace("</i>", "[/]"), x.label].join(' ');
                         var m = getParam(a.value);
-                        console.log('hi');
                         var url = `/ambiental/tldata?a=${a.value}&psmb=${psmb.value}&sp=${sp.value}&${m}=${x.value}&start=${sd}&end=${ed}`;
                         return fetchData(url, tag, name);
                     }
@@ -188,10 +225,10 @@ function callDatas(a: any, sd: any, ed: any, psmbs: any, sps: any, tls: any, gro
 if (semaforo) {
     etl.addEventListener('addItem', (_e: any) => {
         var tls = tl.getValue();
-        var analyses = tls.filter((x: any) => x.groupId === 1);
+        var analyses = tls.filter((x: any) => x.id % 10 === 1);
         if (analyses.length !== 0) {
-            var psmbs = tls.filter((x: any) => x.groupId === 2);
-            var sps = tls.filter((x: any) => x.groupId === 3);
+            var psmbs = tls.filter((x: any) => x.id % 10 === 2);
+            var sps = tls.filter((x: any) => x.id % 10 === 3);
             if (psmbs.length !== 0 && sps.length !== 0) {
                 psmb.disable();
                 variables.disable();
@@ -311,45 +348,6 @@ var showInfo = function (_e: any) {
     infowindow.setContent(content);
     infowindow.open(map, this);
 }
-am4core.ready(function () {
-    am4core.useTheme(am4themes_kelly);
-    chart.language.locale = esp ? am4lang_es_ES : am4lang_en_US;
-    chart.scrollbarY = new am4core.Scrollbar();
-    chart.scrollbarX = new am4core.Scrollbar();
-    chart.zoomOutButton.align = "left";
-    chart.zoomOutButton.valign = "bottom";
-    //dateAxis.dateFormats.setKey("day", "MM");
-    //dateAxis.dateFormats.setKey("month", "MMM");
-    //chart.zoomOutButton.background.cornerRadius(5, 5, 5, 5);
-    //chart.zoomOutButton.background.fill = am4core.color("#25283D");
-    //chart.zoomOutButton.icon.stroke = am4core.color("#EFD9CE");
-    //chart.zoomOutButton.icon.strokeWidth = 2;
-    //chart.zoomOutButton.background.states.getKey("hover").properties.fill = am4core.color("#606271");
-    var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
-    dateAxis.dataFields.category = 'date';
-    var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
-    dateAxis.dateFormats.setKey('year', 'yy');
-    dateAxis.periodChangeDateFormats.setKey('month', 'MMM yy');
-    dateAxis.tooltipDateFormat = 'dd MMM, yyyy';
-    dateAxis.renderer.minGridDistance = 40;
-    chart.legend = new am4charts.Legend();
-    var legendContainer = am4core.create("legenddiv", am4core.Container);
-    legendContainer.width = am4core.percent(100);
-    legendContainer.height = am4core.percent(100);
-    chart.legend.parent = legendContainer;
-    chart.cursor = new am4charts.XYCursor();
-    chart.exporting.menu = new am4core.ExportMenu();
-    if (!logged) {
-        chart.exporting.formatOptions.getKey("png").disabled = true;
-        chart.exporting.formatOptions.getKey("svg").disabled = true;
-        chart.exporting.formatOptions.getKey("pdf").disabled = true;
-        chart.exporting.formatOptions.getKey("json").disabled = true;
-        chart.exporting.formatOptions.getKey("csv").disabled = true;
-        chart.exporting.formatOptions.getKey("xlsx").disabled = true;
-        chart.exporting.formatOptions.getKey("html").disabled = true;
-        chart.exporting.formatOptions.getKey("pdfdata").disabled = true;
-    }
-});
 window.onload = async function initMap() {
     var bnds: google.maps.LatLngBounds = new google.maps.LatLngBounds();
     await fetch('/ambiental/mapdata')
@@ -382,7 +380,7 @@ window.onload = async function initMap() {
             map.fitBounds(bnds);
             map.setCenter(bnds.getCenter());
             loadDates();
-            variables.setChoiceByValue('t');
+            variables.setChoiceByValue('v0');
             psmb.setChoiceByValue('1');
         });
 };
@@ -418,3 +416,63 @@ $('.input-daterange').datepicker({
         tls.forEach((v: any) => tl.setChoiceByValue(v));
     }
 });
+function CreateTableFromJSON(json: any) {
+    // EXTRACT VALUE FOR HTML HEADER.
+    // ('Book ID', 'Book Name', 'Category' and 'Price')
+    var col = [];
+    for (var i = 0; i < json.length; i++) {
+        for (var key in json[i]) {
+            if (col.indexOf(key) === -1) {
+                col.push(key);
+            }
+        }
+    }
+    // CREATE DYNAMIC TABLE.
+    var table = document.createElement("table");
+    table.className = "table";
+    table.id = "newTable";
+    // CREATE HTML TABLE HEADER ROW USING THE EXTRACTED HEADERS ABOVE.
+    var tr = table.insertRow(-1);                   // TABLE ROW.
+
+    for (var i = 0; i < col.length; i++) {
+        var th = document.createElement("th");      // TABLE HEADER.
+        th.innerHTML = col[i];
+        tr.appendChild(th);
+    }
+    // ADD JSON DATA TO THE TABLE AS ROWS.
+    for (var i = 0; i < json.length; i++) {
+        tr = table.insertRow(-1);
+        for (var j = 0; j < col.length; j++) {
+            var tabCell = tr.insertCell(-1);
+            tabCell.innerHTML = json[i][col[j]];
+        }
+    }
+    // FINALLY ADD THE NEWLY CREATED TABLE WITH JSON DATA TO A CONTAINER.
+    var divContainer = document.getElementById("results");
+    divContainer.appendChild(table);
+}
+function fetchPlankton() {
+    var sd = $('#start').val();
+    var ed = $('#end').val();
+    var promises = psmb.getValue(true).map((p:any) => fetch('/ambiental/BuscarInformes', {
+        method: 'POST',
+        headers: new Headers({ 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }),
+        body: `id=${p}&start=${sd}&end=${ed}`
+    }).then(r => r.json()));
+    Promise.all(promises).then(j => {
+        var divContainer = document.getElementById("results");
+        divContainer.innerHTML = "";
+        j.forEach(i => CreateTableFromJSON(i));
+    });
+}
+var tableToExcel = (function () {
+    var uri = 'data:application/vnd.ms-excel;base64,'
+        , template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>'
+        , base64 = function (s:any) { return window.btoa(unescape(encodeURIComponent(s))) }
+        , format = function (s:any, c:any) { return s.replace(/{(\w+)}/g, function (_:any, p:any) { return c[p]; }) }
+    return function (table:any, name:any) {
+        if (!table.nodeType) table = document.getElementById(table)
+        var ctx = { worksheet: name || 'Worksheet', table: table.innerHTML }
+        window.location.href = uri + base64(format(template, ctx))
+    }
+})();
