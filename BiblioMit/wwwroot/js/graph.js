@@ -133,6 +133,7 @@ function fetchData(url, tag, name) {
                         serie.name = name;
                         serie.tooltipText = '{name}: [bold]{valueY}[/]';
                         serie.showOnInit = false;
+                        chart.exporting.dataFields[tag] = name;
                     })];
                 case 1: return [2, _a.sent()];
             }

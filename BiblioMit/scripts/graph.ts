@@ -98,6 +98,7 @@ async function fetchData(url:string, tag:string, name:string) {
             serie.name = name;
             serie.tooltipText = '{name}: [bold]{valueY}[/]';
             serie.showOnInit = false;
+            chart.exporting.dataFields[tag] = name;
         });
 }
 async function loadData(values: any, event: any, boolpsmb: boolean) {
@@ -109,7 +110,6 @@ async function loadData(values: any, event: any, boolpsmb: boolean) {
     if (boolpsmb) {
         //var tag, area tag, var name, area name, group value
         x = [null, event.value, null, event.label];
-        //rd = st + 4;
     } else {
         x = [event.value, null, event.label, null];
         st++;
@@ -418,7 +418,6 @@ $('.input-daterange').datepicker({
 });
 function CreateTableFromJSON(json: any) {
     // EXTRACT VALUE FOR HTML HEADER.
-    // ('Book ID', 'Book Name', 'Category' and 'Price')
     var col = [];
     for (var i = 0; i < json.length; i++) {
         for (var key in json[i]) {
