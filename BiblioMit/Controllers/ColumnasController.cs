@@ -9,6 +9,8 @@ using BiblioMit.Models;
 using BiblioMit.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using BiblioMit.Models.Entities.Digest;
+using System;
+using Microsoft.Extensions.Localization;
 
 namespace BiblioMit.Controllers
 {
@@ -16,10 +18,12 @@ namespace BiblioMit.Controllers
     public class ColumnasController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public ColumnasController(ApplicationDbContext context)
+        private readonly IStringLocalizer<ColumnasController> _localizer;
+        public ColumnasController(ApplicationDbContext context,
+            IStringLocalizer<ColumnasController> localizer)
         {
             _context = context;
+            _localizer = localizer;
         }
 
         public IActionResult Index(int? pg, int? rpp, string srt, bool? asc, string[] val) =>
@@ -79,6 +83,7 @@ namespace BiblioMit.Controllers
         [ValidateAntiForgeryToken]
         public async Task<JsonResult> Editar(int id, string description, string headers, string conversion, int places, string sep, bool negative)
         {
+            if (string.IsNullOrWhiteSpace(sep)) throw new ArgumentException(_localizer["error"]);
             var separator = sep[0];
             var model = await _context.Registries
                 .FindAsync(id).ConfigureAwait(false);
