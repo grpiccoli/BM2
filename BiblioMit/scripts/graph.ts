@@ -1,4 +1,12 @@
 ﻿//out vars
+const loaderStart = () => {
+    (<HTMLElement>document.getElementById('preloader-background')).style.display = "block";
+}
+
+const loaderStop = () => {
+    (<HTMLElement>document.getElementById('preloader-background')).style.display = "none";
+}
+loaderStart();
 var build = new Event("buildChart");
 var cnt = 0;
 var lang = $("html").attr("lang");
@@ -27,7 +35,7 @@ const etl = document.getElementById('tl');
 choiceOps.placeholderValue = esp ? 'Variables semáforo' : 'Semaforo Variables';
 const tl = new Choices(etl, choiceOps);
 const semaforo = !document.getElementById('semaforo').classList.contains('d-none');
-var logged = document.getElementById('logoutForm') !== null;
+//var logged = document.getElementById('logoutForm') !== null;
 //passive support
 var supportsPassiveOption = false;
 try {
@@ -66,7 +74,7 @@ etl.addEventListener("buildChart", function () {
     chart.legend.parent = legendContainer;
     chart.cursor = new am4charts.XYCursor();
     chart.exporting.menu = new am4core.ExportMenu();
-    if (!logged) {
+    if (!semaforo) {
         chart.exporting.formatOptions.getKey("png").disabled = true;
         chart.exporting.formatOptions.getKey("svg").disabled = true;
         chart.exporting.formatOptions.getKey("pdf").disabled = true;
@@ -102,9 +110,10 @@ async function fetchData(url:string, tag:string, name:string) {
         });
 }
 async function loadData(values: any, event: any, boolpsmb: boolean) {
-    psmb.disable();
-    variables.disable();
-    if (semaforo) tl.disable();
+    loaderStart();
+    //psmb.disable();
+    //variables.disable();
+    //if (semaforo) tl.disable();
     var sd = $('#start').val(), ed = $('#end').val();
     var x:any = [], st = 0;
     if (boolpsmb) {
@@ -125,12 +134,15 @@ async function loadData(values: any, event: any, boolpsmb: boolean) {
         return fetchData(url, tag, name);
     });
     Promise.all(promises).then(_ => {
-        psmb.enable();
-        variables.enable();
-        if (semaforo) tl.enable();
+        //psmb.enable();
+        //variables.enable();
+        //if (semaforo) tl.enable();
         if (cnt === 0 && boolpsmb) {
             etl.dispatchEvent(build);
             cnt++;
+            //loaderStop();
+        } else {
+            loaderStop();
         }
     });
 }
@@ -159,10 +171,19 @@ epsmb.addEventListener('removeItem', (event: any) => {
 async function getList(name:string) {
     return await fetch(`/ambiental/${name}list`)
         .then(r => r.json())
-        .catch(e => console.error(e));
+        .catch(e => console.error(e, name));
 }
 const psmb = new Choices(epsmb, choiceOps);
-psmb.setChoices(async () => await getList('psmb'));
+//psmb.setChoices(async () => await getList('psmbs'));
+psmb.setChoices(async () => {
+    var one = [await getList('cuenca')];
+    var two = getList('comuna');
+    if (semaforo) {
+        var three = getList('psmb');
+        return one.concat(await two).concat(await three)
+    }
+    return one.concat(await two);
+});
 //VARIABLE SELECT
 const evariable = document.getElementById('variable');
 evariable.addEventListener('addItem', (event:any) =>
@@ -230,9 +251,10 @@ if (semaforo) {
             var psmbs = tls.filter((x: any) => x.id % 10 === 2);
             var sps = tls.filter((x: any) => x.id % 10 === 3);
             if (psmbs.length !== 0 && sps.length !== 0) {
-                psmb.disable();
-                variables.disable();
-                tl.disable();
+                loaderStart();
+                //psmb.disable();
+                //variables.disable();
+                //tl.disable();
                 var sd = $('#start').val();
                 var ed = $('#end').val();
                 analyses.forEach((a: any) => {
@@ -254,9 +276,10 @@ if (semaforo) {
                     }
                 });
                 chart.invalidateData();
-                psmb.enable();
-                variables.enable();
-                tl.enable();
+                loaderStop();
+                //psmb.enable();
+                //variables.enable();
+                //tl.enable();
             }
         }
     }, supportsPassiveOption ? { passive: true } : false);
@@ -348,40 +371,56 @@ var showInfo = function (_e: any) {
     infowindow.setContent(content);
     infowindow.open(map, this);
 }
-window.onload = async function initMap() {
-    var bnds: google.maps.LatLngBounds = new google.maps.LatLngBounds();
-    await fetch('/ambiental/mapdata')
+var bnds: google.maps.LatLngBounds = new google.maps.LatLngBounds();
+var markers :any[]= [];
+var processMapData = function (dato: any) {
+    var consessionPolygon = new google.maps.Polygon({
+        paths: dato.position,
+        zIndex: dato.id
+    });
+    consessionPolygon.setMap(map);
+    consessionPolygon.addListener('click', addListenerOnPolygon);
+    polygons[dato.id] = consessionPolygon;
+    var center = getBounds(dato.position).getCenter();
+    if (dato.id < 4) bnds.extend(center);
+    var marker = new google.maps.Marker({
+        position: center,
+        title: `${dato.name} ${dato.id}`,
+        zIndex: dato.id
+    });
+    table[dato.id] = {
+        name: dato.name,
+        comuna: dato.comuna,
+        provincia: dato.provincia,
+        code: dato.code
+    }
+    marker.addListener('click', showInfo);
+    return marker;
+}
+window.onload = function initMap() {
+    fetch('/ambiental/cuencadata')
         .then(r => r.json())
-        .then(data => data.map((dato:any) => {
-            var consessionPolygon = new google.maps.Polygon({
-                paths: dato.position,
-                zIndex: dato.id
-            });
-            consessionPolygon.setMap(map);
-            consessionPolygon.addListener('click', addListenerOnPolygon);
-            polygons[dato.id] = consessionPolygon;
-            var center = getBounds(dato.position).getCenter();
-            if(dato.id < 4) bnds.extend(center);
-            var marker = new google.maps.Marker({
-                position: center,
-                title: `${dato.name} ${dato.id}`,
-                zIndex: dato.id
-            });
-            table[dato.id] = {
-                name: dato.name,
-                comuna: dato.comuna,
-                provincia: dato.provincia,
-                code: dato.code
-            }
-            marker.addListener('click', showInfo);
-            return marker;
-            })).then(m => new MarkerClusterer(map, m, { imagePath: '/images/markers/m' })
-        ).then(_ => {
+        .then(data => data.map(processMapData))
+        .then(m => {
+            markers = m;
             map.fitBounds(bnds);
             map.setCenter(bnds.getCenter());
+        }).then(async _ => {
+            await fetch('/ambiental/comunadata')
+                .then(r => r.json())
+                .then(data => data.map(processMapData))
+                .then(m => markers = markers.concat(m));
+            if (semaforo)
+                await fetch('/ambiental/psmbdata')
+                    .then(r => r.json())
+                    .then(data => data.map(processMapData))
+                    .then(m => markers = markers.concat(m));
+        }).then(_ => {
+            new MarkerClusterer(map, markers, { imagePath: '/images/markers/m' });
             loadDates();
             variables.setChoiceByValue('v0');
             psmb.setChoiceByValue('1');
+            loaderStop();
         });
 };
 function loadDates() {

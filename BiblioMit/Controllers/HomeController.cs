@@ -39,7 +39,7 @@ namespace BiblioMit.Controllers
 
         public IActionResult Manual()
         {
-            var url = $"{Request.Scheme}://{Request.Host.Value}/MANUAL_DE_USO_BIBLIOMIT/MANUAL_DE_USO_BIBLIOMIT.html";
+            var url = "~/MANUAL_DE_USO_BIBLIOMIT/MANUAL_DE_USO_BIBLIOMIT.html";
             if (Url.IsLocalUrl(url))
                 return Redirect(url);
             else return RedirectToAction("Index", "Home");
@@ -133,7 +133,6 @@ namespace BiblioMit.Controllers
 
         public IActionResult Index()
         {
-            ViewData["Url"] = $"{Request.Scheme}://{Request.Host}{Request.PathBase}";
             return View();
         }
         public IActionResult Forum()

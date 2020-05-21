@@ -53,7 +53,6 @@ namespace BiblioMit.Models.VM
     }
     public class ChoicesGroup : IChoices
     {
-        public int Id { get; set; }
         public IEnumerable<ChoicesItem> Choices { get; set; }
     }
 }

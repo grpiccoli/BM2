@@ -1,83 +1,160 @@
 ﻿@{
     ViewData["Title"] = "About";
-    ViewData["Message"] = "Plataforma de Gestión Tecnológica para el Sector Mitilicultor";
+    ViewData["Message"] = Localizer["Technological Management Platform for Mussel Farming Sector"].Value;
 }
 
 <partial name="_Libs" model='new HashSet<string> { "nanogallery2" }' />
 
 <div class="row">
-    <div class="col-12 col-sm-6 align-middle">
-        <a class="float-left col-3" href="@Url.Action("Contact", "Home", null, null)" target="_blank">
-            <img src="~/images/ico/bibliomit.svg" alt="BiblioMit" class="img-fluid mh-10" />
+    <div class="col-12 col-md-6">
+        <a class="float-left" href="@Url.Action("Contact", "Home", null, null)" target="_blank">
+            <img src="~/images/ico/bibliomit.svg" alt="BiblioMit" class="img-fluid" style="max-height:4em" />
+            <h1 class="float-right align-bottom">
+                BiblioMit
+            </h1>
         </a>
-        <h1 class="float-right align-middle col-9">
-            BiblioMit
-        </h1>
     </div>
-    <a class="float-left w-33 col-6 col-sm-3" href="https://www.corfo.cl/" target="_blank">
-        <img src="~/images/ico/corfo.svg" alt="corfo" class="img-fluid" />
-    </a>
-    <a class="float-left w-33 col-6 col-sm-3" href="http://www.mejillondechile.cl/" target="_blank">
-        <img src="~/images/ico/mejillondechile.min.png" alt="mejillon de chile" class="img-fluid" />
-    </a>
+    <div class="col-6 col-md-3">
+        <a class="float-left" href="https://www.corfo.cl/" target="_blank" >
+            <img src="~/images/ico/corfo.svg" alt="corfo" class="img-fluid" style="max-height:4em"/>
+        </a>
+    </div>
+    <div class="col-6 col-md-3">
+        <a class="float-left" href="http://www.mejillondechile.cl/" target="_blank" >
+            <img src="~/images/ico/mejillondechile.min.png" alt="mejillon de chile" class="img-fluid" style="max-height:4em"/>
+        </a>
+    </div>
 </div>
-<h3>@ViewData["Message"]</h3>
-<p class="text-justify">
-    Un proyecto de la Asociación de Mitilicultores de Chile (<strong><a target="_blank" href="http://www.amichile.com/">AmiChile</a></strong>),
-    financiado por La Corporación de Fomento de la Producción (<strong><a target="_blank" href="https://www.corfo.cl/">CORFO</a></strong>),
-    enmarcado en el proyecto Código 16 NODO 70434 "Nodo Ciencia y Tecnología para la Industria Mitilicultora"
-    para el Instituto Tecnológico de Mitilicultura (<strong><a target="_blank" href="http://www.intemit.cl/">INTEMIT</a></strong>) y
-    desarrollado por el Centro Acuícola Pesquero de Investigación Aplicada (<strong><a target="_blank" href="http://www.capia.cl">CAPIA</a></strong>)
-    de la Universidad Santo Tomás (<strong><a target="_blank" href="http://www.ust.cl">UST</a></strong>).
-    <br />
-</p>
 <div class="row">
-    <div class="col-md-6">
-        <iframe src="https://www.youtube.com/embed/Xx-qk-a4-fA" frameborder="0" allow="encrypted-media; autoplay" allowfullscreen style="width:100%;height:auto;min-height:300px"></iframe>
+    <div class="col-12 col-md-6">
+        <h3>@ViewData["Message"]</h3>
+        <p class="text-justify">
+            @Localizer["A project from the Guild Association of Mussel Farmers of Chile"]
+            (<strong>
+                <a target="_blank" href="http://www.amichile.com/">
+                    <img src="~/images/ico/amichile.min.png" alt="amichile" class="img-fluid" style="max-height:1.5em" />
+                    AmiChile
+                </a>
+            </strong>),
+            @Localizer["financed by the Production Development Coorporation of Chile"]
+            (<strong>
+                <a target="_blank" href="https://www.corfo.cl/">
+                    <img src="~/images/ico/corfo.min.png" alt="corfo" class="img-fluid" style="max-height:1.5em" />
+                    CORFO
+                </a>
+            </strong>),
+            @Localizer[@"within the framework of project Code 16 Node 70434 ""Science and Technology Node for the Mussel Farming Industry"" of the Strategic Regional Program for the Mussel Indutry"]
+            (<strong>
+                <a target="_blank" href="http://www.mejillondechile.cl/">
+                    <img src="~/images/ico/mejillondechile.min.png" alt="mejillon de chile" class="img-fluid" style="max-height:1.5em" />
+                    MejillondeChile
+                </a>
+            </strong>)
+            @Localizer["for the Technological Institute of Mussel Farming"]
+            (<strong>
+                <a target="_blank" href="http://www.intemit.cl/">
+                    <img src="~/images/ico/intemit.min.png" alt="intemit" class="img-fluid" style="max-height:1.5em" />
+                    INTEMIT
+                </a>
+            </strong>)
+            @Localizer["and developed by Guillermo Rodriguez Piccoli"]
+            (<strong>
+                <a target="_blank" href="https://www.linkedin.com/in/guillermo-rodriguez-piccoli/">
+                    <img src="~/images/socmedia/LinkedIn.svg" alt="epic solutions" class="img-fluid" style="max-height:1.5em" />
+                </a>
+            </strong>)
+            @Localizer["at Epic Solutions Consulting"]
+            (<strong>
+                <a target="_blank" href="http://www.epicsolutions.cl">
+                    <img src="~/images/ico/epic.min.png" alt="epic solutions" class="img-fluid" style="max-height:1.5em" />
+                    Epic Solutions
+                </a>
+            </strong>).
+            @Localizer["and managed by the Centre of Applied Research for Aquaculture and Fishery"]
+            (<strong>
+                <a target="_blank" href="http://www.capia.cl">
+                    <img src="~/images/ico/capia.min.png" alt="capia" class="img-fluid" style="max-height:1.5em" />
+                    CAPIA
+                </a>
+            </strong>)
+            @Localizer["of Saint Thomas University Chile"]
+            (<strong>
+                <a target="_blank" href="http://www.ust.cl">
+                    <img src="~/images/ico/ust.min.png" alt="ust" class="img-fluid" style="max-height:1.5em" />
+                    UST
+                </a>
+            </strong>)
+            <br />
+        </p>
     </div>
-    <div class="col-md-6">
-        <h3>Objetivo:</h3>
-        <p class="text-justify"><strong>BiblioMit</strong> es una herramienta de gestión y portal de conexión entre la industria, academia, centros tecnológicos e institutos que tienen un rol escencial en Investigación y Desarrollo en Ciencia aplicada en el mundo Mitilicultor.</p>
-        <p><strong>BiblioMit</strong> Consta de:</p>
+    <div class="col-12 col-md-6">
+        <iframe src="https://www.youtube.com/embed/Xx-qk-a4-fA" frameborder="0" allow="encrypted-media; autoplay" allowfullscreen style="width:100%;min-height:25vw"></iframe>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <h3>@Localizer["Objective"]:</h3>
+        <p class="text-justify"><strong>BiblioMit</strong> @Localizer["is a management tool and connection portal between the mussel farming industry, academia, research and technology centers and institutes that have an essential role in the development of Applied Sciences for the Mussel Farming world"]</p>
+        <p><strong>BiblioMit</strong> @Localizer["Consists of"]:</p>
         <ol class="text-justify">
             <li>
-                Una Biblioteca electrónica en línea con documentos recopilados desde múltiples fuentes para el sector Mitilicultor a nivel nacional (descargable en formato digital), incluyendo:
+                @Localizer["A forum for connection and exchange of ideas between stakeholders"]
+            </li>
+            <li>
+                @Localizer["A search engine for multiple sources of scientific literature for the mussel farming industry at a national level (downloadable in digital format), including"]:
                 <ul>
                     <li>
-                        Número de actores del sector y su identificación.
+                        @Localizer["List of stakeholders and their contact details"]
                     </li>
                     <li>
-                        Número de tesis académicas publicadas especializadas del sector mitilicultor.
+                        @Localizer["Search engine of nationally published academical thesis"]
                     </li>
                     <li>
-                        Número de publicaciones especializadas del sector mitilicultor.
+                        @Localizer["Search engine of scientific literature powered by Google Scholar"]
                     </li>
                     <li>
-                        Número de proyectos de Investigación y Desarrollo en el sector Mitilicultor categorizados por fuente de financiamiento.
-                        <br>
-                        <br>
+                        @Localizer["Search engine of nationally published research and development projects cathegorized by funding"]
+                    </li>
+                    <li>
+                        @Localizer["Search engine of national grants and funding sources for research and development"]
                     </li>
                 </ul>
             </li>
             <li>
-                Una plataforma en línea que permite entregar información como:
+                @Localizer["A collection of georeferenced data, including"]:
                 <ul>
                     <li>
-                        Agenda de Ciencia y Tecnología del sector priorizada en el corto, mediano y largo plazo.
+                        @Localizer["Oceanografic data such as Ocean Surface Temperature (OST), Ocean Acidification, Oxigen content, Salinity, histological findings and concentrations, and much more"]
                     </li>
                     <li>
-                        Mapa de grupos de investigación disponible para relacionarse con contactos de las empresas e instituciones de investigación dentro del rubro.
+                        @Localizer["Map of all research centers that have worked in mussel research"]
                     </li>
                     <li>
-                        Foro de discusión y ayuda comunitario interactivo.
+                        @Localizer["Map of all mussel farms, contacts and oceanografic data (paid service)"]
+                    </li>
+                </ul>
+            </li>
+            <li>
+                @Localizer["Histopathological Database"]:
+                <ul>
+                    <li>
+                        @Localizer["Catalogue of histopathological findings that affect the species"] <i>Mytilus chilensis</i>
+                    </li>
+                    <li>
+                        @Localizer["Histopathological database of catalogued findings georeferenced (paid service)"]
+                    </li>
+                </ul>
+            </li>
+            <li>
+                @Localizer["Digest"]:
+                <ul>
+                    <li>
+                        @Localizer["Biyearly digest report of production and oceanografic statistics"]
                     </li>
                 </ul>
             </li>
         </ol>
     </div>
-</div>
-<div>
-    <a asp-controller="Home" asp-action="Privacy">@Localizer["Read our Privacy Policy"]</a>
 </div>
 <div class="row justify-content-center">
     <div class="col-8" id="nanogallery2" data-nanogallery2='{

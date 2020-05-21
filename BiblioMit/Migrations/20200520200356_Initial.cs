@@ -521,7 +521,7 @@ namespace BiblioMit.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(nullable: true),
-                    NormalizedName = table.Column<string>(nullable: false),
+                    NormalizedName = table.Column<string>(nullable: true),
                     GenusId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -1612,7 +1612,8 @@ namespace BiblioMit.Migrations
                 name: "IX_SpeciesPhytoplanktons_GenusId_NormalizedName",
                 table: "SpeciesPhytoplanktons",
                 columns: new[] { "GenusId", "NormalizedName" },
-                unique: true);
+                unique: true,
+                filter: "[NormalizedName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Stations_NormalizedName",

@@ -85,7 +85,7 @@
         </div>
     </header>
     <main role="main">
-        <div class="body-content container-fluid">
+        <div class="body-content container-fluid" style="min-height:78vh">
             <partial name="_CookieConsentPartial" />
             <!-- Load Facebook SDK for JavaScript -->
             <div id="fb-root"></div>
@@ -117,27 +117,29 @@
             <partial name="_Modal" model='new BootstrapModel { Id = "modal-action", AreaLabeledId = "modal-action-label", Size = ModalSize.Medium }' />
         </div>
     </main>
-    <footer class="container-fluid">
-        <div class="row justify-content-between">
-            <div class="col-md-3">
-                <p>
-                    <a asp-controller="Home" asp-action="Manual">
-                        <i class="fas fa-info-circle fa-tw"></i> @Localizer["User Manual"]
+    <footer>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12 col-md-6">
+                    <div class="row">
+                        <div class="col">
+                            <a asp-controller="Home" asp-action="Manual">
+                                <i class="fas fa-info-circle fa-tw"></i> @Localizer["User Manual"]
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <a asp-controller="Home" asp-action="Privacy">
+                                <i class="fas fa-info-circle fa-lock"></i> @Localizer["Privacy Policy"]
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <a target="_blank" href="https://www.epicsolutions.cl" class="float-right">
+                        <img src="~/epic_light_hor.svg" alt="epic solutions" class="img-responsive" height="20" /> &copy; @DateTime.Now.Year - BiblioMit
                     </a>
-                </p>
-            </div>
-            <div class="col-md-4 align-self-end">
-                <div class="row">
-                    <div class="col">
-                        <a target="_blank" href="https://www.epicsolutions.cl">
-                            <img src="~/epic_light_hor.svg" alt="epic solutions" class="img-responsive" height="20" />
-                        </a>
-                    </div>
-                    <div class="col">
-                        <p class="text-right">
-                            &copy; @DateTime.Now.Year - BiblioMit
-                        </p>
-                    </div>
                 </div>
             </div>
         </div>

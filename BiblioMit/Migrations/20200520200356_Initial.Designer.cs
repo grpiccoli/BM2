@@ -13,14 +13,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BiblioMit.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200504063926_Initial")]
+    [Migration("20200520200356_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.3")
+                .HasAnnotation("ProductVersion", "3.1.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -1332,13 +1332,13 @@ namespace BiblioMit.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("GenusId", "NormalizedName")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("SpeciesPhytoplanktons");
                 });

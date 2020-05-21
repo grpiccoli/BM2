@@ -46,7 +46,7 @@ namespace BiblioMit.Controllers
         [AllowAnonymous]
         public IActionResult Gallery()
         {
-            var url = $"{Request.Scheme}://{Request.Host.Value}/colecci-n-virtual/index.html";
+            var url = $"~/colecci-n-virtual/index.html";
             if (Url.IsLocalUrl(url))
                 return Redirect(url);
             else

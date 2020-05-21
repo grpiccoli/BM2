@@ -117,10 +117,31 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Address" xml:space="preserve">
+    <value>Dirección</value>
+  </data>
   <data name="Contact" xml:space="preserve">
     <value>Contacto</value>
   </data>
   <data name="Contact us for further information or technical support." xml:space="preserve">
     <value>Contáctenos para mayor información o soporte técnico.</value>
+  </data>
+  <data name="Guild Association of Mussel Farmers of Chile" xml:space="preserve">
+    <value>Asociación Gremial de Mitilicultores de Chile</value>
+  </data>
+  <data name="Management" xml:space="preserve">
+    <value>Administración</value>
+  </data>
+  <data name="Op Hrs" xml:space="preserve">
+    <value>Horarios</value>
+  </data>
+  <data name="Phone" xml:space="preserve">
+    <value>Teléfono</value>
+  </data>
+  <data name="Technical support" xml:space="preserve">
+    <value>Soporte técnico</value>
+  </data>
+  <data name="Technological Institute of Mussel Farming" xml:space="preserve">
+    <value>Instituto Tecnológico de Mitilicultura</value>
   </data>
 </root>

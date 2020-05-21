@@ -180,4 +180,7 @@
   <data name="Total number of visits" xml:space="preserve">
     <value>Visitas totales</value>
   </data>
+  <data name="Web Analytics" xml:space="preserve">
+    <value>Estadísticas de uso</value>
+  </data>
 </root>

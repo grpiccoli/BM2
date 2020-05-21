@@ -186,10 +186,10 @@
                 </figure>
             </button>
             <div class="dropdown-menu" aria-labelledby="brand">
-                <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a>
-                <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="About">Quienes Somos</a>
-                <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="Contact">Contáctanos</a>
-            </div>
+                <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="Index">@Localizer["Home"]</a>
+                <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="About">@Localizer["About us"]</a>
+                <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="Contact">@Localizer["Contact"]</a>
+</div>
         </li>
     </ul>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarApps" aria-controls="navbarApps" aria-expanded="false"
@@ -198,7 +198,7 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarApps">
         <ul class="navbar-nav mr-auto">
-            @{ 
+            @{
                 var forum = new NavDDwnVM
                 {
                     Controller = "Home",
@@ -235,27 +235,27 @@
                 };
                 gallery.Sections.AddRangeOverride(image);
 
-                var boletin = new NavDDwnVM 
+                var boletin = new NavDDwnVM
                 {
-                    Controller = "Boletin", 
-                    Action = "Index", 
-                    Logo = "chart-line", 
+                    Controller = "Boletin",
+                    Action = "Index",
+                    Logo = "chart-line",
                     Title = Localizer["Digest"].Value
                 };
                 boletin.Sections.AddRangeOverride(digest);
             }
-            <partial name="_NavDDwn" model='forum' />
-            <partial name="_NavDDwn" model='publications' />
             <partial name="_NavDDwn" model='producers' />
-            <partial name="_NavDDwn" model='gallery' />
+            <partial name="_NavDDwn" model='publications' />
             <partial name="_NavDDwn" model='boletin' />
+            <partial name="_NavDDwn" model='gallery' />
+            <partial name="_NavDDwn" model='forum' />
             @if (admin)
             {
-                var adminTools = new NavDDwnVM 
+                var adminTools = new NavDDwnVM
                 {
-                    Controller = "User", 
-                    Action = "Index", 
-                    Logo = "wrench", 
+                    Controller = "User",
+                    Action = "Index",
+                    Logo = "wrench",
                     Title = Localizer["Administration"].Value
                 };
                 adminTools.Sections.AddRangeOverride(tools);

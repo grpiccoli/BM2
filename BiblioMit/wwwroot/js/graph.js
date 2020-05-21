@@ -35,6 +35,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 var _this = this;
+var loaderStart = function () {
+    document.getElementById('preloader-background').style.display = "block";
+};
+var loaderStop = function () {
+    document.getElementById('preloader-background').style.display = "none";
+};
+loaderStart();
 var build = new Event("buildChart");
 var cnt = 0;
 var lang = $("html").attr("lang");
@@ -63,7 +70,6 @@ var etl = document.getElementById('tl');
 choiceOps.placeholderValue = esp ? 'Variables semáforo' : 'Semaforo Variables';
 var tl = new Choices(etl, choiceOps);
 var semaforo = !document.getElementById('semaforo').classList.contains('d-none');
-var logged = document.getElementById('logoutForm') !== null;
 var supportsPassiveOption = false;
 try {
     var opts = Object.defineProperty({}, 'passive', {
@@ -99,7 +105,7 @@ etl.addEventListener("buildChart", function () {
     chart.legend.parent = legendContainer;
     chart.cursor = new am4charts.XYCursor();
     chart.exporting.menu = new am4core.ExportMenu();
-    if (!logged) {
+    if (!semaforo) {
         chart.exporting.formatOptions.getKey("png").disabled = true;
         chart.exporting.formatOptions.getKey("svg").disabled = true;
         chart.exporting.formatOptions.getKey("pdf").disabled = true;
@@ -144,10 +150,7 @@ function loadData(values, event, boolpsmb) {
     return __awaiter(this, void 0, void 0, function () {
         var sd, ed, x, st, nd, promises;
         return __generator(this, function (_a) {
-            psmb.disable();
-            variables.disable();
-            if (semaforo)
-                tl.disable();
+            loaderStart();
             sd = $('#start').val(), ed = $('#end').val();
             x = [], st = 0;
             if (boolpsmb) {
@@ -167,13 +170,12 @@ function loadData(values, event, boolpsmb) {
                 return fetchData(url, tag, name);
             });
             Promise.all(promises).then(function (_) {
-                psmb.enable();
-                variables.enable();
-                if (semaforo)
-                    tl.enable();
                 if (cnt === 0 && boolpsmb) {
                     etl.dispatchEvent(build);
                     cnt++;
+                }
+                else {
+                    loaderStop();
                 }
             });
             return [2];
@@ -206,19 +208,36 @@ function getList(name) {
             switch (_a.label) {
                 case 0: return [4, fetch("/ambiental/" + name + "list")
                         .then(function (r) { return r.json(); })
-                        .catch(function (e) { return console.error(e); })];
+                        .catch(function (e) { return console.error(e, name); })];
                 case 1: return [2, _a.sent()];
             }
         });
     });
 }
 var psmb = new Choices(epsmb, choiceOps);
-psmb.setChoices(function () { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
-    switch (_a.label) {
-        case 0: return [4, getList('psmb')];
-        case 1: return [2, _a.sent()];
-    }
-}); }); });
+psmb.setChoices(function () { return __awaiter(_this, void 0, void 0, function () {
+    var one, two, three, _a, _b, _c, _d, _e, _f;
+    return __generator(this, function (_g) {
+        switch (_g.label) {
+            case 0: return [4, getList('cuenca')];
+            case 1:
+                one = [_g.sent()];
+                two = getList('comuna');
+                if (!semaforo) return [3, 4];
+                three = getList('psmb');
+                _c = (_b = one).concat;
+                return [4, two];
+            case 2:
+                _d = (_a = _c.apply(_b, [_g.sent()])).concat;
+                return [4, three];
+            case 3: return [2, _d.apply(_a, [_g.sent()])];
+            case 4:
+                _f = (_e = one).concat;
+                return [4, two];
+            case 5: return [2, _f.apply(_e, [_g.sent()])];
+        }
+    });
+}); });
 var evariable = document.getElementById('variable');
 evariable.addEventListener('addItem', function (event) {
     return loadData(psmb.getValue(), event.detail, false);
@@ -292,9 +311,7 @@ if (semaforo) {
             var psmbs = tls.filter(function (x) { return x.id % 10 === 2; });
             var sps = tls.filter(function (x) { return x.id % 10 === 3; });
             if (psmbs.length !== 0 && sps.length !== 0) {
-                psmb.disable();
-                variables.disable();
-                tl.disable();
+                loaderStart();
                 var sd = $('#start').val();
                 var ed = $('#end').val();
                 analyses.forEach(function (a) {
@@ -316,9 +333,7 @@ if (semaforo) {
                     }
                 });
                 chart.invalidateData();
-                psmb.enable();
-                variables.enable();
-                tl.enable();
+                loaderStop();
             }
         }
     }, supportsPassiveOption ? { passive: true } : false);
@@ -401,51 +416,68 @@ var showInfo = function (_e) {
     infowindow.setContent(content);
     infowindow.open(map, this);
 };
+var bnds = new google.maps.LatLngBounds();
+var markers = [];
+var processMapData = function (dato) {
+    var consessionPolygon = new google.maps.Polygon({
+        paths: dato.position,
+        zIndex: dato.id
+    });
+    consessionPolygon.setMap(map);
+    consessionPolygon.addListener('click', addListenerOnPolygon);
+    polygons[dato.id] = consessionPolygon;
+    var center = getBounds(dato.position).getCenter();
+    if (dato.id < 4)
+        bnds.extend(center);
+    var marker = new google.maps.Marker({
+        position: center,
+        title: dato.name + " " + dato.id,
+        zIndex: dato.id
+    });
+    table[dato.id] = {
+        name: dato.name,
+        comuna: dato.comuna,
+        provincia: dato.provincia,
+        code: dato.code
+    };
+    marker.addListener('click', showInfo);
+    return marker;
+};
 window.onload = function initMap() {
-    return __awaiter(this, void 0, void 0, function () {
-        var bnds;
+    var _this = this;
+    fetch('/ambiental/cuencadata')
+        .then(function (r) { return r.json(); })
+        .then(function (data) { return data.map(processMapData); })
+        .then(function (m) {
+        markers = m;
+        map.fitBounds(bnds);
+        map.setCenter(bnds.getCenter());
+    }).then(function (_) { return __awaiter(_this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0:
-                    bnds = new google.maps.LatLngBounds();
-                    return [4, fetch('/ambiental/mapdata')
-                            .then(function (r) { return r.json(); })
-                            .then(function (data) { return data.map(function (dato) {
-                            var consessionPolygon = new google.maps.Polygon({
-                                paths: dato.position,
-                                zIndex: dato.id
-                            });
-                            consessionPolygon.setMap(map);
-                            consessionPolygon.addListener('click', addListenerOnPolygon);
-                            polygons[dato.id] = consessionPolygon;
-                            var center = getBounds(dato.position).getCenter();
-                            if (dato.id < 4)
-                                bnds.extend(center);
-                            var marker = new google.maps.Marker({
-                                position: center,
-                                title: dato.name + " " + dato.id,
-                                zIndex: dato.id
-                            });
-                            table[dato.id] = {
-                                name: dato.name,
-                                comuna: dato.comuna,
-                                provincia: dato.provincia,
-                                code: dato.code
-                            };
-                            marker.addListener('click', showInfo);
-                            return marker;
-                        }); }).then(function (m) { return new MarkerClusterer(map, m, { imagePath: '/images/markers/m' }); }).then(function (_) {
-                            map.fitBounds(bnds);
-                            map.setCenter(bnds.getCenter());
-                            loadDates();
-                            variables.setChoiceByValue('v0');
-                            psmb.setChoiceByValue('1');
-                        })];
+                case 0: return [4, fetch('/ambiental/comunadata')
+                        .then(function (r) { return r.json(); })
+                        .then(function (data) { return data.map(processMapData); })
+                        .then(function (m) { return markers = markers.concat(m); })];
                 case 1:
                     _a.sent();
-                    return [2];
+                    if (!semaforo) return [3, 3];
+                    return [4, fetch('/ambiental/psmbdata')
+                            .then(function (r) { return r.json(); })
+                            .then(function (data) { return data.map(processMapData); })
+                            .then(function (m) { return markers = markers.concat(m); })];
+                case 2:
+                    _a.sent();
+                    _a.label = 3;
+                case 3: return [2];
             }
         });
+    }); }).then(function (_) {
+        new MarkerClusterer(map, markers, { imagePath: '/images/markers/m' });
+        loadDates();
+        variables.setChoiceByValue('v0');
+        psmb.setChoiceByValue('1');
+        loaderStop();
     });
 };
 function loadDates() {

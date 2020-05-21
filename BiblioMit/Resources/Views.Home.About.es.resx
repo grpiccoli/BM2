@@ -117,10 +117,91 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="A collection of georeferenced data, including" xml:space="preserve">
+    <value>Una collección de datos georeferenciados, incluyendo</value>
+  </data>
+  <data name="A project from the Guild Association of Mussel Farmers of Chile" xml:space="preserve">
+    <value>Un proyecto de la Asociación de Mitilicultores de Chile</value>
+  </data>
+  <data name="A search engine for multiple sources of scientific literature for the mussel farming industry at a national level (downloadable in digital format), including" xml:space="preserve">
+    <value>Un buscador de literatura científica con documentos recopilados desde múltiples fuentes para el sector Mitilicultor a nivel nacional (descargable en formato digital), incluyendo</value>
+  </data>
   <data name="About" xml:space="preserve">
     <value>Nosotros</value>
   </data>
+  <data name="and developed by Guillermo Rodriguez Piccoli" xml:space="preserve">
+    <value>y desarrollado por Guillermo Rodríguez Piccoli</value>
+  </data>
+  <data name="and managed by the Centre of Applied Research for Aquaculture and Fishery" xml:space="preserve">
+    <value>y administrado por el Centro Acuícola Pesquero de Investigación Aplicada</value>
+  </data>
+  <data name="at Epic Solutions Consulting" xml:space="preserve">
+    <value>desde la consultora Epic Solutions</value>
+  </data>
+  <data name="Biyearly digest report of production and oceanografic statistics" xml:space="preserve">
+    <value>Boletín semestral con reporte de estadíticas productivas y oceanográficas</value>
+  </data>
+  <data name="Catalogue of histopathological findings that affect the species" xml:space="preserve">
+    <value>Catálogo de hayazgos histopatológicos que afectan a la especie</value>
+  </data>
+  <data name="Consists of" xml:space="preserve">
+    <value>Consta de</value>
+  </data>
+  <data name="Digest" xml:space="preserve">
+    <value>Boletín</value>
+  </data>
+  <data name="financed by the Production Development Coorporation of Chile" xml:space="preserve">
+    <value>financiado por La Corporación de Fomento de la Producción</value>
+  </data>
+  <data name="for the Technological Institute of Mussel Farming" xml:space="preserve">
+    <value>para el Instituto Tecnológico de Mitilicultura</value>
+  </data>
+  <data name="Histopathological Database" xml:space="preserve">
+    <value>Base de datos histopatológica</value>
+  </data>
+  <data name="Histopathological database of catalogued findings georeferenced (paid service)" xml:space="preserve">
+    <value>Base de datos hisotpatológica de hayazgos catalogados y georeferenciados (servicio pagado)</value>
+  </data>
+  <data name="is a management tool and connection portal between the mussel farming industry, academia, research and technology centers and institutes that have an essential role in the development of Applied Sciences for the Mussel Farming world" xml:space="preserve">
+    <value>es una herramienta de gestión y portal de conexión entre la industria, academia, centros tecnológicos e institutos que tienen un rol esencial en Investigación y Desarrollo en Ciencia aplicada en el mundo Mitilicultor</value>
+  </data>
+  <data name="List of stakeholders and their contact details" xml:space="preserve">
+    <value>Listado de actores del sector y su identificación</value>
+  </data>
+  <data name="Map of all mussel farms, contacts and oceanografic data (paid service)" xml:space="preserve">
+    <value>Mapa de centros de cultivo, contactos y datos oceanográficos (servicio pagado)</value>
+  </data>
+  <data name="Map of all research centers that have worked in mussel research" xml:space="preserve">
+    <value>Mapa de centros de investigación que han trabajado en investigación para la mitilicultura</value>
+  </data>
+  <data name="Objective" xml:space="preserve">
+    <value>Objetivo</value>
+  </data>
+  <data name="Oceanografic data such as Ocean Surface Temperature (OST), Ocean Acidification, Oxigen content, Salinity, histological findings and concentrations, and much more" xml:space="preserve">
+    <value>Datos oceanográficos como Temperatura Superficial del Oceano (TSO), acidificación, salinidad, niveles de oxígeno, análisis histológicos y mucho más</value>
+  </data>
+  <data name="of Saint Thomas University Chile" xml:space="preserve">
+    <value>de la Universidad Santo Tomás</value>
+  </data>
   <data name="Read our Privacy Policy" xml:space="preserve">
     <value>Lea nuestras política de privacidad</value>
+  </data>
+  <data name="Search engine of national grants and funding sources for research and development" xml:space="preserve">
+    <value>Motor de búsqueda de fuentes de financiamiento para investigación y desarrollo</value>
+  </data>
+  <data name="Search engine of nationally published academical thesis" xml:space="preserve">
+    <value>Motor de búsqueda de tesis académicas publicadas a nivel nacional</value>
+  </data>
+  <data name="Search engine of nationally published research and development projects cathegorized by funding" xml:space="preserve">
+    <value>Motor de búsqueda de proyectos de investigación y desarrollo categorizados por su fuente de financiamiento</value>
+  </data>
+  <data name="Search engine of scientific literature powered by Google Scholar" xml:space="preserve">
+    <value>Motor de búsqueda de literatura científica a través de Google Scholar</value>
+  </data>
+  <data name="Technological Management Platform for Mussel Farming Sector" xml:space="preserve">
+    <value>Plataforma de Gestión Tecnológica para el Sector Mitilicultor</value>
+  </data>
+  <data name="within the framework of project Code 16 Node 70434 &quot;Science and Technology Node for the Mussel Farming Industry&quot; of the Strategic Regional Program for the Mussel Indutry" xml:space="preserve">
+    <value>enmarcado en el proyecto Código 16 NODO 70434 "Nodo Ciencia y Tecnología para la Industria Mitilicultora" del Programa Estratégico Regional Industria de la Mitilicultura</value>
   </data>
 </root>
