@@ -101,7 +101,7 @@ sudo ln -s /etc/nginx/sites-available/bibliomit /etc/nginx/sites-enabled/bibliom
 sudo /usr/sbin/nginx -s reload
 
 #backup database
-sqlcmd -S 127.0.0.1 -s "^" -U SA -P 34erdfERDF -d BiblioMit -W -h-1 -k -r1 -Q 'SELECT * FROM dbo.EnsayoFito' | tr '^' '\t' | grep '^[1-9]' | sed "s/NULL//g" > EnsayoFito.tsv
+sqlcmd -S localhost -h -1 -s "^" -W -k -r 1 -U SA -P JGdtaStFe7LXf4A3 -d aspnet-BiblioMit-3E10FA62-82AF-4FA8-91A7-71A1040A7646 -Q 'SELECT * FROM dbo.Analists' | tr '^' '\t' | grep '^[1-9]' | sed "s/NULL//g" > Analists.tsv
 scp 190.13.148.78:~/EnsayoFito.tsv /media/sf_E_DRIVE/WebProjects/BiblioMit/BiblioMit/Data/DIGEST/
 sqlcmd -S 127.0.0.1 -s "^" -U SA -P 34erdfERDF -d BiblioMit -W -h-1 -k -r1 -Q 'SELECT * FROM dbo.Phytoplankton' | tr '^' '\t' | grep '^[1-9]' | sed "s/NULL//g" > Phytoplankton.tsv
 scp 190.13.148.78:~/Phytoplankton.tsv /media/sf_E_DRIVE/WebProjects/BiblioMit/BiblioMit/Data/DIGEST/
