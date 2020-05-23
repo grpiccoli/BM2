@@ -480,3 +480,22 @@ nav button.dropdown-toggle::after {
         text-shadow: 1px 1px 0 #7e004a, 2px 2px 0 #7e004a, 3px 3px 0 #7e004a, 4px 4px 0 #7e004a, 5px 5px 0 #7e004a, 6px 6px 0 #7e004a, 7px 7px 0 #7e004a, 8px 8px 0 #7e004a, 9px 9px 0 #7e004a, 10px 10px 0 #7e004a;
         transition: .5s ease-in-out;
     }*/
+
+ul.correct-ul > li {
+    padding-bottom: 1.5em;
+    padding-left: 0.7em;
+}
+
+/*@media only screen and (max-width:1200px) and (min-width: 993px) {
+    ul.responsive-ul {
+        columns: 100px 5 !important;
+        display: block;
+
+        .dropdown-menu.show {
+            display: inline-flex;
+            .dropdown-header{
+                display: none;
+            }
+        }
+    }
+}*/

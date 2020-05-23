@@ -1330,13 +1330,13 @@ namespace BiblioMit.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("GenusId", "NormalizedName")
-                        .IsUnique()
-                        .HasFilter("[NormalizedName] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("SpeciesPhytoplanktons");
                 });

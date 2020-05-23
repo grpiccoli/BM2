@@ -40,13 +40,13 @@ namespace BiblioMit.Controllers
                         Comuna = f.Commune.Name,
                         Provincia = f.Commune.Province.Name,
                         Region = f.Commune.Province.Region.Name,
-                        Code = f.Code.ToString(CultureInfo.InvariantCulture),
-                        Position = new[]{f.Polygon.Vertices.OrderBy(o => o.Order).Select(o =>
+                        Code = f.Code,
+                        Position = f.Polygon.Vertices.OrderBy(o => o.Order).Select(o =>
                         new GMapCoordinate
                         {
                             Lat = o.Latitude,
                             Lng = o.Longitude
-                        }) }
+                        })
                     }));
         }
         private async Task<IEnumerable<Psmb>> GetPsmbs<TEntity>(int[] c, int[] i) 

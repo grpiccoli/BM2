@@ -1,4 +1,4 @@
-﻿//out vars
+﻿//loader
 const loaderStart = () => {
     (<HTMLElement>document.getElementById('preloader-background')).style.display = "block";
 }
@@ -7,18 +7,23 @@ const loaderStop = () => {
     (<HTMLElement>document.getElementById('preloader-background')).style.display = "none";
 }
 loaderStart();
-var build = new Event("buildChart");
-var cnt = 0;
+//get language
 var lang = $("html").attr("lang");
 var esp = lang === 'es';
-var choiceOps:any = {
+//is semaforo?
+const semaforo = !document.getElementById('semaforo').classList.contains('d-none');
+//choice elements
+const epsmb = document.getElementById('psmb');
+const evariable = document.getElementById('variable');
+const etl = document.getElementById('tl');
+//choice options
+var choiceOps: any = {
     maxItemCount: 50,
     removeItemButton: true,
     duplicateItemsAllowed: false,
     paste: false,
     searchResultLimit: 10,
     shouldSort: false,
-    placeholderValue: esp ? 'Seleccione áreas' : 'Select areas',
     fuseOptions: {
         include: 'score'
     }
@@ -31,325 +36,40 @@ if (esp) {
     choiceOps.itemSelectText = 'Presione para seleccionar';
     choiceOps.maxItemText = (maxItemCount: number) => `Máximo ${maxItemCount} valores`;
 }
-const etl = document.getElementById('tl');
-choiceOps.placeholderValue = esp ? 'Variables semáforo' : 'Semaforo Variables';
-const tl = new Choices(etl, choiceOps);
-const semaforo = !document.getElementById('semaforo').classList.contains('d-none');
-//var logged = document.getElementById('logoutForm') !== null;
-//passive support
-var supportsPassiveOption = false;
-try {
-    var opts = Object.defineProperty({}, 'passive', {
-        get: function () {
-            supportsPassiveOption = true;
-            return;
-        }
-    });
-    var noop = function () { };
-    window.addEventListener('testPassiveEventSupport', noop, opts);
-    window.removeEventListener('testPassiveEventSupport', noop, opts);
-} catch (e) { }
-//CHART
-var chart: any = am4core.create("chartdiv", am4charts.XYChart);
-var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
-dateAxis.dataFields.category = 'date';
-var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
-etl.addEventListener("buildChart", function () {
-    am4core.useTheme(am4themes_kelly);
-    chart.language.locale = esp ? am4lang_es_ES : am4lang_en_US;
-    chart.scrollbarY = new am4core.Scrollbar();
-    chart.scrollbarX = new am4core.Scrollbar();
-    chart.zoomOutButton.align = "left";
-    chart.zoomOutButton.valign = "bottom";
-    //dateAxis.dateFormats.setKey("day", "MM");
-    //dateAxis.dateFormats.setKey("month", "MMM");
-    dateAxis.dateFormats.setKey('year', 'yy');
-    dateAxis.periodChangeDateFormats.setKey('month', 'MMM yy');
-    dateAxis.tooltipDateFormat = 'dd MMM, yyyy';
-    dateAxis.renderer.minGridDistance = 40;
-    chart.legend = new am4charts.Legend();
-    var legendContainer = am4core.create("legenddiv", am4core.Container);
-    legendContainer.width = am4core.percent(100);
-    legendContainer.height = am4core.percent(100);
-    chart.legend.parent = legendContainer;
-    chart.cursor = new am4charts.XYCursor();
-    chart.exporting.menu = new am4core.ExportMenu();
-    if (!semaforo) {
-        chart.exporting.formatOptions.getKey("png").disabled = true;
-        chart.exporting.formatOptions.getKey("svg").disabled = true;
-        chart.exporting.formatOptions.getKey("pdf").disabled = true;
-        chart.exporting.formatOptions.getKey("json").disabled = true;
-        chart.exporting.formatOptions.getKey("csv").disabled = true;
-        chart.exporting.formatOptions.getKey("xlsx").disabled = true;
-        chart.exporting.formatOptions.getKey("html").disabled = true;
-        chart.exporting.formatOptions.getKey("pdfdata").disabled = true;
-    }
-}, false);
-$("#legenddiv").bind('DOMSubtreeModified', function (_e) {
-    document.getElementById("legenddiv").style.height = chart.legend.contentHeight + "px";
-});
-//LOAD DATA
-async function fetchData(url:string, tag:string, name:string) {
-    return await fetch(url)
-        .then(data => data.json())
-        .then(j => {
-            var counter = 0;
-            chart.data.map((c: any) => {
-                if (counter < j.length && c.date == j[counter].date) {
-                    c[tag] = j[counter].value;
-                    counter++;
-                }
-            });
-            var serie = chart.series.push(new am4charts.LineSeries());
-            serie.dataFields.valueY = tag;
-            serie.dataFields.dateX = 'date';
-            serie.name = name;
-            serie.tooltipText = '{name}: [bold]{valueY}[/]';
-            serie.showOnInit = false;
-            chart.exporting.dataFields[tag] = name;
-        });
-}
-async function loadData(values: any, event: any, boolpsmb: boolean) {
-    loaderStart();
-    //psmb.disable();
-    //variables.disable();
-    //if (semaforo) tl.disable();
-    var sd = $('#start').val(), ed = $('#end').val();
-    var x:any = [], st = 0;
-    if (boolpsmb) {
-        //var tag, area tag, var name, area name, group value
-        x = [null, event.value, null, event.label];
-    } else {
-        x = [event.value, null, event.label, null];
-        st++;
-    }
-    var nd = st + 2;
-    var promises = values.map((e:any) => {
-        x[st] = e.value;
-        x[nd] = e.label;
-        //if (boolpsmb) x[rd] = e.groupId;
-        var tag = `${x[0]}_${x[1]}`;
-        var name = `${x[2]} ${x[3]}`;
-        var url = `/ambiental/data?area=${x[1]}&var=${x[0]}&start=${sd}&end=${ed}`;
-        return fetchData(url, tag, name);
-    });
-    Promise.all(promises).then(_ => {
-        //psmb.enable();
-        //variables.enable();
-        //if (semaforo) tl.enable();
-        if (cnt === 0 && boolpsmb) {
-            etl.dispatchEvent(build);
-            cnt++;
-            //loaderStop();
-        } else {
-            loaderStop();
-        }
-    });
-}
-function clickMap(e:any) {
-    if (e !== undefined && polygons[e.detail.value] !== undefined)
-        google.maps.event.trigger(polygons[e.detail.value], 'click', {});
-}
-//PSMB SELECT
-const eall = document.querySelector('select.choice');
-const epsmb = document.getElementById('psmb');
-epsmb.addEventListener('addItem', (event: any) => {
-    loadData(variables.getValue(), event.detail, true);
-    clickMap(event);
-}, supportsPassiveOption ? { passive: true } : false);
-epsmb.addEventListener('removeItem', (event: any) => {
-    variables.getValue(true).forEach((e:any) => {
-        var name = `${e}_${event.detail.value}`;
-        chart.series._values.forEach((v: any, i: number) => {
-            if (v.dataFields.valueY === name)
-                chart.series.removeIndex(i).dispose();
-        });
-    });
-    clickMap(event);
-}, supportsPassiveOption ? { passive: true } : false);
-
-async function getList(name:string) {
-    return await fetch(`/ambiental/${name}list`)
-        .then(r => r.json())
-        .catch(e => console.error(e, name));
-}
+//psmb load choices
+choiceOps.placeholderValue = esp ? 'Seleccione áreas' : 'Select areas';
 const psmb = new Choices(epsmb, choiceOps);
-//psmb.setChoices(async () => await getList('psmbs'));
-psmb.setChoices(async () => {
-    var one = [await getList('cuenca')];
-    var two = getList('comuna');
-    if (semaforo) {
-        var three = getList('psmb');
-        return one.concat(await two).concat(await three)
-    }
-    return one.concat(await two);
-});
-//VARIABLE SELECT
-const evariable = document.getElementById('variable');
-evariable.addEventListener('addItem', (event:any) =>
-    loadData(psmb.getValue(), event.detail, false)
-    , supportsPassiveOption ? { passive: true } : false);
-evariable.addEventListener('removeItem', (event: any) => {
-    psmb.getValue(true).forEach((e:any) => {
-        var name = `${event.detail.value}_${e}`;
-        chart.series._values.forEach((v: any, i: number) => {
-            if (v.dataFields.valueY === name)
-                chart.series.removeIndex(i).dispose();
-        });
-    });
-}, supportsPassiveOption ? { passive: true } : false);
+//variable load choices
 choiceOps.placeholderValue = esp ? 'Seleccione variables' : 'Select Variables';
 const variables = new Choices(evariable, choiceOps);
-variables.setChoices(async () => await getList('variable'));
-//SEMAFORO select
-function getParam(a: string) {
-    switch (a) {
-        case '11':
-            return 't';
-        case '12':
-            return 'l';
-        case '13':
-        case '16':
-            return 's';
-        case '15':
-            return 'rs';
-        default:
-            return '';
-    };
-}
-function callDatas(a: any, sd: any, ed: any, psmbs: any, sps: any, tls: any, groupId:number)
-{
-    var nogroup = groupId === 0;
-    var promises = nogroup ?
-        psmbs.map((psmb: any) =>
-        sps.map((sp: any) => {
-            var tag = [a.value, psmb.value, sp.value].join('_');
-            if (!chart.series._values.some((v: any) => tag === v.dataFields.valueY)) {
-                var name = [a.label, psmb.label, sp.label.replace("<i>","[bold font-style: italic]").replace("</i>","[/]")].join(' ');
-                var url = `/ambiental/tldata?a=${a.value}&psmb=${psmb.value}&sp=${sp.value}&start=${sd}&end=${ed}`;
-                return fetchData(url, tag, name);
-            }
-        })) :
-        tls.filter((x: any) => x.id % 10 === groupId).map((x: any) =>
-            psmbs.map((psmb: any) =>
-                sps.map((sp: any) => {
-                    var tag = [a.value, psmb.value, sp.value, x.value].join('_');
-                    if (!chart.series._values.some((v: any) => tag === v.dataFields.valueY)) {
-                        var name = [a.label, psmb.label, sp.label.replace("<i>", "[bold font-style: italic]").replace("</i>", "[/]"), x.label].join(' ');
-                        var m = getParam(a.value);
-                        var url = `/ambiental/tldata?a=${a.value}&psmb=${psmb.value}&sp=${sp.value}&${m}=${x.value}&start=${sd}&end=${ed}`;
-                        return fetchData(url, tag, name);
-                    }
-                })));
-    return Promise.all(promises).then(r => r);
-}
-if (semaforo) {
-    etl.addEventListener('addItem', (_e: any) => {
-        var tls = tl.getValue();
-        var analyses = tls.filter((x: any) => x.id % 10 === 1);
-        if (analyses.length !== 0) {
-            var psmbs = tls.filter((x: any) => x.id % 10 === 2);
-            var sps = tls.filter((x: any) => x.id % 10 === 3);
-            if (psmbs.length !== 0 && sps.length !== 0) {
-                loaderStart();
-                //psmb.disable();
-                //variables.disable();
-                //tl.disable();
-                var sd = $('#start').val();
-                var ed = $('#end').val();
-                analyses.forEach((a: any) => {
-                    switch (a.value) {
-                        case '14':
-                        case '17':
-                            return callDatas(a, sd, ed, psmbs, sps, null, 0);
-                        case '11':
-                            return callDatas(a, sd, ed, psmbs, sps, tls, 4);
-                        case '12':
-                            return callDatas(a, sd, ed, psmbs, sps, tls, 5);
-                        case '15':
-                            return callDatas(a, sd, ed, psmbs, sps, tls, 6);
-                        case '13':
-                        case '16':
-                            return callDatas(a, sd, ed, psmbs, sps, tls, 7);
-                        default:
-                            return;
-                    }
-                });
-                chart.invalidateData();
-                loaderStop();
-                //psmb.enable();
-                //variables.enable();
-                //tl.enable();
-            }
-        }
-    }, supportsPassiveOption ? { passive: true } : false);
-    etl.addEventListener('removeItem', (event: any) => {
-        var id = event.detail.value;
-        chart.series._values.forEach((v: any, i: number) => {
-            var k = v.dataFields.valueY;
-            if (k.match(/^[1-7][0-8]_[1-7][0-8]_[1-7][0-8](_[1-7][0-8])?$/g) && k.includes(id))
-            chart.series.removeIndex(i).dispose();
-        });
-    }, supportsPassiveOption ? { passive: true } : false);
-    tl.setChoices(async () => await getList('tl'));
-}
-//MAP
+//semaforo
+choiceOps.placeholderValue = esp ? 'Variables semáforo' : 'Semaforo Variables';
+const tl = new Choices(etl, choiceOps);
+//define info
+var infowindow = new google.maps.InfoWindow({
+    maxWidth: 500
+});
+var tableInfo: any = [];
+var polygons: any = {};
+var titles = esp ?
+    ["Código", "Comuna", "Provincia", "Región", "Área", "Fuentes"] :
+    ["Code", "Commune", "Province", "Region", "Area", "Sources"];
 var Area = function (path: google.maps.LatLng[] | google.maps.MVCArray<google.maps.LatLng>) {
     return (google.maps.geometry.spherical.computeArea(path) / 10000).toFixed(2);
-}
-const selected = 'red';
-function addListenerOnPolygon(e:any) {
-    if ($.isEmptyObject(e)) {
-        psmb.getValue(true).includes(this.zIndex.toString()) ?
-            this.setOptions({ fillColor: selected, strokeColor: selected }) :
-            this.setOptions({ fillColor: undefined, strokeColor: undefined });
-    } else {
-        if (psmb.getValue(true).includes(this.zIndex.toString())) {
-            this.setOptions({ fillColor: undefined, strokeColor: undefined });
-            psmb.removeActiveItemsByValue(this.zIndex.toString());
-        } else {
-            this.setOptions({ fillColor: selected, strokeColor: selected });
-            psmb.setChoiceByValue(this.zIndex.toString());
-        }
-    }
-};
-var flatten = function (items:any[]) {
-    const flat:any[] = [];
-    items.forEach(item => {
-        if (Array.isArray(item)) {
-            flat.push(...flatten(item));
-        } else {
-            flat.push(item);
-        }
-    });
-    return flat;
-}
-var getBounds = function (positions:any[]) {
-    var bounds = new google.maps.LatLngBounds();
-    flatten(positions).forEach(p => bounds.extend(p));
-    return bounds;
 }
 var map = new google.maps.Map(document.getElementById('map'), {
     mapTypeId: 'terrain'
 });
-var infowindow = new google.maps.InfoWindow({
-    maxWidth: 500
-});
-var polygons: any = {};
-var table: any = [];
-var titles = esp ?
-    ["Código", "Comuna", "Provincia", "Región", "Área", "Fuentes"] :
-    ["Code", "Commune", "Province", "Region", "Area", "Sources"];
 var showInfo = function (_e: any) {
     var id = this.zIndex;
     var content =
-        `<h4>${table[id].name}</h4><table class="table"><tr><th scope="row">${titles[0]}</th><td align="right">${table[id].code}</td></tr>`;
-    if (table[id].comuna !== null)
+        `<h4>${tableInfo[id].name}</h4><table class="table"><tr><th scope="row">${titles[0]}</th><td align="right">${tableInfo[id].code}</td></tr>`;
+    if (tableInfo[id].comuna !== null)
         content +=
-            `<tr><th scope="row">${titles[1]}</th><td align="right">${table[id].comuna}</td></tr>`;
-    if (table[id].provincia !== null)
+            `<tr><th scope="row">${titles[1]}</th><td align="right">${tableInfo[id].comuna}</td></tr>`;
+    if (tableInfo[id].provincia !== null)
         content +=
-            `<tr><th scope="row">${titles[2]}</th><td align="right">${table[id].provincia}</td></tr>`;
+            `<tr><th scope="row">${titles[2]}</th><td align="right">${tableInfo[id].provincia}</td></tr>`;
     content +=
         `<tr><th scope="row">${titles[3]}</th><td align="right">Los Lagos</td>
 </tr><tr><th scope="row">${titles[4]} (ha)</th>
@@ -371,8 +91,43 @@ var showInfo = function (_e: any) {
     infowindow.setContent(content);
     infowindow.open(map, this);
 }
+const selected = 'red';
+function addListenerOnPolygon(e: any) {
+    if ($.isEmptyObject(e)) {
+        psmb.getValue(true).includes(this.zIndex) ?
+            this.setOptions({ fillColor: selected, strokeColor: selected }) :
+            this.setOptions({ fillColor: undefined, strokeColor: undefined });
+    } else {
+        if (psmb.getValue(true).includes(this.zIndex)) {
+            this.setOptions({ fillColor: undefined, strokeColor: undefined });
+            psmb.removeActiveItemsByValue(this.zIndex);
+        } else {
+            this.setOptions({ fillColor: selected, strokeColor: selected });
+            psmb.setChoiceByValue(this.zIndex);
+        }
+    }
+};
+//flatten array
+var flatten = function (items: any[]) {
+    const flat: any[] = [];
+    items.forEach(item => {
+        if (Array.isArray(item)) {
+            flat.push(...flatten(item));
+        } else {
+            flat.push(item);
+        }
+    });
+    return flat;
+}
+//get bounderies from array of arrays
+var getBounds = function (positions: any[]) {
+    var bounds = new google.maps.LatLngBounds();
+    flatten(positions).forEach(p => bounds.extend(p));
+    return bounds;
+}
+//define map
 var bnds: google.maps.LatLngBounds = new google.maps.LatLngBounds();
-var markers :any[]= [];
+var markers: any[] = [];
 var processMapData = function (dato: any) {
     var consessionPolygon = new google.maps.Polygon({
         paths: dato.position,
@@ -388,7 +143,7 @@ var processMapData = function (dato: any) {
         title: `${dato.name} ${dato.id}`,
         zIndex: dato.id
     });
-    table[dato.id] = {
+    tableInfo[dato.id] = {
         name: dato.name,
         comuna: dato.comuna,
         provincia: dato.provincia,
@@ -397,32 +152,49 @@ var processMapData = function (dato: any) {
     marker.addListener('click', showInfo);
     return marker;
 }
-window.onload = function initMap() {
-    fetch('/ambiental/cuencadata')
-        .then(r => r.json())
-        .then(data => data.map(processMapData))
-        .then(m => {
-            markers = m;
-            map.fitBounds(bnds);
-            map.setCenter(bnds.getCenter());
-        }).then(async _ => {
-            await fetch('/ambiental/comunadata')
-                .then(r => r.json())
-                .then(data => data.map(processMapData))
-                .then(m => markers = markers.concat(m));
-            if (semaforo)
-                await fetch('/ambiental/psmbdata')
-                    .then(r => r.json())
-                    .then(data => data.map(processMapData))
-                    .then(m => markers = markers.concat(m));
-        }).then(_ => {
-            new MarkerClusterer(map, markers, { imagePath: '/images/markers/m' });
-            loadDates();
-            variables.setChoiceByValue('v0');
-            psmb.setChoiceByValue('1');
-            loaderStop();
-        });
-};
+//define chart
+var chart: any = am4core.create("chartdiv", am4charts.XYChart);
+var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+dateAxis.dataFields.category = 'date';
+var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+//"beforedatavalidated beforedisposed beforevalidated blur childadded childremoved dataitemsvalidated datarangechanged datavalidated disabled doublehit down drag dragged dragstart dragstop enabled endchange focus globalscalechanged hidden hit hold inited input keydown keypress keyup layoutvalidated maxsizechanged out over parentset positionchanged propertychanged rangechangeended rangechangestarted ready resize rightclick shown sizechanged startchanged startedchanged swipe swipeleft swiperight toggled track transformed transitionended up validated visibilitychanged wheel wheeldown wheelleft wheelright wheelup zIndexChanged"
+//log all events
+//chart.events.on('appeared', (e: any) => { console.log(e); }); chart.events.on('beforedatavalidated', (e: any) => { console.log(e) }); chart.events.on('beforedisposed', (e: any) => { console.log(e) }); chart.events.on('beforevalidated', (e: any) => { console.log(e) }); chart.events.on('blur', (e: any) => { console.log(e) }); chart.events.on('childadded', (e: any) => { console.log(e) }); chart.events.on('childremoved', (e: any) => { console.log(e) }); chart.events.on('dataitemsvalidated', (e: any) => { console.log(e) }); chart.events.on('datarangechanged', (e: any) => { console.log(e) }); chart.events.on('datavalidated', (e: any) => { console.log(e) }); chart.events.on('disabled', (e: any) => { console.log(e) }); chart.events.on('doublehit', (e: any) => { console.log(e) }); chart.events.on('down', (e: any) => { console.log(e) }); chart.events.on('drag', (e: any) => { console.log(e) }); chart.events.on('dragged', (e: any) => { console.log(e) }); chart.events.on('dragstart', (e: any) => { console.log(e) }); chart.events.on('dragstop', (e: any) => { console.log(e) }); chart.events.on('enabled', (e: any) => { console.log(e) }); chart.events.on('endchange', (e: any) => { console.log(e) }); chart.events.on('focus', (e: any) => { console.log(e) }); chart.events.on('globalscalechanged', (e: any) => { console.log(e) }); chart.events.on('hidden', (e: any) => { console.log(e) }); chart.events.on('hit', (e: any) => { console.log(e) }); chart.events.on('hold', (e: any) => { console.log(e) }); chart.events.on('inited', (e: any) => { console.log(e) }); chart.events.on('input', (e: any) => { console.log(e) }); chart.events.on('keydown', (e: any) => { console.log(e) }); chart.events.on('keypress', (e: any) => { console.log(e) }); chart.events.on('keyup', (e: any) => { console.log(e) }); chart.events.on('layoutvalidated', (e: any) => { console.log(e) }); chart.events.on('maxsizechanged', (e: any) => { console.log(e) }); chart.events.on('out', (e: any) => { console.log(e) }); chart.events.on('over', (e: any) => { console.log(e) }); chart.events.on('parentset', (e: any) => { console.log(e) }); chart.events.on('positionchanged', (e: any) => { console.log(e) }); chart.events.on('propertychanged', (e: any) => { console.log(e) }); chart.events.on('rangechangeended', (e: any) => { console.log(e) }); chart.events.on('rangechangestarted', (e: any) => { console.log(e) }); chart.events.on('ready', (e: any) => { console.log(e) }); chart.events.on('resize', (e: any) => { console.log(e) }); chart.events.on('rightclick', (e: any) => { console.log(e) }); chart.events.on('shown', (e: any) => { console.log(e) }); chart.events.on('sizechanged', (e: any) => { console.log(e) }); chart.events.on('startchanged', (e: any) => { console.log(e) }); chart.events.on('startedchanged', (e: any) => { console.log(e) }); chart.events.on('swipe', (e: any) => { console.log(e) }); chart.events.on('swipeleft', (e: any) => { console.log(e) }); chart.events.on('swiperight', (e: any) => { console.log(e) }); chart.events.on('toggled', (e: any) => { console.log(e) }); chart.events.on('track', (e: any) => { console.log(e) }); chart.events.on('transformed', (e: any) => { console.log(e) }); chart.events.on('transitionended', (e: any) => { console.log(e) }); chart.events.on('up', (e: any) => { console.log(e) }); chart.events.on('validated', (e: any) => { console.log(e) }); chart.events.on('visibilitychanged', (e: any) => { console.log(e) }); chart.events.on('wheel', (e: any) => { console.log(e) }); chart.events.on('wheeldown', (e: any) => { console.log(e) }); chart.events.on('wheelleft', (e: any) => { console.log(e) }); chart.events.on('wheelright', (e: any) => { console.log(e) }); chart.events.on('wheelup', (e: any) => { console.log(e) }); chart.events.on('zIndexChanged', (e: any) => { console.log(e); });
+
+var chartloaded = false;
+var loadChart = function (_: any) {
+    am4core.useTheme(am4themes_kelly);
+    chart.language.locale = esp ? am4lang_es_ES : am4lang_en_US;
+    chart.scrollbarY = new am4core.Scrollbar();
+    chart.scrollbarX = new am4core.Scrollbar();
+    chart.zoomOutButton.align = "left";
+    chart.zoomOutButton.valign = "bottom";
+    dateAxis.dateFormats.setKey('year', 'yy');
+    dateAxis.periodChangeDateFormats.setKey('month', 'MMM yy');
+    dateAxis.tooltipDateFormat = 'dd MMM, yyyy';
+    dateAxis.renderer.minGridDistance = 40;
+    chart.legend = new am4charts.Legend();
+    var legendContainer = am4core.create("legenddiv", am4core.Container);
+    legendContainer.width = am4core.percent(100);
+    legendContainer.height = am4core.percent(100);
+    chart.legend.parent = legendContainer;
+    chart.cursor = new am4charts.XYCursor();
+    chart.exporting.menu = new am4core.ExportMenu();
+    if (!semaforo) {
+        chart.exporting.formatOptions.getKey("png").disabled = true;
+        chart.exporting.formatOptions.getKey("svg").disabled = true;
+        chart.exporting.formatOptions.getKey("pdf").disabled = true;
+        chart.exporting.formatOptions.getKey("json").disabled = true;
+        chart.exporting.formatOptions.getKey("csv").disabled = true;
+        chart.exporting.formatOptions.getKey("xlsx").disabled = true;
+        chart.exporting.formatOptions.getKey("html").disabled = true;
+        chart.exporting.formatOptions.getKey("pdfdata").disabled = true;
+    }
+    chartloaded = true;
+    chart.events.off('validated', loadChart);
+}
+chart.events.on('validated', loadChart);
+//define load dates function
 function loadDates() {
     var sd = $('#start').val();
     var ed = $('#end').val();
@@ -434,14 +206,266 @@ function loadDates() {
     }
     return chart.data;
 }
+//fetch each series from server and loaded into graph
+async function fetchData(url: string, tag: string, name: string) {
+    if (!(tag in chart.exporting.dataFields)) {
+        chart.exporting.dataFields[tag] = name;
+        return await fetch(url)
+            .then(data => data.json())
+            .then(j => {
+                var counter = 0;
+                chart.data.map((c: any) => {
+                    if (counter < j.length && c.date === j[counter].date) {
+                        c[tag] = j[counter].value;
+                        counter++;
+                    }
+                });
+                var serie = chart.series.push(new am4charts.LineSeries());
+                serie.dataFields.valueY = tag;
+                serie.dataFields.dateX = 'date';
+                serie.name = name;
+                serie.tooltipText = '{name}: [bold]{valueY}[/]';
+                serie.showOnInit = false;
+            }).catch((e: any) => {
+                delete chart.exporting.dataFields[tag];
+            });
+    }
+}
+async function generatefetchData(v: any, p: any, sd: any, ed: any) {
+    var tag = `${v.value}_${p.value}`;
+    var name = `${v.label} ${p.label}`;
+    var url = `/ambiental/data?area=${p.value}&var=${v.value}&start=${sd}&end=${ed}`;
+    return fetchData(url, tag, name);
+}
+//interface to fetch collections to server and load them into graph
+async function loadData(e: any, isPsmb: boolean) {
+    var arr = isPsmb ? variables.getValue() : psmb.getValue();
+    if (arr.length === 0) return;
+    loaderStart();
+    var sd = $('#start').val(), ed = $('#end').val();
+    var promises = isPsmb ?
+        arr.map((v: any) => generatefetchData(v, e.detail, sd, ed)) :
+        arr.map((p: any) => generatefetchData(e.detail, p, sd, ed));
+    Promise.all(promises).then(_ => {
+        chart.invalidateData();
+    });
+}
+//passive support
+var supportsPassiveOption = false;
+try {
+    var opts = Object.defineProperty({}, 'passive', {
+        get: function () {
+            supportsPassiveOption = true;
+            return;
+        }
+    });
+    var noop = function () { };
+    window.addEventListener('testPassiveEventSupport', noop, opts);
+    window.removeEventListener('testPassiveEventSupport', noop, opts);
+} catch (e) { }
+var passive = supportsPassiveOption ? { passive: true } : false;
+//variable choice listeners
+evariable.addEventListener('addItem', (e: any) => loadData(e, false), passive);
+evariable.addEventListener('removeItem', (event: any) => {
+    psmb.getValue(true).forEach((e: any) => {
+        var tag = `${event.detail.value}_${e}`;
+        chart.series.values.forEach((v: any, i: number) => {
+            if (v.dataFields.valueY === tag) {
+                delete chart.exporting.dataFields[tag];
+                chart.series.removeIndex(i).dispose();
+            }
+        });
+    });
+}, passive);
+//trigger map click on selection
+function clickMap(e: any) {
+    if (e !== undefined && polygons[e.detail.value] !== undefined)
+        google.maps.event.trigger(polygons[e.detail.value], 'click', {});
+}
+//psmb choice listeners
+epsmb.addEventListener('addItem', (e: any) => {
+    loadData(e, true);
+    clickMap(e);
+}, passive);
+epsmb.addEventListener('removeItem', (event: any) => {
+    variables.getValue(true).forEach((e: any) => {
+        var tag = `${e}_${event.detail.value}`;
+        chart.series.values.forEach((v: any, i: number) => {
+            if (v.dataFields.valueY === tag) {
+                delete chart.exporting.dataFields[tag];
+                chart.series.removeIndex(i).dispose();
+            }
+        });
+    });
+    clickMap(event);
+}, passive);
+//get lists of choices
+async function getList(name: string) {
+    return await fetch(`/ambiental/${name}list`)
+        .then(r => r.json())
+        .catch(e => console.error(e, name));
+}
+//wait until
+function loaderStopped() {
+    return new Promise((resolve: any, _) => {
+        (function wait() {
+            if ((<HTMLElement>document.getElementById('preloader-background')).style.display === "none") return resolve();
+            setTimeout(wait, 400);
+        })();
+    });
+}
+function chartLoaded() {
+    return new Promise((resolve: any, _) => {
+        (function wait() {
+            if (chartloaded) return resolve();
+            setTimeout(wait, 400);
+        })();
+    });
+}
+//init function
+var init = async function () {
+    loadDates();
+    var cuencadata = fetch('/ambiental/cuencadata')
+        .then(r => r.json())
+        .then(data => data.map(processMapData))
+        .then(m => {
+            markers = m;
+            map.fitBounds(bnds);
+            map.setCenter(bnds.getCenter());
+        });
+    var oceanvarlist = getList('oceanvar');
+    var cuencalist = getList('cuenca');
+    var comunadata = fetch('/ambiental/comunadata')
+        .then(r => r.json())
+        .then(data => data.map(processMapData))
+        .then(m => markers = markers.concat(m));
+    var comunalist = getList('comuna');
+    var groupvarlist = getList('groupvar');
+    var variablechoicesInit = Promise.all([oceanvarlist]).then(r => { variables.setChoices([r[0]]); return true; });
+    var psmbchoicesInit = Promise.all([cuencalist]).then(r => { psmb.setChoices([r[0]]); return true; });
+    let buildchart = Promise.all([variablechoicesInit, psmbchoicesInit, cuencadata]).then(r => {
+        variables.setChoiceByValue('v0');
+        psmb.setChoiceByValue(1);
+        return chartLoaded();
+    });
+    if (semaforo) {
+        var psmbdata = fetch('/ambiental/psmbdata')
+            .then(r => r.json())
+            .then(data => data.map(processMapData))
+            .then(m => markers = markers.concat(m));
+        var psmblist = getList('psmb');
+        var genusvarlist = getList('genusvar');
+        var speciesvarlist = getList('speciesvar');
+        var tllist = getList('tl');
+        var psmbchoices = Promise.all([psmbchoicesInit, comunalist, psmblist]).then(r => {
+            psmb.setChoices(r[1].concat(r[2]));
+            return true;
+        });
+        var variablechoices = Promise.all([variablechoicesInit, groupvarlist, genusvarlist, speciesvarlist]).then(r => {
+            variables.setChoices([r[1], r[2], r[3]]);
+            return true;
+        });
+        var tlchoices = Promise.all([tllist]).then(r => { tl.setChoices(r[0]); return true; });
+        var clusters = Promise.all([cuencadata, comunadata, psmbdata]).then(_ => new MarkerClusterer(map, markers, { imagePath: '/images/markers/m' }));
+        function callDatas(a: any, sd: any, ed: any, psmbs: any, sps: any, tls: any, groupId: number) {
+            var nogroup = groupId === 0;
+            var promises = nogroup ?
+                psmbs.map((psmb: any) =>
+                    sps.map((sp: any) => {
+                        var tag = [a.value, psmb.value, sp.value].join('_');
+                        if (!chart.series._values.some((v: any) => tag === v.dataFields.valueY)) {
+                            var name = [a.label, psmb.label, sp.label.replace("<i>", "[bold font-style: italic]").replace("</i>", "[/]")].join(' ');
+                            var url = `/ambiental/tldata?a=${a.value}&psmb=${psmb.value}&sp=${sp.value}&start=${sd}&end=${ed}`;
+                            return fetchData(url, tag, name);
+                        }
+                    })) :
+                tls.filter((x: any) => Math.floor(x.value / 10) === groupId).map((x: any) =>
+                    psmbs.map((psmb: any) =>
+                        sps.map((sp: any) => {
+                            var tag = [a.value, psmb.value, sp.value, x.value].join('_');
+                            if (!chart.series._values.some((v: any) => tag === v.dataFields.valueY)) {
+                                var name = [a.label, psmb.label, sp.label.replace("<i>", "[bold font-style: italic]").replace("</i>", "[/]"), x.label].join(' ');
+                                var url = `/ambiental/tldata?a=${a.value}&psmb=${psmb.value}&sp=${sp.value}&v=${x.value}&start=${sd}&end=${ed}`;
+                                return fetchData(url, tag, name);
+                            }
+                        })));
+            return Promise.all(promises).then(r => r);
+        }
+        etl.addEventListener('addItem', (_e: any) => {
+            var tls = tl.getValue();
+            var analyses = tls.filter((x: any) => Math.floor(x.value / 10) === 1);
+            if (analyses.length !== 0) {
+                var psmbs = tls.filter((x: any) => Math.floor(x.value / 10) === 2);
+                var sps = tls.filter((x: any) => Math.floor(x.value / 10) === 3);
+                if (psmbs.length !== 0 && sps.length !== 0) {
+                    loaderStart();
+                    var sd = $('#start').val();
+                    var ed = $('#end').val();
+                    analyses.forEach((a: any) => {
+                        switch (a.value) {
+                            case 14:
+                            case 17:
+                                return callDatas(a, sd, ed, psmbs, sps, null, 0);
+                            case 11:
+                                return callDatas(a, sd, ed, psmbs, sps, tls, 4);
+                            case 12:
+                                return callDatas(a, sd, ed, psmbs, sps, tls, 5);
+                            case 15:
+                                return callDatas(a, sd, ed, psmbs, sps, tls, 6);
+                            case 13:
+                            case 16:
+                                return callDatas(a, sd, ed, psmbs, sps, tls, 7);
+                            default:
+                                return;
+                        }
+                    });
+                    chart.invalidateData();
+                }
+            }
+        }, passive);
+        etl.addEventListener('removeItem', (event: any) => {
+            if (chart.series.values.length === 0) return;
+            var tags = chart.series.values.map((v: any) => v.dataFields.valueY);
+            var id = event.detail.value;
+            var removed = 0;
+            tags.forEach((k: any, i:number) => {
+                if (k.match(/^[1-7][0-8]_[1-7][0-8]_[1-7][0-8](_[1-7][0-8])?$/g) && k.includes(id)) {
+                    delete chart.exporting.dataFields[k];
+                    chart.series.removeIndex(i - removed).dispose();
+                    removed++;
+                }
+            });
+        }, passive);
+        Promise.all([buildchart, psmbchoices, variablechoices, tlchoices, clusters]).then(_ => {
+            chart.events.on('validated', loaderStop);
+            loaderStop();
+        });
+    } else {
+        var psmbchoices = Promise.all([psmbchoicesInit, comunalist]).then(r => {
+            psmb.setChoices(r[1]);
+            return true;
+        });
+        var variablechoices = Promise.all([variablechoicesInit, groupvarlist]).then(r => {
+            variables.setChoices([r[1]]);
+            return true;
+        });
+        var clusters = Promise.all([cuencadata, comunadata]).then(_ => new MarkerClusterer(map, markers, { imagePath: '/images/markers/m' }));
+        Promise.all([buildchart, psmbchoices, variablechoices, clusters]).then(_ => {
+            chart.events.on('validated', loaderStop);
+            loaderStop();
+        });
+    }
+}
+//init and load marker clusters after
+init();
 //DATES
 $('.input-daterange').datepicker({
     inputs: $('.actual_range'),
     format: 'yyyy-mm-dd',
-    language: 'es',
+    language: lang,
     startDate: $('#start').val().toString(),
     endDate: $('#end').val().toString()
-}).on('changeDate', (_:any) => {
+}).on('changeDate', (_: any) => {
     var vars = variables.getValue(true);
     variables.removeActiveItems();
     if (semaforo) {
@@ -514,3 +538,7 @@ var tableToExcel = (function () {
         window.location.href = uri + base64(format(template, ctx))
     }
 })();
+//overflow scroll legend if to many elements added
+document.getElementById('legenddiv').addEventListener('DOMSubtreeModified', function (_e) {
+    document.getElementById("legenddiv").style.height = chart.legend.contentHeight + "px";
+});

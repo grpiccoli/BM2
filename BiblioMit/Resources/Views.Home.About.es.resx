@@ -120,8 +120,14 @@
   <data name="A collection of georeferenced data, including" xml:space="preserve">
     <value>Una collección de datos georeferenciados, incluyendo</value>
   </data>
+  <data name="A forum for connection and exchange of ideas between stakeholders" xml:space="preserve">
+    <value>Un foro para la conexión e intercambio de ideas entre los actores de la industria</value>
+  </data>
+  <data name="A project from the &lt;strong&gt;Guild Association of Mussel Farmers of Chile&lt;/strong&gt;" xml:space="preserve">
+    <value>Un proyecto de la &lt;strong&gt;Asociación Gremial de Mitilicultores de Chile&lt;/strong&gt;</value>
+  </data>
   <data name="A project from the Guild Association of Mussel Farmers of Chile" xml:space="preserve">
-    <value>Un proyecto de la Asociación de Mitilicultores de Chile</value>
+    <value>Un proyecto de la &lt;strong&gt;Asociación de Mitilicultores de Chile&lt;/strong&gt;</value>
   </data>
   <data name="A search engine for multiple sources of scientific literature for the mussel farming industry at a national level (downloadable in digital format), including" xml:space="preserve">
     <value>Un buscador de literatura científica con documentos recopilados desde múltiples fuentes para el sector Mitilicultor a nivel nacional (descargable en formato digital), incluyendo</value>
@@ -129,14 +135,14 @@
   <data name="About" xml:space="preserve">
     <value>Nosotros</value>
   </data>
-  <data name="and developed by Guillermo Rodriguez Piccoli" xml:space="preserve">
-    <value>y desarrollado por Guillermo Rodríguez Piccoli</value>
+  <data name="and developed by &lt;strong&gt;Guillermo Rodriguez Piccoli&lt;/strong&gt;" xml:space="preserve">
+    <value>y desarrollado por &lt;strong&gt;Guillermo Rodríguez Piccoli&lt;/strong&gt;</value>
   </data>
-  <data name="and managed by the Centre of Applied Research for Aquaculture and Fishery" xml:space="preserve">
-    <value>y administrado por el Centro Acuícola Pesquero de Investigación Aplicada</value>
+  <data name="and managed by the &lt;strong&gt;Centre of Applied Research for Aquaculture and Fishery&lt;/strong&gt;" xml:space="preserve">
+    <value>y administrado por el &lt;strong&gt;Centro Acuícola Pesquero de Investigación Aplicada&lt;/strong&gt;</value>
   </data>
-  <data name="at Epic Solutions Consulting" xml:space="preserve">
-    <value>desde la consultora Epic Solutions</value>
+  <data name="at &lt;strong&gt;Epic Solutions Consulting&lt;/strong&gt;" xml:space="preserve">
+    <value>desde la consultora &lt;strong&gt;Epic Solutions&lt;/strong&gt;</value>
   </data>
   <data name="Biyearly digest report of production and oceanografic statistics" xml:space="preserve">
     <value>Boletín semestral con reporte de estadíticas productivas y oceanográficas</value>
@@ -150,11 +156,11 @@
   <data name="Digest" xml:space="preserve">
     <value>Boletín</value>
   </data>
-  <data name="financed by the Production Development Coorporation of Chile" xml:space="preserve">
-    <value>financiado por La Corporación de Fomento de la Producción</value>
+  <data name="financed by the &lt;strong&gt;Production Development Coorporation of Chile&lt;/strong&gt;" xml:space="preserve">
+    <value>financiado por la &lt;strong&gt;Corporación de Fomento de la Producción&lt;/strong&gt;</value>
   </data>
-  <data name="for the Technological Institute of Mussel Farming" xml:space="preserve">
-    <value>para el Instituto Tecnológico de Mitilicultura</value>
+  <data name="for the &lt;strong&gt;Technological Institute of Mussel Farming&lt;/strong&gt;" xml:space="preserve">
+    <value>para el &lt;strong&gt;Instituto Tecnológico de Mitilicultura&lt;/strong&gt;</value>
   </data>
   <data name="Histopathological Database" xml:space="preserve">
     <value>Base de datos histopatológica</value>
@@ -180,8 +186,8 @@
   <data name="Oceanografic data such as Ocean Surface Temperature (OST), Ocean Acidification, Oxigen content, Salinity, histological findings and concentrations, and much more" xml:space="preserve">
     <value>Datos oceanográficos como Temperatura Superficial del Oceano (TSO), acidificación, salinidad, niveles de oxígeno, análisis histológicos y mucho más</value>
   </data>
-  <data name="of Saint Thomas University Chile" xml:space="preserve">
-    <value>de la Universidad Santo Tomás</value>
+  <data name="of &lt;strong&gt;Saint Thomas University Chile&lt;/strong&gt;" xml:space="preserve">
+    <value>de la &lt;strong&gt;Universidad Santo Tomás&lt;/strong&gt;</value>
   </data>
   <data name="Read our Privacy Policy" xml:space="preserve">
     <value>Lea nuestras política de privacidad</value>
@@ -201,7 +207,7 @@
   <data name="Technological Management Platform for Mussel Farming Sector" xml:space="preserve">
     <value>Plataforma de Gestión Tecnológica para el Sector Mitilicultor</value>
   </data>
-  <data name="within the framework of project Code 16 Node 70434 &quot;Science and Technology Node for the Mussel Farming Industry&quot; of the Strategic Regional Program for the Mussel Indutry" xml:space="preserve">
-    <value>enmarcado en el proyecto Código 16 NODO 70434 "Nodo Ciencia y Tecnología para la Industria Mitilicultora" del Programa Estratégico Regional Industria de la Mitilicultura</value>
+  <data name="within the framework of project &lt;i&gt;Code 16 Node 70434 &quot;Science and Technology Node for the Mussel Farming Industry&quot;&lt;/i&gt; of the &lt;strong&gt;Strategic Regional Program for the Mussel Indutry&lt;/strong&gt;" xml:space="preserve">
+    <value>enmarcado en el proyecto &lt;i&gt;Código 16 NODO 70434 "Nodo Ciencia y Tecnología para la Industria Mitilicultora"&lt;/i&gt; del &lt;strong&gt;Programa Estratégico Regional Industria de la Mitilicultura&lt;/strong&gt;</value>
   </data>
 </root>

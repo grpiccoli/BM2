@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BiblioMit.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200520200356_Initial")]
+    [Migration("20200523010919_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1332,13 +1332,13 @@ namespace BiblioMit.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("GenusId", "NormalizedName")
-                        .IsUnique()
-                        .HasFilter("[NormalizedName] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("SpeciesPhytoplanktons");
                 });

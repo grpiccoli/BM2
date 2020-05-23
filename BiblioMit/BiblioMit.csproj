@@ -180,6 +180,8 @@
     <Compile Remove="Migrations\20200503082804_Initial.Designer.cs" />
     <Compile Remove="Migrations\20200504063926_Initial.cs" />
     <Compile Remove="Migrations\20200504063926_Initial.Designer.cs" />
+    <Compile Remove="Migrations\20200520200356_Initial.cs" />
+    <Compile Remove="Migrations\20200520200356_Initial.Designer.cs" />
   </ItemGroup>
   
   <ItemGroup>

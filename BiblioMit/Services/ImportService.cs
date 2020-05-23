@@ -867,8 +867,7 @@ namespace BiblioMit.Services
                             {
                                 GenusId = genusId
                             };
-                            if(genusSp[1] != null)
-                                specie.SetName(genusSp[1]);
+                            specie.SetName(genusSp[1] ?? "SP");
                             sp = specie;
                         }
                         else

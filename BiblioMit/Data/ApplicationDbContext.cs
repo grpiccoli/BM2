@@ -110,6 +110,7 @@ namespace BiblioMit.Data
             {
                 s.HasIndex(p => new { p.GenusId, p.NormalizedName }).IsUnique();
                 s.Property(p => p.GenusId).IsRequired();
+                s.Property(p => p.NormalizedName).IsRequired();
             });
             modelBuilder.Entity<Phone>(s =>
             {

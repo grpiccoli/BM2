@@ -1,4 +1,5 @@
 {
+  "version": "1.0",
   "defaultProvider": "unpkg",
   "libraries": [
     {
@@ -272,6 +273,5 @@
       "destination": "wwwroot/lib/xlsx",
       "files": [ "dist/xlsx.core.min.js" ]
     }
-  ],
-  "version": "1.0"
+  ]
 }

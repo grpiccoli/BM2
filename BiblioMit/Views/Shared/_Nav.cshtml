@@ -197,7 +197,7 @@
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarApps">
-        <ul class="navbar-nav mr-auto">
+        <ul class="navbar-nav mr-auto responsive-ul">
             @{
                 var forum = new NavDDwnVM
                 {
@@ -262,7 +262,7 @@
                 <partial name="_NavDDwn" model='adminTools' />
             }
         </ul>
-        <ul class="navbar-nav ml-auto">
+        <ul class="navbar-nav ml-auto responsive-ul">
             <partial name="_LoginPartial" model="new LoginViewModel()" />
         </ul>
     </div>

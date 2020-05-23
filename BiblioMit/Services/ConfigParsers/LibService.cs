@@ -9,23 +9,23 @@ namespace BiblioMit.Services
 {
     public static class Libman
     {
+        private const double latest = 1.0;
         private static Libs Libs { get; set; } = new Libs();
-
         public static Libs LoadJson()
         {
             using StreamReader r = new StreamReader("libman.json");
             string json = r.ReadToEnd();
             Libs = JsonConvert.DeserializeObject<Libs>(json);
             var os = Environment.OSVersion.Platform.ToString();
-            if ("Win32NT" != os)
+            if ("Win32NT" != os && Libs.Version > latest)
             {
-                foreach(var lib in Libs.Libraries)
+                foreach (var lib in Libs.Libraries)
                 {
                     //unpkg as default!!!
-                    if(string.IsNullOrWhiteSpace(lib.Provider))
+                    if (string.IsNullOrWhiteSpace(lib.Provider))
                     {
                         var prefix = $"https://unpkg.com/{lib.Library}/";
-                        foreach(var file in lib.Files)
+                        foreach (var file in lib.Files)
                         {
                             using var process = new Process
                             {

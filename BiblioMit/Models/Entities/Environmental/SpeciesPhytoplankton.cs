@@ -16,11 +16,11 @@ namespace BiblioMit.Models
             TextInfo text = CultureInfo.InvariantCulture.TextInfo;
             Name = text.ToLower(value);
         }
-        public string GetFullName()
-        {
-            var n = string.IsNullOrWhiteSpace(Name) ? "sp" : Name;
-            return $"{Genus.Name} {n}";
-        }
+        //public string GetFullName()
+        //{
+        //    var n = string.IsNullOrWhiteSpace(Name) ? "sp" : Name;
+        //    return $"{Genus.Name} {n}";
+        //}
         [Required]
         public int GenusId { get; set; }
         public virtual GenusPhytoplankton Genus { get; set; }

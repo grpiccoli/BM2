@@ -21,15 +21,22 @@ namespace BiblioMit.Models.VM
         public string Rut { get; set; }
         public string BusinessName { get; set; }
     }
-    public class GMapPolygon
+    public abstract class GMapPolygonBase
     {
-        public IEnumerable<IEnumerable<GMapCoordinate>> Position { get; set; }
         public int Id { get; set; }
         public string Name { get; set; }
         public string Comuna { get; set; }
         public string Provincia { get; set; }
         public string Region { get; set; }
-        public string Code { get; set; }
+        public int Code { get; set; }
+    }
+    public class GMapPolygon : GMapPolygonBase
+    {
+        public IEnumerable<GMapCoordinate> Position { get; set; }
+    }
+    public class GMapMultiPolygon : GMapPolygonBase
+    {
+        public IEnumerable<IEnumerable<GMapCoordinate>> Position { get; set; }
     }
     public class IExport
     {
@@ -49,7 +56,8 @@ namespace BiblioMit.Models.VM
     }
     public class ChoicesItem : IChoices
     {
-        public string Value { get; set; }
+        public object Value { get; set; }
+        public bool Selected { get; set; }
     }
     public class ChoicesGroup : IChoices
     {

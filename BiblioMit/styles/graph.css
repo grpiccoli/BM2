@@ -38,7 +38,3 @@
   text-align: center; }
   .preloader-background .spinner-grow {
     margin-top: calc( 25vw - 30px); }
-
-@media only screen and (max-width: 990px) {
-  .preloader-background {
-    left: calc(50% - 25px); } }

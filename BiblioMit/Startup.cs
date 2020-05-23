@@ -134,7 +134,10 @@ namespace BiblioMit
                 .AddViewLocalization(
                 LanguageViewLocationExpanderFormat.Suffix)
                 .AddDataAnnotationsLocalization()
-                .AddNewtonsoftJson();
+                .AddNewtonsoftJson(o => 
+                    o.SerializerSettings.NullValueHandling = NullValueHandling.Ignore
+                ).AddJsonOptions(o => 
+                    o.JsonSerializerOptions.IgnoreNullValues = true);
 
             services.ConfigureNonBreakingSameSiteCookies();
 
@@ -165,7 +168,6 @@ namespace BiblioMit
             services.AddSignalR(options => {
                 options.EnableDetailedErrors = true;
             });
-
             Libman.LoadJson();
             Bundler.LoadJson();
         }
