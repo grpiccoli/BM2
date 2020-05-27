@@ -62,5 +62,13 @@
   {
     "outputFile": "styles/bibliomit.css",
     "inputFile": "styles/bibliomit.scss"
+  },
+  {
+    "outputFile": "styles/loader.css",
+    "inputFile": "styles/loader.scss"
+  },
+  {
+    "outputFile": "styles/centres.css",
+    "inputFile": "styles/centres.scss"
   }
 ]

@@ -41,12 +41,29 @@ var loaderStop = function () {
     document.getElementById('preloader-background').style.display = "none";
 };
 loaderStart();
+var Area = function (path) {
+    return (google.maps.geometry.spherical.computeArea(path) / 10000).toFixed(2);
+};
+var flatten = function (items) {
+    var flat = [];
+    items.forEach(function (item) {
+        if (Array.isArray(item)) {
+            flat.push.apply(flat, flatten(item));
+        }
+        else {
+            flat.push(item);
+        }
+    });
+    return flat;
+};
+var getBounds = function (positions) {
+    var bounds = new google.maps.LatLngBounds();
+    flatten(positions).forEach(function (p) { return bounds.extend(p); });
+    return bounds;
+};
+var selected = 'red';
 var lang = $("html").attr("lang");
 var esp = lang === 'es';
-var semaforo = !document.getElementById('semaforo').classList.contains('d-none');
-var epsmb = document.getElementById('psmb');
-var evariable = document.getElementById('variable');
-var etl = document.getElementById('tl');
 var choiceOps = {
     maxItemCount: 50,
     removeItemButton: true,
@@ -66,26 +83,29 @@ if (esp) {
     choiceOps.itemSelectText = 'Presione para seleccionar';
     choiceOps.maxItemText = function (maxItemCount) { return "M\u00E1ximo " + maxItemCount + " valores"; };
 }
+var semaforo = !document.getElementById('semaforo').classList.contains('d-none');
+var epsmb = document.getElementById('psmb');
+var evariable = document.getElementById('variable');
+var etl = document.getElementById('tl');
 choiceOps.placeholderValue = esp ? 'Seleccione áreas' : 'Select areas';
 var psmb = new Choices(epsmb, choiceOps);
 choiceOps.placeholderValue = esp ? 'Seleccione variables' : 'Select Variables';
 var variables = new Choices(evariable, choiceOps);
 choiceOps.placeholderValue = esp ? 'Variables semáforo' : 'Semaforo Variables';
 var tl = new Choices(etl, choiceOps);
+var map = new google.maps.Map(document.getElementById('map'), {
+    mapTypeId: 'terrain'
+});
 var infowindow = new google.maps.InfoWindow({
     maxWidth: 500
 });
 var tableInfo = [];
 var polygons = {};
+var bnds = new google.maps.LatLngBounds();
+var markers = [];
 var titles = esp ?
     ["Código", "Comuna", "Provincia", "Región", "Área", "Fuentes"] :
     ["Code", "Commune", "Province", "Region", "Area", "Sources"];
-var Area = function (path) {
-    return (google.maps.geometry.spherical.computeArea(path) / 10000).toFixed(2);
-};
-var map = new google.maps.Map(document.getElementById('map'), {
-    mapTypeId: 'terrain'
-});
 var showInfo = function (_e) {
     var id = this.zIndex;
     var content = "<h4>" + tableInfo[id].name + "</h4><table class=\"table\"><tr><th scope=\"row\">" + titles[0] + "</th><td align=\"right\">" + tableInfo[id].code + "</td></tr>";
@@ -100,8 +120,7 @@ var showInfo = function (_e) {
     infowindow.setContent(content);
     infowindow.open(map, this);
 };
-var selected = 'red';
-function addListenerOnPolygon(e) {
+var addListenerOnPolygon = function (e) {
     if ($.isEmptyObject(e)) {
         psmb.getValue(true).includes(this.zIndex) ?
             this.setOptions({ fillColor: selected, strokeColor: selected }) :
@@ -117,27 +136,7 @@ function addListenerOnPolygon(e) {
             psmb.setChoiceByValue(this.zIndex);
         }
     }
-}
-;
-var flatten = function (items) {
-    var flat = [];
-    items.forEach(function (item) {
-        if (Array.isArray(item)) {
-            flat.push.apply(flat, flatten(item));
-        }
-        else {
-            flat.push(item);
-        }
-    });
-    return flat;
 };
-var getBounds = function (positions) {
-    var bounds = new google.maps.LatLngBounds();
-    flatten(positions).forEach(function (p) { return bounds.extend(p); });
-    return bounds;
-};
-var bnds = new google.maps.LatLngBounds();
-var markers = [];
 var processMapData = function (dato) {
     var consessionPolygon = new google.maps.Polygon({
         paths: dato.position,
@@ -200,7 +199,7 @@ var loadChart = function (_) {
     chart.events.off('validated', loadChart);
 };
 chart.events.on('validated', loadChart);
-function loadDates() {
+var loadDates = function () {
     var sd = $('#start').val();
     var ed = $('#end').val();
     var current = moment(sd);
@@ -210,8 +209,8 @@ function loadDates() {
         current.add(1, 'days');
     }
     return chart.data;
-}
-function fetchData(url, tag, name) {
+};
+var fetchData = function (url, tag, name) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -242,8 +241,8 @@ function fetchData(url, tag, name) {
             }
         });
     });
-}
-function generatefetchData(v, p, sd, ed) {
+};
+var generatefetchData = function (v, p, sd, ed) {
     return __awaiter(this, void 0, void 0, function () {
         var tag, name, url;
         return __generator(this, function (_a) {
@@ -253,8 +252,8 @@ function generatefetchData(v, p, sd, ed) {
             return [2, fetchData(url, tag, name)];
         });
     });
-}
-function loadData(e, isPsmb) {
+};
+var loadData = function (e, isPsmb) {
     return __awaiter(this, void 0, void 0, function () {
         var arr, sd, ed, promises;
         return __generator(this, function (_a) {
@@ -272,7 +271,7 @@ function loadData(e, isPsmb) {
             return [2];
         });
     });
-}
+};
 var supportsPassiveOption = false;
 try {
     var opts = Object.defineProperty({}, 'passive', {
@@ -299,10 +298,10 @@ evariable.addEventListener('removeItem', function (event) {
         });
     });
 }, passive);
-function clickMap(e) {
+var clickMap = function (e) {
     if (e !== undefined && polygons[e.detail.value] !== undefined)
         google.maps.event.trigger(polygons[e.detail.value], 'click', {});
-}
+};
 epsmb.addEventListener('addItem', function (e) {
     loadData(e, true);
     clickMap(e);
@@ -319,7 +318,7 @@ epsmb.addEventListener('removeItem', function (event) {
     });
     clickMap(event);
 }, passive);
-function getList(name) {
+var getList = function (name) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -330,8 +329,8 @@ function getList(name) {
             }
         });
     });
-}
-function loaderStopped() {
+};
+var loaderStopped = function () {
     return new Promise(function (resolve, _) {
         (function wait() {
             if (document.getElementById('preloader-background').style.display === "none")
@@ -339,8 +338,8 @@ function loaderStopped() {
             setTimeout(wait, 400);
         })();
     });
-}
-function chartLoaded() {
+};
+var chartLoaded = function () {
     return new Promise(function (resolve, _) {
         (function wait() {
             if (chartloaded)
@@ -348,37 +347,10 @@ function chartLoaded() {
             setTimeout(wait, 400);
         })();
     });
-}
+};
 var init = function () {
     return __awaiter(this, void 0, void 0, function () {
-        function callDatas(a, sd, ed, psmbs, sps, tls, groupId) {
-            var nogroup = groupId === 0;
-            var promises = nogroup ?
-                psmbs.map(function (psmb) {
-                    return sps.map(function (sp) {
-                        var tag = [a.value, psmb.value, sp.value].join('_');
-                        if (!chart.series._values.some(function (v) { return tag === v.dataFields.valueY; })) {
-                            var name = [a.label, psmb.label, sp.label.replace("<i>", "[bold font-style: italic]").replace("</i>", "[/]")].join(' ');
-                            var url = "/ambiental/tldata?a=" + a.value + "&psmb=" + psmb.value + "&sp=" + sp.value + "&start=" + sd + "&end=" + ed;
-                            return fetchData(url, tag, name);
-                        }
-                    });
-                }) :
-                tls.filter(function (x) { return Math.floor(x.value / 10) === groupId; }).map(function (x) {
-                    return psmbs.map(function (psmb) {
-                        return sps.map(function (sp) {
-                            var tag = [a.value, psmb.value, sp.value, x.value].join('_');
-                            if (!chart.series._values.some(function (v) { return tag === v.dataFields.valueY; })) {
-                                var name = [a.label, psmb.label, sp.label.replace("<i>", "[bold font-style: italic]").replace("</i>", "[/]"), x.label].join(' ');
-                                var url = "/ambiental/tldata?a=" + a.value + "&psmb=" + psmb.value + "&sp=" + sp.value + "&v=" + x.value + "&start=" + sd + "&end=" + ed;
-                                return fetchData(url, tag, name);
-                            }
-                        });
-                    });
-                });
-            return Promise.all(promises).then(function (r) { return r; });
-        }
-        var cuencadata, oceanvarlist, cuencalist, comunadata, comunalist, groupvarlist, variablechoicesInit, psmbchoicesInit, buildchart, psmbdata, psmblist, genusvarlist, speciesvarlist, tllist, psmbchoices, variablechoices, tlchoices, clusters, psmbchoices, variablechoices, clusters;
+        var cuencadata, oceanvarlist, cuencalist, comunadata, comunalist, groupvarlist, variablechoicesInit, psmbchoicesInit, buildchart, psmbdata, psmblist, genusvarlist, speciesvarlist, tllist, psmbchoices, variablechoices, tlchoices, clusters, callDatas, psmbchoices, variablechoices, clusters;
         return __generator(this, function (_a) {
             loadDates();
             cuencadata = fetch('/ambiental/cuencadata')
@@ -423,6 +395,33 @@ var init = function () {
                 });
                 tlchoices = Promise.all([tllist]).then(function (r) { tl.setChoices(r[0]); return true; });
                 clusters = Promise.all([cuencadata, comunadata, psmbdata]).then(function (_) { return new MarkerClusterer(map, markers, { imagePath: '/images/markers/m' }); });
+                callDatas = function (a, sd, ed, psmbs, sps, tls, groupId) {
+                    var nogroup = groupId === 0;
+                    var promises = nogroup ?
+                        psmbs.map(function (psmb) {
+                            return sps.map(function (sp) {
+                                var tag = [a.value, psmb.value, sp.value].join('_');
+                                if (!chart.series._values.some(function (v) { return tag === v.dataFields.valueY; })) {
+                                    var name = [a.label, psmb.label, sp.label.replace("<i>", "[bold font-style: italic]").replace("</i>", "[/]")].join(' ');
+                                    var url = "/ambiental/tldata?a=" + a.value + "&psmb=" + psmb.value + "&sp=" + sp.value + "&start=" + sd + "&end=" + ed;
+                                    return fetchData(url, tag, name);
+                                }
+                            });
+                        }) :
+                        tls.filter(function (x) { return Math.floor(x.value / 10) === groupId; }).map(function (x) {
+                            return psmbs.map(function (psmb) {
+                                return sps.map(function (sp) {
+                                    var tag = [a.value, psmb.value, sp.value, x.value].join('_');
+                                    if (!chart.series._values.some(function (v) { return tag === v.dataFields.valueY; })) {
+                                        var name = [a.label, psmb.label, sp.label.replace("<i>", "[bold font-style: italic]").replace("</i>", "[/]"), x.label].join(' ');
+                                        var url = "/ambiental/tldata?a=" + a.value + "&psmb=" + psmb.value + "&sp=" + sp.value + "&v=" + x.value + "&start=" + sd + "&end=" + ed;
+                                        return fetchData(url, tag, name);
+                                    }
+                                });
+                            });
+                        });
+                    return Promise.all(promises).then(function (r) { return r; });
+                };
                 etl.addEventListener('addItem', function (_e) {
                     var tls = tl.getValue();
                     var analyses = tls.filter(function (x) { return Math.floor(x.value / 10) === 1; });
@@ -514,7 +513,7 @@ $('.input-daterange').datepicker({
         tls.forEach(function (v) { return tl.setChoiceByValue(v); });
     }
 });
-function CreateTableFromJSON(json) {
+var CreateTableFromJSON = function (json) {
     var col = [];
     for (var i = 0; i < json.length; i++) {
         for (var key in json[i]) {
@@ -541,8 +540,8 @@ function CreateTableFromJSON(json) {
     }
     var divContainer = document.getElementById("results");
     divContainer.appendChild(table);
-}
-function fetchPlankton() {
+};
+var fetchPlankton = function () {
     var sd = $('#start').val();
     var ed = $('#end').val();
     var promises = psmb.getValue(true).map(function (p) { return fetch('/ambiental/BuscarInformes', {
@@ -555,7 +554,7 @@ function fetchPlankton() {
         divContainer.innerHTML = "";
         j.forEach(function (i) { return CreateTableFromJSON(i); });
     });
-}
+};
 var tableToExcel = (function () {
     var uri = 'data:application/vnd.ms-excel;base64,', template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>', base64 = function (s) { return window.btoa(unescape(encodeURIComponent(s))); }, format = function (s, c) { return s.replace(/{(\w+)}/g, function (_, p) { return c[p]; }); };
     return function (table, name) {

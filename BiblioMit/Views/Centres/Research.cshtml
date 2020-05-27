@@ -1,7 +1,5 @@
-﻿@model IEnumerable<Psmb>
-
-@{
+﻿@{
     ViewData["Title"] = Localizer["Research Centres"].Value;
 }
 <input id="type" value="@((int)BiblioMit.Models.Entities.Centres.PsmbType.ResearchCentre)" class="d-none" />
-<partial name="_Psmbs" model="@Model" />
+<partial name="_Psmbs" />

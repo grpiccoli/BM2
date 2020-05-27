@@ -8,35 +8,10 @@
 <partial name="_GMaps" />
 <partial name="_ValidationScriptsPartial" />
 <partial name="_AmCharts" />
-<partial name="_LibsPg" model='new HashSet<string> { "@google/markerclustererplus",
+<partial name="_LibsPg" model='new HashSet<string> { "loader", "@google/markerclustererplus",
     "choices.js", "@popperjs/core", "tippy.js", "moment.js", "bootstrap-datepicker", "tippy" }' />
+<partial name="_Loader" />
 
-<div id="preloader-background" class="preloader-background">
-    <div class="spinner-grow text-primary" role="status">
-        <span class="sr-only"></span>
-    </div>
-    <div class="spinner-grow text-secondary" role="status">
-        <span class="sr-only"></span>
-    </div>
-    <div class="spinner-grow text-success" role="status">
-        <span class="sr-only"></span>
-    </div>
-    <div class="spinner-grow text-danger" role="status">
-        <span class="sr-only"></span>
-    </div>
-    <div class="spinner-grow text-warning" role="status">
-        <span class="sr-only"></span>
-    </div>
-    <div class="spinner-grow text-info" role="status">
-        <span class="sr-only"></span>
-    </div>
-    <div class="spinner-grow text-light" role="status">
-        <span class="sr-only"></span>
-    </div>
-    <div class="spinner-grow text-dark" role="status">
-        <span class="sr-only"></span>
-    </div>
-</div>
 <div class="container-fluid">
     <div class="row">
         <div class="col-12 col-md-4">
@@ -107,7 +82,7 @@
         <div class="row">
             <div id="results" class="col-12"></div>
         </div>
-        <div id="infotable" class="d-none" style="float:right;">
+        <div id="infotable" class="d-none" style="float:right">
             <table class="small table-striped text-center w-100">
                 <tr>
                     <th>@Localizer["Analysis"]</th>

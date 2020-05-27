@@ -15,9 +15,39 @@
     ]
   },
   {
+    "outputFileName": "wwwroot/css/loader.min.css",
+    "inputFiles": [
+      "styles/loader.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/centres.min.css",
+    "inputFiles": [
+      "styles/centres.css"
+    ]
+  },
+  {
     "outputFileName": "wwwroot/js/graph.min.js",
     "inputFiles": [
       "wwwroot/js/graph.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/loader.min.js",
+    "inputFiles": [
+      "wwwroot/js/loader.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/gmaps.min.js",
+    "inputFiles": [
+      "wwwroot/js/gmaps.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/site.min.js",
+    "inputFiles": [
+      "wwwroot/js/site.js"
     ]
   },
   {

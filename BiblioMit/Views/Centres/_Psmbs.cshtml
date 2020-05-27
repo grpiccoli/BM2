@@ -1,65 +1,19 @@
-﻿@model IEnumerable<Psmb>
-
-@{
-    TextInfo textInfo = new CultureInfo("es-CL", false).TextInfo;
-    string c = ViewData["c"] as string;
-    string i = ViewData["i"] as string;
-}
-
-<partial name="_GMaps" />
+﻿<partial name="_GMaps" />
 <partial name="_ValidationScriptsPartial" />
-<partial name="_Libs" model='new HashSet<string> { "bootstrap-select", "@google/markerclustererplus", "centres" }' />
+<partial name="_Libs" model='new HashSet<string> { "loader", "bootstrap-select", "@google/markerclustererplus", "choices.js", "centres" }' />
 
 <h2 id="maintitle">@ViewData["Title"]</h2>
-
-<form>
-    <div class="input-group col-12 col-lg-9 mb-3">
-        <select name="c" class="selectpicker form-control" multiple
-                data-live-search="true" data-actions-box="true" tabindex="-98"
-                value="@c"
-                title="@Localizer["Filter by Commune, Province and/or Region"]"
-                data-selected-text-format="count > 3">
-            <optgroup label="Comunas">
-                @foreach (var g in Model.GroupBy(f => f.Commune))
-                {
-                    <text>
-                        <option data-tokens="@string.Join(" ", g.Key.Psmbs.Select(k => k.Address))"
-                                selected="@c.Contains(g.Key.Id.ToString())" data-subtext="@g.Key.GetFullName()"
-                                value="@g.Key.Id">
-                            @g.Key.Name
-                        </option>
-                    </text>
-                }
-            </optgroup>
-        </select>
-        <select name="i" class="selectpicker form-control" multiple
-                data-live-search="true" data-actions-box="true" tabindex="-98"
-                value="@i" title="Filtrar"
-                data-selected-text-format="count">
-            <optgroup label="Centres">
-                @foreach (var g in Model.GroupBy(f => f.Company).Where(a => a.Key.Acronym != null))
-                {
-                    <text>
-                        <option data-icon="/images/ico/@(g.Key.Acronym).png" data-tokens="@string.Join(" ", g.Key.BusinessName, g.Key.Psmbs.Select(k => k.Address))"
-                                selected="@i.Contains(g.Key.Id.ToString())" data-subtext="@g.Key.Acronym @g.Key.GetRUT()"
-                                value="@g.Key.Id">
-                            @textInfo.ToTitleCase(textInfo
-                            .ToLower(g.Key.BusinessName.Substring(0, Math.Min(g.Key.BusinessName.Length, 50))))
-                            @if (g.Key.BusinessName.Length > 50)
-                            {
-                                @:&hellip;
-                            }
-                        </option>
-                    </text>
-                }
-            </optgroup>
-        </select>
-        <div class="input-group-append">
-            <button type="submit" value="Buscar" class="btn btn-info"><i class="fas fa-filter fa-tw"></i>&emsp;Filter</button>
-        </div>
+<partial name="_Loader" />
+<div class="row">
+    <div class="col-6">
+        <select id="area" class="choice form-control" multiple></select>
     </div>
-</form>
-<br />
-<dd>
-    <div id="map" style="height: 450px;"></div>
-</dd>
+    <div class="col-6">
+        <select id="company" class="choice form-control" multiple></select>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <div class="w-100" id="map" style="min-height:400px;"></div>
+    </div>
+</div>

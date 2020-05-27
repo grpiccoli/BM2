@@ -186,6 +186,8 @@
   
   <ItemGroup>
     <Content Remove="wwwroot\js\clock.min.js" />
+    <Content Remove="wwwroot\js\gmaps.min.js" />
+    <Content Remove="wwwroot\js\loader.min.js" />
   </ItemGroup>
   
   <ItemGroup>
@@ -212,6 +214,8 @@
   
   <ItemGroup>
     <_ContentIncludedByDefault Remove="wwwroot\js\clock.min.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\js\gmaps.min.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\js\loader.min.js" />
   </ItemGroup>
     
   <ItemGroup>
@@ -252,6 +256,8 @@
 
   <ItemGroup>
     <None Include="wwwroot\js\clock.min.js" />
+    <None Include="wwwroot\js\gmaps.min.js" />
+    <None Include="wwwroot\js\loader.min.js" />
   </ItemGroup>
 
   <ItemGroup>

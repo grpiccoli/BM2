@@ -14,6 +14,7 @@ using BiblioMit.Blazor;
 using BiblioMit.Extensions;
 using Microsoft.Extensions.Localization;
 using BiblioMit.Models.VM;
+using Schema.NET;
 
 namespace BiblioMit.Controllers
 {
@@ -76,6 +77,32 @@ namespace BiblioMit.Controllers
                 });
         }
         [AllowAnonymous]
+        public IActionResult RegionList() => Json(new ChoicesGroup
+            {
+                Label = _localizer["Regions"],
+                Choices = _context.Regions
+                    .Select(com => new ChoicesItem
+                    {
+                        Value = com.Id,
+                        Label = com.Name
+                    })
+            });
+        [AllowAnonymous]
+        public IActionResult ProvinciaList()
+        {
+            var singlabel = _localizer["Catchment Area"] + " ";
+            return Json(_context.Regions.Select(c => new ChoicesGroup
+            {
+                Label = c.Name,
+                Choices = c.Provinces
+                    .Select(com => new ChoicesItem
+                    {
+                        Value = com.Id,
+                        Label = com.Name + ", " + c.Name
+                    })
+            }));
+        }
+        [AllowAnonymous]
         public IActionResult ComunaList()
         {
             var singlabel = _localizer["Catchment Area"] + " ";
@@ -103,6 +130,80 @@ namespace BiblioMit.Controllers
                         Label = p.Code + " " + p.Name + " " + c.Name
                     })
                 }));
+        public IActionResult ProvinciaFarmList() => ProvinciaList();
+        public IActionResult ComunaFarmList() => ComunaList();
+        public IActionResult ProvinciaResearchList() => Json(_context.Regions
+            .Select(c => new ChoicesGroup
+            {
+                Label = c.Name,
+                Choices = c.Provinces
+                .Where(c => c.Communes.Any(c => c.Psmbs.Any(p => p.Discriminator == Models.Entities.Centres.PsmbType.ResearchCentre)))
+                        .Select(com => new ChoicesItem
+                        {
+                            Value = com.Id,
+                            Label = com.Name + ", " + c.Name
+                        })
+            }));
+        public IActionResult ComunaResearchList() => Json(_context.Provinces
+            .Select(c => new ChoicesGroup
+            {
+                Label = c.Name,
+                Choices = c.Communes
+                .Where(c => c.Psmbs.Any(p => p.Discriminator == Models.Entities.Centres.PsmbType.ResearchCentre))
+                        .Select(com => new ChoicesItem
+                        {
+                            Value = com.Id,
+                            Label = com.Name + ", " + c.Name
+                        })
+            }));
+        public IActionResult FarmData() => Json(SelectPsmbs(_context.PsmbAreas
+            .Where(c => c.PolygonId.HasValue)));
+        public IActionResult ResearchData() => Json(_context.ResearchCentres
+                    .Where(c => c.PolygonId.HasValue)
+                    .Select(c => new GMapPolygon
+                    {
+                        Id = c.Id,
+                        Name = c.Name + " (" + c.Acronym + ")",
+                        Comuna = c.Commune.Name,
+                        Provincia = c.Commune.Province.Name,
+                        Region = c.Commune.Province.Region.Name,
+                        Position = c.Polygon
+                        .Vertices.Select(o => new GMapCoordinate
+                        {
+                            Lat = o.Latitude,
+                            Lng = o.Longitude
+                        })
+                    }));
+        public IActionResult FarmList() => Json(_context.Farms
+                    .Where(p => p.PolygonId.HasValue)
+                    .Select(p => new ChoicesItem
+                    {
+                        Value = p.Id,
+                        Label = p.Code + " " + p.Name
+                    }));
+        public IActionResult CompanyList() => Json(_context.Companies
+                    .Where(p => p.Id > 900_000 && p.Psmbs.Any(f => f.Discriminator == Models.Entities.Centres.PsmbType.Farm && f.PolygonId.HasValue))
+                    .Select(p => new ChoicesItem
+                    {
+                        Value = p.Id,
+                        Label = p.BusinessName + " (" + p.GetRUT() + ")"
+                    }));
+        [AllowAnonymous]
+        public IActionResult ResearchList() => Json(_context.ResearchCentres
+                    .Where(p => p.PolygonId.HasValue)
+                    .Select(p => new ChoicesItem
+                    {
+                        Value = p.Id,
+                        Label =  p.Name + " (" + p.Acronym + ")"
+                    }));
+        [AllowAnonymous]
+        public IActionResult InstitutionList() => Json(_context.Companies
+                    .Where(p => p.Psmbs.Any(p => p.Discriminator == Models.Entities.Centres.PsmbType.ResearchCentre))
+                    .Select(p => new ChoicesItem
+                    {
+                        Value = p.Id,
+                        Label = p.BusinessName + " (" + p.Acronym + ")"
+                    }));
         [AllowAnonymous]
         public JsonResult OceanVarList() => Json(Variable.t.Enum2ChoicesGroup("v").FirstOrDefault());
         [AllowAnonymous]
@@ -499,22 +600,23 @@ namespace BiblioMit.Controllers
                     }))
                 }));
         }
-        public IActionResult PsmbData() => Json(_context.PsmbAreas
-                    .Where(c => c.Commune.CatchmentAreaId.HasValue && c.PolygonId.HasValue && c.PlanktonAssays.Any())
-                    .Select(c => new GMapPolygon
-                    {
-                        Id = c.Id,
-                        Name = c.Code + " " + c.Name,
-                        Comuna = c.Commune.Name,
-                        Provincia = c.Commune.Province.Name,
-                        Code = c.Code,
-                        Position = c.Polygon
+        private IQueryable<GMapPolygon> SelectPsmbs(IQueryable<PsmbArea> psmbs) =>
+            psmbs.Select(c => new GMapPolygon
+                                 {
+                                     Id = c.Id,
+                                     Name = c.Code + " " + c.Name,
+                                     Comuna = c.Commune.Name,
+                                     Provincia = c.Commune.Province.Name,
+                                     Code = c.Code,
+                                     Position = c.Polygon
                         .Vertices.Select(o => new GMapCoordinate
-                            {
-                                Lat = o.Latitude,
-                                Lng = o.Longitude
-                            })
-                    }));
+                        {
+                            Lat = o.Latitude,
+                            Lng = o.Longitude
+                        })
+                                 });
+        public IActionResult PsmbData() => Json(SelectPsmbs(_context.PsmbAreas
+                    .Where(c => c.Commune.CatchmentAreaId.HasValue && c.PolygonId.HasValue && c.PlanktonAssays.Any())));
         public IActionResult BuscarInformes(int id, string start, string end)
         {
             var i = Convert.ToDateTime(start, CultureInfo.InvariantCulture);

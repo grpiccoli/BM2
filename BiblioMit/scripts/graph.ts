@@ -1,21 +1,37 @@
 ﻿//loader
-const loaderStart = () => {
+var loaderStart = () => {
     (<HTMLElement>document.getElementById('preloader-background')).style.display = "block";
 }
-
-const loaderStop = () => {
+var loaderStop = () => {
     (<HTMLElement>document.getElementById('preloader-background')).style.display = "none";
 }
 loaderStart();
+//maps
+var Area = function (path: google.maps.LatLng[] | google.maps.MVCArray<google.maps.LatLng>) {
+    return (google.maps.geometry.spherical.computeArea(path) / 10000).toFixed(2);
+}
+//flatten array
+var flatten = function (items: any[]) {
+    const flat: any[] = [];
+    items.forEach(item => {
+        if (Array.isArray(item)) {
+            flat.push(...flatten(item));
+        } else {
+            flat.push(item);
+        }
+    });
+    return flat;
+}
+//get bounderies from array of arrays
+var getBounds = function (positions: any[]) {
+    var bounds = new google.maps.LatLngBounds();
+    flatten(positions).forEach(p => bounds.extend(p));
+    return bounds;
+}
+var selected = 'red';
 //get language
 var lang = $("html").attr("lang");
 var esp = lang === 'es';
-//is semaforo?
-const semaforo = !document.getElementById('semaforo').classList.contains('d-none');
-//choice elements
-const epsmb = document.getElementById('psmb');
-const evariable = document.getElementById('variable');
-const etl = document.getElementById('tl');
 //choice options
 var choiceOps: any = {
     maxItemCount: 50,
@@ -36,30 +52,35 @@ if (esp) {
     choiceOps.itemSelectText = 'Presione para seleccionar';
     choiceOps.maxItemText = (maxItemCount: number) => `Máximo ${maxItemCount} valores`;
 }
+//is semaforo?
+var semaforo = !document.getElementById('semaforo').classList.contains('d-none');
+//choice elements
+var epsmb = document.getElementById('psmb');
+var evariable = document.getElementById('variable');
+var etl = document.getElementById('tl');
 //psmb load choices
 choiceOps.placeholderValue = esp ? 'Seleccione áreas' : 'Select areas';
-const psmb = new Choices(epsmb, choiceOps);
+var psmb = new Choices(epsmb, choiceOps);
 //variable load choices
 choiceOps.placeholderValue = esp ? 'Seleccione variables' : 'Select Variables';
-const variables = new Choices(evariable, choiceOps);
+var variables = new Choices(evariable, choiceOps);
 //semaforo
 choiceOps.placeholderValue = esp ? 'Variables semáforo' : 'Semaforo Variables';
-const tl = new Choices(etl, choiceOps);
+var tl = new Choices(etl, choiceOps);
 //define info
+var map = new google.maps.Map(document.getElementById('map'), {
+    mapTypeId: 'terrain'
+});
 var infowindow = new google.maps.InfoWindow({
     maxWidth: 500
 });
 var tableInfo: any = [];
 var polygons: any = {};
+var bnds: google.maps.LatLngBounds = new google.maps.LatLngBounds();
+var markers: any = [];
 var titles = esp ?
     ["Código", "Comuna", "Provincia", "Región", "Área", "Fuentes"] :
     ["Code", "Commune", "Province", "Region", "Area", "Sources"];
-var Area = function (path: google.maps.LatLng[] | google.maps.MVCArray<google.maps.LatLng>) {
-    return (google.maps.geometry.spherical.computeArea(path) / 10000).toFixed(2);
-}
-var map = new google.maps.Map(document.getElementById('map'), {
-    mapTypeId: 'terrain'
-});
 var showInfo = function (_e: any) {
     var id = this.zIndex;
     var content =
@@ -91,8 +112,7 @@ var showInfo = function (_e: any) {
     infowindow.setContent(content);
     infowindow.open(map, this);
 }
-const selected = 'red';
-function addListenerOnPolygon(e: any) {
+var addListenerOnPolygon = function(e: any) {
     if ($.isEmptyObject(e)) {
         psmb.getValue(true).includes(this.zIndex) ?
             this.setOptions({ fillColor: selected, strokeColor: selected }) :
@@ -107,27 +127,7 @@ function addListenerOnPolygon(e: any) {
         }
     }
 };
-//flatten array
-var flatten = function (items: any[]) {
-    const flat: any[] = [];
-    items.forEach(item => {
-        if (Array.isArray(item)) {
-            flat.push(...flatten(item));
-        } else {
-            flat.push(item);
-        }
-    });
-    return flat;
-}
-//get bounderies from array of arrays
-var getBounds = function (positions: any[]) {
-    var bounds = new google.maps.LatLngBounds();
-    flatten(positions).forEach(p => bounds.extend(p));
-    return bounds;
-}
 //define map
-var bnds: google.maps.LatLngBounds = new google.maps.LatLngBounds();
-var markers: any[] = [];
 var processMapData = function (dato: any) {
     var consessionPolygon = new google.maps.Polygon({
         paths: dato.position,
@@ -195,7 +195,7 @@ var loadChart = function (_: any) {
 }
 chart.events.on('validated', loadChart);
 //define load dates function
-function loadDates() {
+var loadDates = function() {
     var sd = $('#start').val();
     var ed = $('#end').val();
     var current = moment(sd);
@@ -207,7 +207,7 @@ function loadDates() {
     return chart.data;
 }
 //fetch each series from server and loaded into graph
-async function fetchData(url: string, tag: string, name: string) {
+var fetchData = async function(url: string, tag: string, name: string) {
     if (!(tag in chart.exporting.dataFields)) {
         chart.exporting.dataFields[tag] = name;
         return await fetch(url)
@@ -231,14 +231,14 @@ async function fetchData(url: string, tag: string, name: string) {
             });
     }
 }
-async function generatefetchData(v: any, p: any, sd: any, ed: any) {
+var generatefetchData = async function(v: any, p: any, sd: any, ed: any) {
     var tag = `${v.value}_${p.value}`;
     var name = `${v.label} ${p.label}`;
     var url = `/ambiental/data?area=${p.value}&var=${v.value}&start=${sd}&end=${ed}`;
     return fetchData(url, tag, name);
 }
 //interface to fetch collections to server and load them into graph
-async function loadData(e: any, isPsmb: boolean) {
+var loadData = async function(e: any, isPsmb: boolean) {
     var arr = isPsmb ? variables.getValue() : psmb.getValue();
     if (arr.length === 0) return;
     loaderStart();
@@ -278,7 +278,7 @@ evariable.addEventListener('removeItem', (event: any) => {
     });
 }, passive);
 //trigger map click on selection
-function clickMap(e: any) {
+var clickMap = function(e: any) {
     if (e !== undefined && polygons[e.detail.value] !== undefined)
         google.maps.event.trigger(polygons[e.detail.value], 'click', {});
 }
@@ -300,13 +300,13 @@ epsmb.addEventListener('removeItem', (event: any) => {
     clickMap(event);
 }, passive);
 //get lists of choices
-async function getList(name: string) {
+var getList = async function(name: string) {
     return await fetch(`/ambiental/${name}list`)
         .then(r => r.json())
         .catch(e => console.error(e, name));
 }
 //wait until
-function loaderStopped() {
+var loaderStopped = function() {
     return new Promise((resolve: any, _) => {
         (function wait() {
             if ((<HTMLElement>document.getElementById('preloader-background')).style.display === "none") return resolve();
@@ -314,7 +314,7 @@ function loaderStopped() {
         })();
     });
 }
-function chartLoaded() {
+var chartLoaded = function() {
     return new Promise((resolve: any, _) => {
         (function wait() {
             if (chartloaded) return resolve();
@@ -367,7 +367,7 @@ var init = async function () {
         });
         var tlchoices = Promise.all([tllist]).then(r => { tl.setChoices(r[0]); return true; });
         var clusters = Promise.all([cuencadata, comunadata, psmbdata]).then(_ => new MarkerClusterer(map, markers, { imagePath: '/images/markers/m' }));
-        function callDatas(a: any, sd: any, ed: any, psmbs: any, sps: any, tls: any, groupId: number) {
+        var callDatas = function (a: any, sd: any, ed: any, psmbs: any, sps: any, tls: any, groupId: number) {
             var nogroup = groupId === 0;
             var promises = nogroup ?
                 psmbs.map((psmb: any) =>
@@ -479,7 +479,7 @@ $('.input-daterange').datepicker({
         tls.forEach((v: any) => tl.setChoiceByValue(v));
     }
 });
-function CreateTableFromJSON(json: any) {
+var CreateTableFromJSON = function(json: any) {
     // EXTRACT VALUE FOR HTML HEADER.
     var col = [];
     for (var i = 0; i < json.length; i++) {
@@ -513,7 +513,7 @@ function CreateTableFromJSON(json: any) {
     var divContainer = document.getElementById("results");
     divContainer.appendChild(table);
 }
-function fetchPlankton() {
+var fetchPlankton = function() {
     var sd = $('#start').val();
     var ed = $('#end').val();
     var promises = psmb.getValue(true).map((p:any) => fetch('/ambiental/BuscarInformes', {

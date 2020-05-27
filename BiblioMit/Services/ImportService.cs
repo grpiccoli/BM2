@@ -858,16 +858,18 @@ namespace BiblioMit.Services
                             InSet[nameof(GenusPhytoplankton)].Add(genus.NormalizedName, genus.Id);
                         }
                         int genusId = InSet[nameof(GenusPhytoplankton)][genusSp[0]];
-                        if (genusSp.Count == 1) genusSp.Add(null);
+                        if (genusSp.Count == 1) genusSp.Add("SP");
                         SpeciesPhytoplankton specie = await _context.SpeciesPhytoplanktons
-                            .FirstOrDefaultAsync(s => s.Genus.NormalizedName == genusSp[0] && s.NormalizedName == genusSp[1]).ConfigureAwait(false);
+                            .FirstOrDefaultAsync(s => 
+                            s.Genus.NormalizedName == genusSp[0] 
+                            && s.NormalizedName == genusSp[1]).ConfigureAwait(false);
                         if (specie == null)
                         {
                             specie = new SpeciesPhytoplankton
                             {
                                 GenusId = genusId
                             };
-                            specie.SetName(genusSp[1] ?? "SP");
+                            specie.SetName(genusSp[1]);
                             sp = specie;
                         }
                         else

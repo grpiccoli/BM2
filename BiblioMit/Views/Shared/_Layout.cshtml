@@ -93,7 +93,7 @@
                 window.fbAsyncInit = function () {
                     FB.init({
                         xfbml: true,
-                        version: 'v5.0'
+                        version: 'v7.0'
                     });
                 };
 
@@ -105,13 +105,15 @@
                     fjs.parentNode.insertBefore(js, fjs);
                 }(document, 'script', 'facebook-jssdk'));</script>
 
-            <!-- Your customer chat code -->
+            <!-- Your Chat Plugin code -->
             <div class="fb-customerchat"
                  attribution=setup_tool
                  page_id="1350128371792150"
                  theme_color="#20cef5"
                  logged_in_greeting="@Localizer["Hi! How can we assist you?"]"
-                 logged_out_greeting="@Localizer["Thank you for chatting with us"]">
+                 logged_out_greeting="@Localizer["Thank you for chatting with us"]"
+                 greeting_dialog_display="fade"
+                 greeting_dialog_delay="4">
             </div>
             @RenderBody()
             <partial name="_Modal" model='new BootstrapModel { Id = "modal-action", AreaLabeledId = "modal-action-label", Size = ModalSize.Medium }' />
