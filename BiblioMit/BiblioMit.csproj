@@ -84,10 +84,10 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Content Include="DB\**" CopyToPublishDirectory="PreserveNewest" LinkBase="DB" />
+    <Content Include="Data\**" CopyToPublishDirectory="PreserveNewest" LinkBase="Data" />
   </ItemGroup>
-  
-  <ItemGroup>
+
+	<ItemGroup>
     <Compile Remove="Migrations\20200318045853_Initial.cs" />
     <Compile Remove="Migrations\20200318045853_Initial.Designer.cs" />
     <Compile Remove="Migrations\20200319054533_Initial.cs" />
