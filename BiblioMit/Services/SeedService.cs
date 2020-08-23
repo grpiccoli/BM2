@@ -266,6 +266,7 @@ END";
                 .ExecuteSqlInterpolatedAsync($"BulkInsert {dbo}, {tmp}")
                 .ConfigureAwait(false);
             File.Delete(tmp);
+            Console.WriteLine($"{name} saved to Database");
             return;
         }
         public async Task Users()
