@@ -1131,7 +1131,7 @@ Date = GetDate(n, dateSelect)
                         Uri = GetUri(url, n.QuerySelector(quriSelect)),
                         Authors = GetAuthors(n, authorSelect),
                         Company = co,
-                    }), acronym, num.Count());
+                    }), acronym, num.Length);
                 }
                 catch
                 {

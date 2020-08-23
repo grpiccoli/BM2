@@ -48,19 +48,19 @@ namespace BiblioMit.Extensions
             list.RemoveAt(oldIndex);
             list.Insert(newIndex, item);
         }
-        public static void MoveFirst<T>(this List<T> list, Func<T, bool> func)
+        public static IEnumerable<T> MoveFirst<T>(this List<T> list, Func<T, bool> func)
         {
-            if (list == null) return;
+            if (list == null) return list;
             T item = list.FirstOrDefault(func);
             list.Remove(item);
-            list.Prepend(item);
+            return list.Prepend(item);
         }
-        public static void MoveLast<T>(this List<T> list, Func<T, bool> func)
+        public static IEnumerable<T> MoveLast<T>(this List<T> list, Func<T, bool> func)
         {
-            if (list == null) return;
+            if (list == null) return list;
             T item = list.FirstOrDefault(func);
             list.Remove(item);
-            list.Append(item);
+            return list.Append(item);
         }
         public static IEnumerable<TKey> ExceptNull<TKey>(this IEnumerable<TKey> list, IEnumerable<TKey> listExcept)
         {
@@ -101,11 +101,11 @@ namespace BiblioMit.Extensions
         }
         public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
         {
-            if (source != null) foreach (var item in source) action(item);
+            if (source != null && action != null) foreach (var item in source) action(item);
         }
         public static void ForEachOrBreak<T>(this IEnumerable<T> source, Func<T, bool> func)
         {
-            if (source != null)
+            if (source != null && func != null)
                 foreach (var item in source)
                 {
                     bool result = func(item);

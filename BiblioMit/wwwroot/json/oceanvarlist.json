@@ -1,0 +1,1 @@
+{"choices":[{"value":"v0","selected":false,"label":"Surface Temperature (°C)"},{"value":"v1","selected":false,"label":"Acidification (pH)"},{"value":"v2","selected":false,"label":"Oxigen (ppm)"},{"value":"v3","selected":false,"label":"Salinity (ppm)"},{"value":"v4","selected":false,"label":"Total Phytoplankton (Cel/mL)"}],"label":"Oceanographic Variables"}

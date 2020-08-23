@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -12,6 +13,14 @@ using System.Text.RegularExpressions;
 
 namespace BiblioMit.Extensions
 {
+    public class LowercaseContractResolver : DefaultContractResolver
+    {
+        protected override string ResolvePropertyName(string propertyName)
+        {
+            var textInfo = CultureInfo.InvariantCulture.TextInfo;
+            return textInfo.ToLower(propertyName);
+        }
+    }
     public static class StringExtensions
     {
         private readonly static List<string> romanNumerals = 
@@ -78,7 +87,7 @@ namespace BiblioMit.Extensions
         }
         public static List<int> AllIndexesOf(this string str, string value)
         {
-            if (string.IsNullOrEmpty(value))
+            if (string.IsNullOrEmpty(value) || string.IsNullOrEmpty(str))
                 //throw new ArgumentException("El texto a buscar no puede estar vacío", nameof(value));
                 return null;
             List<int> indexes = new List<int>();

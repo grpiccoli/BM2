@@ -5,6 +5,7 @@ using BiblioMit.Data;
 using BiblioMit.Models;
 using BiblioMit.Services;
 using BiblioMit.Services.Hubs;
+using BiblioMit.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -56,6 +57,7 @@ namespace BiblioMit
 
             services.AddHostedService<SeedBackground>();
             services.AddScoped<ISeed, SeedService>();
+            services.AddScoped<IUpdateJsons, UpdateJsons>();
             services.AddScoped<INodeService, NodeService>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<IImport, ImportService>();

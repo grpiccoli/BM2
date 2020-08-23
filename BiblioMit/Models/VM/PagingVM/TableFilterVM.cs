@@ -22,7 +22,7 @@ namespace BiblioMit.Models.ViewModels
 
         public MultiSelectList List { get; set; }
 
-        public bool LiveSearch { get; set; } = false;
+        public bool LiveSearch { get; set; }
 
         public FilterType Type { get; set; } = FilterType.sort;
     }

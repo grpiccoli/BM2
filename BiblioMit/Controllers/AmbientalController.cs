@@ -88,10 +88,9 @@ namespace BiblioMit.Controllers
                     })
             });
         [AllowAnonymous]
-        public IActionResult ProvinciaList()
-        {
-            var singlabel = _localizer["Catchment Area"] + " ";
-            return Json(_context.Regions.Select(c => new ChoicesGroup
+        public IActionResult ProvinciaList() => Json(Provincia());
+        private IQueryable<ChoicesGroup> Provincia() =>
+            _context.Regions.Select(c => new ChoicesGroup
             {
                 Label = c.Name,
                 Choices = c.Provinces
@@ -100,23 +99,24 @@ namespace BiblioMit.Controllers
                         Value = com.Id,
                         Label = com.Name + ", " + c.Name
                     })
-            }));
-        }
+            });
         [AllowAnonymous]
         public IActionResult ComunaList()
         {
             var singlabel = _localizer["Catchment Area"] + " ";
-            return Json(_context.CatchmentAreas.Select(c => new ChoicesGroup
-                {
-                    Label = singlabel + c.Name,
-                    Choices = c.Communes
+            return Json(Comuna(singlabel));
+        }
+        private IQueryable<ChoicesGroup> Comuna(string singlabel) =>
+            _context.CatchmentAreas.Select(c => new ChoicesGroup
+            {
+                Label = singlabel + c.Name,
+                Choices = c.Communes
                     .Select(com => new ChoicesItem
                     {
                         Value = com.Id,
                         Label = com.Name + " " + c.Name
                     })
-                }));
-        }
+            });
         public IActionResult PsmbList() => Json(_context.Communes
                 .Where(c => c.CatchmentAreaId.HasValue)
                 .Select(c => new ChoicesGroup
@@ -130,8 +130,13 @@ namespace BiblioMit.Controllers
                         Label = p.Code + " " + p.Name + " " + c.Name
                     })
                 }));
-        public IActionResult ProvinciaFarmList() => ProvinciaList();
-        public IActionResult ComunaFarmList() => ComunaList();
+        public IActionResult ProvinciaFarmList() => Json(Provincia());
+        public IActionResult ComunaFarmList()
+        {
+            var singlabel = _localizer["Catchment Area"] + " ";
+            return Json(Comuna(singlabel));
+        }
+        [AllowAnonymous]
         public IActionResult ProvinciaResearchList() => Json(_context.Regions
             .Select(c => new ChoicesGroup
             {
@@ -144,6 +149,7 @@ namespace BiblioMit.Controllers
                             Label = com.Name + ", " + c.Name
                         })
             }));
+        [AllowAnonymous]
         public IActionResult ComunaResearchList() => Json(_context.Provinces
             .Select(c => new ChoicesGroup
             {
@@ -158,6 +164,7 @@ namespace BiblioMit.Controllers
             }));
         public IActionResult FarmData() => Json(SelectPsmbs(_context.PsmbAreas
             .Where(c => c.PolygonId.HasValue)));
+        [AllowAnonymous]
         public IActionResult ResearchData() => Json(_context.ResearchCentres
                     .Where(c => c.PolygonId.HasValue)
                     .Select(c => new GMapPolygon
@@ -566,7 +573,7 @@ namespace BiblioMit.Controllers
                 }
             });
         [AllowAnonymous]
-        public IActionResult CuencaData()
+        public JsonResult CuencaData()
         {
             var title = _localizer["Catchment Area"] + " ";
             return Json(_context.CatchmentAreas.Select(c => new GMapPolygon
@@ -582,7 +589,7 @@ namespace BiblioMit.Controllers
                }));
         }
         [AllowAnonymous]
-        public IActionResult ComunaData()
+        public JsonResult ComunaData()
         {
             var title = _localizer["Commune"] + " ";
             return Json(_context.Communes
@@ -600,7 +607,7 @@ namespace BiblioMit.Controllers
                     }))
                 }));
         }
-        private IQueryable<GMapPolygon> SelectPsmbs(IQueryable<PsmbArea> psmbs) =>
+        private static IQueryable<GMapPolygon> SelectPsmbs(IQueryable<PsmbArea> psmbs) =>
             psmbs.Select(c => new GMapPolygon
                                  {
                                      Id = c.Id,
@@ -615,7 +622,7 @@ namespace BiblioMit.Controllers
                             Lng = o.Longitude
                         })
                                  });
-        public IActionResult PsmbData() => Json(SelectPsmbs(_context.PsmbAreas
+        public JsonResult PsmbData() => Json(SelectPsmbs(_context.PsmbAreas
                     .Where(c => c.Commune.CatchmentAreaId.HasValue && c.PolygonId.HasValue && c.PlanktonAssays.Any())));
         public IActionResult BuscarInformes(int id, string start, string end)
         {

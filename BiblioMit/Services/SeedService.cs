@@ -18,12 +18,15 @@ using System.Data;
 using Pluralize.NET.Core;
 using BiblioMit.Models.Entities.Digest;
 using BiblioMit.Models.Entities.Environmental;
+using BiblioMit.Controllers;
+using BiblioMit.Services.Interfaces;
 
 namespace BiblioMit.Services
 {
     public class SeedService : ISeed
     {
         private readonly IImport _import;
+        private readonly IUpdateJsons _update;
         private readonly ILogger _logger;
         private readonly IStringLocalizer _localizer;
         public IConfiguration Configuration { get; }
@@ -39,9 +42,11 @@ namespace BiblioMit.Services
             IConfiguration configuration,
             IWebHostEnvironment environment,
             ApplicationDbContext context,
-            ILookupNormalizer normalizer
+            ILookupNormalizer normalizer,
+            IUpdateJsons update
             )
         {
+            _update = update;
             _import = import;
             _logger = logger;
             _localizer = localizer;
@@ -188,6 +193,7 @@ namespace BiblioMit.Services
                 var path = "UNSYNC/bibliomit/DB";
                 if(Directory.Exists(path))
                     await AddBulkFiles(path).ConfigureAwait(false);
+                _update.SeedUpdate();
             }
             catch (Exception ex)
             {

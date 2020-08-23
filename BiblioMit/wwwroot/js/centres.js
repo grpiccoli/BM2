@@ -100,11 +100,13 @@ var infowindow = new google.maps.InfoWindow({
 var tableInfo = {};
 var polygons = {};
 var markers = {};
+var companies = {};
+var psmbs = {};
 var bnds = new google.maps.LatLngBounds();
 var showInfo = function (_e) {
     var id = this.zIndex;
-    var head = "<h4>" + tableInfo[id].code + " " + tableInfo[id].name + "</h4><table><tr><th>C\u00F3digo</th><td align=\"\"right\"\">" + tableInfo[id].code + "</td></tr><tr><th>Compa\u00F1\u00EDa</th><td align=\"\"right\"\">" + tableInfo[id].businessName + "</td></tr><tr><th>RUT</th><td align=\"\"right\"\">" + tableInfo[id].rut + "</td></tr><tr><th>Localidad</th><td align=\"\"right\"\">" + tableInfo[id].name + "</td></tr><tr><th>Comuna</th><td align=\"\"right\"\">" + tableInfo[id].comuna + "</td></tr><tr><th>Provincia</th><td align=\"\"right\"\">" + tableInfo[id].provincia + "</td></tr><tr><th>Regi\u00F3n</th><td align=\"\"right\"\">" + tableInfo[id].region + "</td></tr></tr><tr><th>\u00C1rea (Ha)</th><td align=\"\"right\"\">";
-    var tail = "</td></tr><tr><a href=\"\"/Centres/Details/" + id + "\"\">Detalles</a></tr><tr><th>Fuentes</th><td></td></tr><tr><td>Sernapesca</td><td align=\"\"right\"\"><a target=\"\"_blank\"\" href=\"\"https://www.sernapesca.cl\"\"><img src=\"\"../images/ico/sernapesca.svg\"\" height=\"\"20\"\" /></a></td></tr><tr><td>PER Mitilidos</td><td align=\"\"right\"\"><a target=\"\"_blank\"\" href=\"\"https://www.mejillondechile.cl\"\"><img src=\"\"../images/ico/mejillondechile.min.png\"\" height=\"\"20\"\" /></a></td></tr><tr><td>Subpesca</td><td align=\"\"right\"\"><a target=\"\"_blank\"\" href=\"\"https://www.subpesca.cl\"\"><img src=\"\"../images/ico/subpesca.png\"\" height=\"\"20\"\" /></a></td></tr>";
+    var head = "<h4>" + tableInfo[id].code + " " + tableInfo[id].name + "</h4>\n<table><tr><th>C\u00F3digo</th><td align=\"\"right\"\">" + tableInfo[id].code + "</td></tr>\n<tr><th>Compa\u00F1\u00EDa</th><td align=\"\"right\"\">" + tableInfo[id].businessName + "</td></tr>\n<tr><th>RUT</th><td align=\"\"right\"\">" + tableInfo[id].rut + "</td></tr>\n<tr><th>Localidad</th><td align=\"\"right\"\">" + tableInfo[id].name + "</td></tr>\n<tr><th>Comuna</th><td align=\"\"right\"\">" + tableInfo[id].comuna + "</td></tr>\n<tr><th>Provincia</th><td align=\"\"right\"\">" + tableInfo[id].provincia + "</td></tr>\n<tr><th>Regi\u00F3n</th><td align=\"\"right\"\">" + tableInfo[id].region + "</td></tr></tr>\n<tr><th>\u00C1rea (Ha)</th><td align=\"\"right\"\">";
+    var tail = "</td></tr><tr><a href=\"\"/Centres/Details/" + id + "\"\">Detalles</a></tr>\n<tr><th>Fuentes</th><td></td></tr><tr><td>Sernapesca</td>\n<td align=\"\"right\"\"><a target=\"\"_blank\"\" href=\"\"https://www.sernapesca.cl\"\"><img src=\"\"../images/ico/sernapesca.svg\"\" height=\"\"20\"\" /></a></td></tr>\n<tr><td>PER Mitilidos</td>\n<td align=\"\"right\"\"><a target=\"\"_blank\"\" href=\"\"https://www.mejillondechile.cl\"\"><img src=\"\"../images/ico/mejillondechile.min.png\"\" height=\"\"20\"\" /></a></td></tr>\n<tr><td>Subpesca</td>\n<td align=\"\"right\"\"><a target=\"\"_blank\"\" href=\"\"https://www.subpesca.cl\"\"><img src=\"\"../images/ico/subpesca.png\"\" height=\"\"20\"\" /></a></td></tr>";
     infowindow.setContent(head + Area(polygons[id].getPath().getArray()) + tail);
     infowindow.open(map, this);
 };
@@ -126,18 +128,20 @@ var addListenerOnPolygon = function (e) {
     }
 };
 var processMapData = function (dato) {
-    var consessionPolygon = new google.maps.Polygon({
-        paths: dato.position,
-        zIndex: dato.id,
-        strokeColor: '#FF0000',
-        strokeOpacity: 0.8,
-        strokeWeight: 2,
-        fillColor: '#FF0000',
-        fillOpacity: 0.35
-    });
-    consessionPolygon.setMap(map);
-    consessionPolygon.addListener('click', addListenerOnPolygon);
-    polygons[dato.id] = consessionPolygon;
+    if (!isresearch) {
+        var consessionPolygon = new google.maps.Polygon({
+            paths: dato.position,
+            zIndex: dato.id,
+            strokeColor: '#FF0000',
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: '#FF0000',
+            fillOpacity: 0.35
+        });
+        consessionPolygon.setMap(map);
+        consessionPolygon.addListener('click', addListenerOnPolygon);
+        polygons[dato.id] = consessionPolygon;
+    }
     var center = getBounds(dato.position).getCenter();
     bnds.extend(center);
     var marker = new google.maps.Marker({
@@ -148,12 +152,21 @@ var processMapData = function (dato) {
     tableInfo[dato.id] = {
         name: dato.name,
         comuna: dato.comuna,
-        comunaid: dato.comunaid,
         provincia: dato.provincia,
         code: dato.code,
         rut: dato.rut,
         bsnssName: dato.bsnssName
     };
+    if (!(dato.rut in companies))
+        companies[dato.rut] = {};
+    companies[dato.rut].push(dato.id);
+    if (!(dato.comunaid in psmbs))
+        psmbs[dato.comunaid] = {};
+    if (!(dato.provinciaid in psmbs))
+        psmbs[dato.provinciaid] = {};
+    if (!(dato.regionid in psmbs))
+        psmbs[dato.regionid] = {};
+    companies[dato.rut].push(dato.id);
     marker.addListener('click', showInfo);
     markers[dato.id] = marker;
     return marker;
@@ -172,41 +185,25 @@ try {
 }
 catch (e) { }
 var passive = supportsPassiveOption ? { passive: true } : false;
-var filter = function (e, iscompany) {
-    var ch = iscompany ? company.getValue(false) : psmb.getValue(false);
-    tableInfo.forEach(function (m, i) {
-        if (i !== e.value) {
-            markers[i].setMap(null);
-            markers[i].setMap(null);
-        }
-        else {
-        }
+var filter = function () {
+    markers.forEach(function (m) {
+        m.setMap(null);
+    });
+    company.getValue(false).forEach(function (c) {
+        companies[c].forEach(function (s) {
+            markers[s].setMap(map);
+        });
+    });
+    psmb.getValue(false).forEach(function (c) {
+        psmbs[c].forEach(function (s) {
+            markers[s].setMap(map);
+        });
     });
 };
-epsmb.addEventListener('addItem', function (e) { return filter(e, false); }, passive);
-epsmb.addEventListener('removeItem', function (event) {
-    company.getValue(true).forEach(function (e) {
-        var tag = event.detail.value + "_" + e;
-        chart.series.values.forEach(function (v, i) {
-            if (v.dataFields.valueY === tag) {
-                delete chart.exporting.dataFields[tag];
-                chart.series.removeIndex(i).dispose();
-            }
-        });
-    });
-}, passive);
-ecompany.addEventListener('addItem', function (e) { return filter(e, true); }, passive);
-ecompany.addEventListener('removeItem', function (event) {
-    psmb.getValue(true).forEach(function (e) {
-        var tag = event.detail.value + "_" + e;
-        chart.series.values.forEach(function (v, i) {
-            if (v.dataFields.valueY === tag) {
-                delete chart.exporting.dataFields[tag];
-                chart.series.removeIndex(i).dispose();
-            }
-        });
-    });
-}, passive);
+epsmb.addEventListener('addItem', function (_) { return filter(); }, passive);
+epsmb.addEventListener('removeItem', function (_) { return filter(); }, passive);
+ecompany.addEventListener('addItem', function (_) { return filter(); }, passive);
+ecompany.addEventListener('removeItem', function (_) { return filter(); }, passive);
 var clickMap = function (e) {
     if (e !== undefined && polygons[e.detail.value] !== undefined)
         google.maps.event.trigger(polygons[e.detail.value], 'click', {});

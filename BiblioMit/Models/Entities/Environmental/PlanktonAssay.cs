@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BiblioMit.Models.Entities.Environmental.Plancton;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -59,11 +60,14 @@ namespace BiblioMit.Models
         [NotMapped]
         public int? AreaCode { get; set; }
         [ParseSkip]
+        public int? PlanktonUserId { get; set; }
+        public virtual PlanktonUser PlanktonUser { get; set; }
+        [ParseSkip]
         public virtual ICollection<Phytoplankton> Phytoplanktons { get; } = new List<Phytoplankton>();
         public override bool Equals(object obj)
         {
-            if (obj is null) return this as object is null;
-            if (this as object is null) return obj is null;
+            if (obj is null) return this is null;
+            if (this is null) return obj is null;
             if (ReferenceEquals(this, obj)) return true;
             return obj is PlanktonAssay q
             && Id == q.Id
@@ -87,15 +91,15 @@ namespace BiblioMit.Models
         [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Tests for nullity")]
         public static bool operator ==(PlanktonAssay x, PlanktonAssay y)
         {
-            if (x as object is null) return y as object is null;
+            if (x is null) return y is null;
             return x.Equals(y);
         }
         public static bool operator !=(PlanktonAssay x, PlanktonAssay y) => !(x == y);
         public override int GetHashCode() => HashCode.Combine(Id);
         public bool Equals(PlanktonAssay other)
         {
-            if (other as object is null) return this as object is null;
-            if (this as object is null) return other as object is null;
+            if (other is null) return this is null;
+            if (this is null) return other is null;
             if (ReferenceEquals(this, other)) return true;
             return Id.Equals(other.Id)
             && Id.Equals(other.Id)

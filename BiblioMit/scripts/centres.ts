@@ -72,11 +72,27 @@ var infowindow = new google.maps.InfoWindow({
 var tableInfo: any = {};
 var polygons: any = {};
 var markers: any = {};
+var companies: any = {};
+var psmbs: any = {};
 var bnds: google.maps.LatLngBounds = new google.maps.LatLngBounds();
 var showInfo = function (_e: any) {
     var id = this.zIndex;
-    var head = `<h4>${tableInfo[id].code} ${tableInfo[id].name}</h4><table><tr><th>Código</th><td align=""right"">${tableInfo[id].code}</td></tr><tr><th>Compañía</th><td align=""right"">${tableInfo[id].businessName}</td></tr><tr><th>RUT</th><td align=""right"">${tableInfo[id].rut}</td></tr><tr><th>Localidad</th><td align=""right"">${tableInfo[id].name}</td></tr><tr><th>Comuna</th><td align=""right"">${tableInfo[id].comuna}</td></tr><tr><th>Provincia</th><td align=""right"">${tableInfo[id].provincia}</td></tr><tr><th>Región</th><td align=""right"">${tableInfo[id].region}</td></tr></tr><tr><th>Área (Ha)</th><td align=""right"">`;
-    var tail = `</td></tr><tr><a href=""/Centres/Details/${id}"">Detalles</a></tr><tr><th>Fuentes</th><td></td></tr><tr><td>Sernapesca</td><td align=""right""><a target=""_blank"" href=""https://www.sernapesca.cl""><img src=""../images/ico/sernapesca.svg"" height=""20"" /></a></td></tr><tr><td>PER Mitilidos</td><td align=""right""><a target=""_blank"" href=""https://www.mejillondechile.cl""><img src=""../images/ico/mejillondechile.min.png"" height=""20"" /></a></td></tr><tr><td>Subpesca</td><td align=""right""><a target=""_blank"" href=""https://www.subpesca.cl""><img src=""../images/ico/subpesca.png"" height=""20"" /></a></td></tr>`;
+    var head = `<h4>${tableInfo[id].code} ${tableInfo[id].name}</h4>
+<table><tr><th>Código</th><td align=""right"">${tableInfo[id].code}</td></tr>
+<tr><th>Compañía</th><td align=""right"">${tableInfo[id].businessName}</td></tr>
+<tr><th>RUT</th><td align=""right"">${tableInfo[id].rut}</td></tr>
+<tr><th>Localidad</th><td align=""right"">${tableInfo[id].name}</td></tr>
+<tr><th>Comuna</th><td align=""right"">${tableInfo[id].comuna}</td></tr>
+<tr><th>Provincia</th><td align=""right"">${tableInfo[id].provincia}</td></tr>
+<tr><th>Región</th><td align=""right"">${tableInfo[id].region}</td></tr></tr>
+<tr><th>Área (Ha)</th><td align=""right"">`;
+    var tail = `</td></tr><tr><a href=""/Centres/Details/${id}"">Detalles</a></tr>
+<tr><th>Fuentes</th><td></td></tr><tr><td>Sernapesca</td>
+<td align=""right""><a target=""_blank"" href=""https://www.sernapesca.cl""><img src=""../images/ico/sernapesca.svg"" height=""20"" /></a></td></tr>
+<tr><td>PER Mitilidos</td>
+<td align=""right""><a target=""_blank"" href=""https://www.mejillondechile.cl""><img src=""../images/ico/mejillondechile.min.png"" height=""20"" /></a></td></tr>
+<tr><td>Subpesca</td>
+<td align=""right""><a target=""_blank"" href=""https://www.subpesca.cl""><img src=""../images/ico/subpesca.png"" height=""20"" /></a></td></tr>`;
     infowindow.setContent(head + Area(polygons[id].getPath().getArray()) + tail);
     infowindow.open(map, this);
 }
@@ -96,18 +112,20 @@ var addListenerOnPolygon = function (e: any) {
     }
 };
 var processMapData = function (dato: any) {
-    var consessionPolygon = new google.maps.Polygon({
-        paths: dato.position,
-        zIndex: dato.id,
-        strokeColor: '#FF0000',
-        strokeOpacity: 0.8,
-        strokeWeight: 2,
-        fillColor: '#FF0000',
-        fillOpacity: 0.35
-    });
-    consessionPolygon.setMap(map);
-    consessionPolygon.addListener('click', addListenerOnPolygon);
-    polygons[dato.id] = consessionPolygon;
+    if (!isresearch) {
+        var consessionPolygon = new google.maps.Polygon({
+            paths: dato.position,
+            zIndex: dato.id,
+            strokeColor: '#FF0000',
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: '#FF0000',
+            fillOpacity: 0.35
+        });
+        consessionPolygon.setMap(map);
+        consessionPolygon.addListener('click', addListenerOnPolygon);
+        polygons[dato.id] = consessionPolygon;
+    }
     var center = getBounds(dato.position).getCenter();
     bnds.extend(center);
     var marker = new google.maps.Marker({
@@ -118,12 +136,17 @@ var processMapData = function (dato: any) {
     tableInfo[dato.id] = {
         name: dato.name,
         comuna: dato.comuna,
-        comunaid: dato.comunaid,
         provincia: dato.provincia,
         code: dato.code,
         rut: dato.rut,
         bsnssName: dato.bsnssName
     }
+    if (!(dato.rut in companies)) companies[dato.rut] = {};
+    companies[dato.rut].push(dato.id);
+    if (!(dato.comunaid in psmbs)) psmbs[dato.comunaid] = {};
+    if (!(dato.provinciaid in psmbs)) psmbs[dato.provinciaid] = {};
+    if (!(dato.regionid in psmbs)) psmbs[dato.regionid] = {};
+    companies[dato.rut].push(dato.id);
     marker.addListener('click', showInfo);
     markers[dato.id] = marker;
     return marker;
@@ -143,42 +166,26 @@ try {
 } catch (e) { }
 var passive = supportsPassiveOption ? { passive: true } : false;
 //
-var filter = function (e: any, iscompany: boolean) {
-    var ch = iscompany ? company.getValue(false) : psmb.getValue(false);
-    tableInfo.forEach((m:any, i:number) => {
-        if (i !== e.value) {
-            markers[i].setMap(null);
-            markers[i].setMap(null);
-        } else {
-
-        }
+var filter = function () {
+    markers.forEach((m: any) => {
+        m.setMap(null);
+    });
+    company.getValue(false).forEach((c: any) => {
+        companies[c].forEach((s: any) => {
+            markers[s].setMap(map);
+        });
+    });
+    psmb.getValue(false).forEach((c: any) => {
+        psmbs[c].forEach((s: any) => {
+            markers[s].setMap(map);
+        });
     });
 }
 //variable choice listeners
-epsmb.addEventListener('addItem', (e: any) => filter(e, false), passive);
-epsmb.addEventListener('removeItem', (event: any) => {
-    company.getValue(true).forEach((e: any) => {
-        var tag = `${event.detail.value}_${e}`;
-        chart.series.values.forEach((v: any, i: number) => {
-            if (v.dataFields.valueY === tag) {
-                delete chart.exporting.dataFields[tag];
-                chart.series.removeIndex(i).dispose();
-            }
-        });
-    });
-}, passive);
-ecompany.addEventListener('addItem', (e: any) => filter(e, true), passive);
-ecompany.addEventListener('removeItem', (event: any) => {
-    psmb.getValue(true).forEach((e: any) => {
-        var tag = `${event.detail.value}_${e}`;
-        chart.series.values.forEach((v: any, i: number) => {
-            if (v.dataFields.valueY === tag) {
-                delete chart.exporting.dataFields[tag];
-                chart.series.removeIndex(i).dispose();
-            }
-        });
-    });
-}, passive);
+epsmb.addEventListener('addItem', (_: any) => filter(), passive);
+epsmb.addEventListener('removeItem', (_: any) => filter(), passive);
+ecompany.addEventListener('addItem', (_: any) => filter(), passive);
+ecompany.addEventListener('removeItem', (_: any) => filter(), passive);
 //trigger map click on selection
 var clickMap = function(e: any) {
     if (e !== undefined && polygons[e.detail.value] !== undefined)

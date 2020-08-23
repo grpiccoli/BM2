@@ -8,7 +8,7 @@
       "files": [ "dist/browser/signalr.min.js" ]
     },
     {
-      "library": "@fortawesome/fontawesome-free@5.13.0",
+      "library": "@fortawesome/fontawesome-free@5.14.0",
       "destination": "wwwroot/lib/@fortawesome/fontawesome-free",
       "files": [
         "css/all.min.css",
@@ -28,17 +28,17 @@
     },
     {
       "provider": "cdnjs",
-      "library": "moment.js@2.25.3",
+      "library": "moment.js@2.27.0",
       "destination": "wwwroot/lib/moment.js",
       "files": [ "moment.min.js", "locale/es.js" ]
     },
     {
-      "library": "ckeditor5@19.0.0",
+      "library": "ckeditor5@21.0.0",
       "destination": "wwwroot/lib/ckeditor5",
       "files": [ "package.json" ]
     },
     {
-      "library": "@amcharts/amcharts4@4.9.21",
+      "library": "@amcharts/amcharts4@4.9.37",
       "destination": "wwwroot/lib/@amcharts/amcharts4",
       "files": [
         "core.js",
@@ -56,19 +56,19 @@
       ]
     },
     {
-      "library": "@google/markerclustererplus@5.0.3",
+      "library": "@google/markerclustererplus@5.1.0",
       "destination": "wwwroot/lib/@google/markerclustererplus",
       "files": [
         "dist/markerclustererplus.min.js"
       ]
     },
     {
-      "library": "fabric@3.6.3",
+      "library": "fabric@4.0.0",
       "destination": "wwwroot/lib/fabric",
       "files": [ "dist/fabric.min.js" ]
     },
     {
-      "library": "alasql@0.6.0",
+      "library": "alasql@0.6.3",
       "destination": "wwwroot/lib/alasql",
       "files": [ "dist/alasql.min.js" ]
     },
@@ -78,7 +78,7 @@
       "files": [ "dist/clipboard.min.js" ]
     },
     {
-      "library": "angular@1.7.9",
+      "library": "angular@1.8.0",
       "destination": "wwwroot/lib/angular",
       "files": [ "angular.min.js" ]
     },
@@ -94,7 +94,7 @@
       ]
     },
     {
-      "library": "bootstrap@4.5.0",
+      "library": "bootstrap@4.5.2",
       "destination": "wwwroot/lib/bootstrap",
       "files": [
         "dist/css/bootstrap.min.css",
@@ -111,7 +111,7 @@
       ]
     },
     {
-      "library": "bootstrap-select@1.13.17",
+      "library": "bootstrap-select@1.13.18",
       "destination": "wwwroot/lib/bootstrap-select",
       "files": [
         "dist/css/bootstrap-select.min.css",
@@ -127,7 +127,7 @@
       ]
     },
     {
-      "library": "dropzone@5.7.0",
+      "library": "dropzone@5.7.2",
       "destination": "wwwroot/lib/dropzone",
       "files": [ "dist/min/dropzone.min.js", "dist/min/dropzone.min.css" ]
     },
@@ -141,7 +141,7 @@
       "destination": "wwwroot/lib/cldr-data"
     },
     {
-      "library": "cldrjs@0.5.1",
+      "library": "cldrjs@0.5.4",
       "destination": "wwwroot/lib/cldrjs",
       "files": [
         "dist/cldr.js",
@@ -167,7 +167,7 @@
       ]
     },
     {
-      "library": "flatpickr@4.6.3",
+      "library": "flatpickr@4.6.6",
       "destination": "wwwroot/lib/flatpickr",
       "files": [ "dist/flatpickr.min.css", "dist/flatpickr.min.js", "dist/l10n/es.js" ]
     },
@@ -186,12 +186,12 @@
       "files": [ "jquery.rut.min.js" ]
     },
     {
-      "library": "jspdf@1.5.3",
+      "library": "jspdf@2.0.0",
       "destination": "wwwroot/lib/jspdf",
-      "files": [ "dist/jspdf.min.js" ]
+      "files": [ "dist/jspdf.umd.min.js", "dist/jspdf.es.min.js" ]
     },
     {
-      "library": "pdfmake@0.1.65",
+      "library": "pdfmake@0.1.68",
       "destination": "wwwroot/lib/pdfmake",
       "files": [ "build/pdfmake.min.js", "build/vfs_fonts.js" ]
     },
@@ -215,7 +215,7 @@
       ]
     },
     {
-      "library": "jquery-validation@1.19.1",
+      "library": "jquery-validation@1.19.2",
       "destination": "wwwroot/lib/jquery-validation",
       "files": [
         "dist/jquery.validate.min.js",
@@ -233,7 +233,7 @@
       "files": [ "jquery.validate.unobtrusive.globalize.min.js" ]
     },
     {
-      "library": "nanogallery2@2.4.2",
+      "library": "nanogallery2@3.0.2",
       "destination": "wwwroot/lib/nanogallery2",
       "files": [
         "dist/css/nanogallery2.min.css",
@@ -241,12 +241,12 @@
       ]
     },
     {
-      "library": "@popperjs/core@2.4.0",
+      "library": "@popperjs/core@2.4.4",
       "destination": "wwwroot/lib/@popperjs/core",
       "files": [ "dist/umd/popper.min.js" ]
     },
     {
-      "library": "tippy.js@6.2.3",
+      "library": "tippy.js@6.2.6",
       "destination": "wwwroot/lib/tippy.js",
       "files": [ "dist/tippy-bundle.umd.js" ]
     },
@@ -256,7 +256,7 @@
       "files": [ "qrcode.min.js" ]
     },
     {
-      "library": "smartwizard@4.4.1",
+      "library": "smartwizard@5.1.1",
       "destination": "wwwroot/lib/smartwizard",
       "files": [
         "dist/css/smart_wizard.min.css",
@@ -269,7 +269,7 @@
       "files": [ "dist/umd/tooltip.min.js" ]
     },
     {
-      "library": "xlsx@0.16.0",
+      "library": "xlsx@0.16.6",
       "destination": "wwwroot/lib/xlsx",
       "files": [ "dist/xlsx.core.min.js" ]
     }

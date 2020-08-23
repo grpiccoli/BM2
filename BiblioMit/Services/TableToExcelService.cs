@@ -19,11 +19,11 @@ namespace BiblioMit.Services
         {
             _localizer = localizer;
         }
-        private int maxRow = 0;
+        private int maxRow;
         private ExcelWorksheet sheet;
         private Dictionary<(int, int), string> Matrix { get; set; }
-        private int RowIndex = 0;
-        private int ColumnIndex = 0;
+        private int RowIndex;
+        private int ColumnIndex;
         public async Task<ExcelPackage> ProcessAsync(string filePath)
         {
             using var stream = File.OpenRead(filePath);

@@ -322,7 +322,7 @@ var getList = function (name) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4, fetch("/ambiental/" + name + "list")
+                case 0: return [4, fetch("/json/" + name + "list.json")
                         .then(function (r) { return r.json(); })
                         .catch(function (e) { return console.error(e, name); })];
                 case 1: return [2, _a.sent()];
@@ -353,7 +353,7 @@ var init = function () {
         var cuencadata, oceanvarlist, cuencalist, comunadata, comunalist, groupvarlist, variablechoicesInit, psmbchoicesInit, buildchart, psmbdata, psmblist, genusvarlist, speciesvarlist, tllist, psmbchoices, variablechoices, tlchoices, clusters, callDatas, psmbchoices, variablechoices, clusters;
         return __generator(this, function (_a) {
             loadDates();
-            cuencadata = fetch('/ambiental/cuencadata')
+            cuencadata = fetch('/json/cuencadata.json')
                 .then(function (r) { return r.json(); })
                 .then(function (data) { return data.map(processMapData); })
                 .then(function (m) {
@@ -363,7 +363,7 @@ var init = function () {
             });
             oceanvarlist = getList('oceanvar');
             cuencalist = getList('cuenca');
-            comunadata = fetch('/ambiental/comunadata')
+            comunadata = fetch('/json/comunadata.json')
                 .then(function (r) { return r.json(); })
                 .then(function (data) { return data.map(processMapData); })
                 .then(function (m) { return markers = markers.concat(m); });
@@ -377,7 +377,7 @@ var init = function () {
                 return chartLoaded();
             });
             if (semaforo) {
-                psmbdata = fetch('/ambiental/psmbdata')
+                psmbdata = fetch('/json/psmbdata.json')
                     .then(function (r) { return r.json(); })
                     .then(function (data) { return data.map(processMapData); })
                     .then(function (m) { return markers = markers.concat(m); });

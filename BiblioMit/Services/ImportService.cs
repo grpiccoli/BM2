@@ -35,7 +35,7 @@ namespace BiblioMit.Services
         private List<string> Headers { get; set; }
         private Registry PhytoStart { get; set; }
         private Registry PhytoEnd { get; set; }
-        private int StartRow { get; set; } = 0;
+        private int StartRow { get; set; }
         private Tdata PhytoTData { get; set; }
         private Dictionary<string, Dictionary<string, int>> InSet { get; set; } = new Dictionary<string, Dictionary<string, int>>();
         private MethodInfo FirstOrDefaultAsyncMethod { get; set; }

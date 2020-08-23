@@ -191,6 +191,20 @@ namespace BiblioMit.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PlanktonUser",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(nullable: true),
+                    Password = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PlanktonUser", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Products",
                 columns: table => new
                 {
@@ -555,7 +569,8 @@ namespace BiblioMit.Migrations
                     Temperature = table.Column<double>(nullable: true),
                     Oxigen = table.Column<double>(nullable: true),
                     Ph = table.Column<double>(nullable: true),
-                    Salinity = table.Column<double>(nullable: true)
+                    Salinity = table.Column<double>(nullable: true),
+                    PlanktonUserId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -576,6 +591,12 @@ namespace BiblioMit.Migrations
                         name: "FK_PlanktonAssays_Phones_PhoneId",
                         column: x => x.PhoneId,
                         principalTable: "Phones",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_PlanktonAssays_PlanktonUser_PlanktonUserId",
+                        column: x => x.PlanktonUserId,
+                        principalTable: "PlanktonUser",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -1461,6 +1482,11 @@ namespace BiblioMit.Migrations
                 column: "PhoneId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PlanktonAssays_PlanktonUserId",
+                table: "PlanktonAssays",
+                column: "PlanktonUserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PlanktonAssays_PsmbId",
                 table: "PlanktonAssays",
                 column: "PsmbId");
@@ -1794,6 +1820,9 @@ namespace BiblioMit.Migrations
 
             migrationBuilder.DropTable(
                 name: "Phones");
+
+            migrationBuilder.DropTable(
+                name: "PlanktonUser");
 
             migrationBuilder.DropTable(
                 name: "SamplingEntities");

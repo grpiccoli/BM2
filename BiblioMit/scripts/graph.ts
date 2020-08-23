@@ -301,7 +301,7 @@ epsmb.addEventListener('removeItem', (event: any) => {
 }, passive);
 //get lists of choices
 var getList = async function(name: string) {
-    return await fetch(`/ambiental/${name}list`)
+    return await fetch(`/json/${name}list.json`)
         .then(r => r.json())
         .catch(e => console.error(e, name));
 }
@@ -325,7 +325,7 @@ var chartLoaded = function() {
 //init function
 var init = async function () {
     loadDates();
-    var cuencadata = fetch('/ambiental/cuencadata')
+    var cuencadata = fetch('/json/cuencadata.json')
         .then(r => r.json())
         .then(data => data.map(processMapData))
         .then(m => {
@@ -335,7 +335,7 @@ var init = async function () {
         });
     var oceanvarlist = getList('oceanvar');
     var cuencalist = getList('cuenca');
-    var comunadata = fetch('/ambiental/comunadata')
+    var comunadata = fetch('/json/comunadata.json')
         .then(r => r.json())
         .then(data => data.map(processMapData))
         .then(m => markers = markers.concat(m));
@@ -349,7 +349,7 @@ var init = async function () {
         return chartLoaded();
     });
     if (semaforo) {
-        var psmbdata = fetch('/ambiental/psmbdata')
+        var psmbdata = fetch('/json/psmbdata.json')
             .then(r => r.json())
             .then(data => data.map(processMapData))
             .then(m => markers = markers.concat(m));

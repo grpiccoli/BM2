@@ -30,7 +30,7 @@ namespace BiblioMit.Extensions
                 var scriptBuilder = webPage.ViewContext.HttpContext.Items[name + BLOCK_BUILDER] as StringBuilder ?? new StringBuilder();
 
                 template?.Invoke(null).WriteTo(tw, encoder);
-                scriptBuilder.Append(sb.ToString());
+                scriptBuilder.Append(sb);
                 webPage.ViewContext.HttpContext.Items[name + BLOCK_BUILDER] = scriptBuilder;
 
                 return new HtmlString(string.Empty);

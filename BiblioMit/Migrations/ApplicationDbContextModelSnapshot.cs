@@ -18,7 +18,7 @@ namespace BiblioMit.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.4")
+                .HasAnnotation("ProductVersion", "3.1.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -459,6 +459,24 @@ namespace BiblioMit.Migrations
                     b.ToTable("GenusPhytoplanktons");
                 });
 
+            modelBuilder.Entity("BiblioMit.Models.Entities.Environmental.Plancton.PlanktonUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PlanktonUser");
+                });
+
             modelBuilder.Entity("BiblioMit.Models.Entry", b =>
                 {
                     b.Property<int>("Id")
@@ -820,6 +838,9 @@ namespace BiblioMit.Migrations
                     b.Property<int?>("PhoneId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("PlanktonUserId")
+                        .HasColumnType("int");
+
                     b.Property<int>("PsmbId")
                         .HasColumnType("int");
 
@@ -848,6 +869,8 @@ namespace BiblioMit.Migrations
                     b.HasIndex("LaboratoryId");
 
                     b.HasIndex("PhoneId");
+
+                    b.HasIndex("PlanktonUserId");
 
                     b.HasIndex("PsmbId");
 
@@ -1844,6 +1867,10 @@ namespace BiblioMit.Migrations
                     b.HasOne("BiblioMit.Models.Phone", "Phone")
                         .WithMany()
                         .HasForeignKey("PhoneId");
+
+                    b.HasOne("BiblioMit.Models.Entities.Environmental.Plancton.PlanktonUser", "PlanktonUser")
+                        .WithMany("Assays")
+                        .HasForeignKey("PlanktonUserId");
 
                     b.HasOne("BiblioMit.Models.Psmb", "Psmb")
                         .WithMany("PlanktonAssays")
