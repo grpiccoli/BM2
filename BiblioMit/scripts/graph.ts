@@ -234,7 +234,7 @@ var fetchData = async function(url: string, tag: string, name: string) {
 var generatefetchData = async function(v: any, p: any, sd: any, ed: any) {
     var tag = `${v.value}_${p.value}`;
     var name = `${v.label} ${p.label}`;
-    var url = `/ambiental/data?area=${p.value}&var=${v.value}&start=${sd}&end=${ed}`;
+    var url = `/ambiental/data?area=${p.value}&type=${v.value.charAt(0)}&id=${v.value.substring(1)}&start=${sd}&end=${ed}`;
     return fetchData(url, tag, name);
 }
 //interface to fetch collections to server and load them into graph

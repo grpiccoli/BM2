@@ -248,7 +248,7 @@ var generatefetchData = function (v, p, sd, ed) {
         return __generator(this, function (_a) {
             tag = v.value + "_" + p.value;
             name = v.label + " " + p.label;
-            url = "/ambiental/data?area=" + p.value + "&var=" + v.value + "&start=" + sd + "&end=" + ed;
+            url = "/ambiental/data?area=" + p.value + "&type=" + v.value.charAt(0) + "&id=" + v.value.substring(1) + "&start=" + sd + "&end=" + ed;
             return [2, fetchData(url, tag, name)];
         });
     });
