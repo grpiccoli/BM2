@@ -35,7 +35,9 @@
 .carousel-inner, .container-fill, .carousel, .item, .fill {
   height: 225px;
   width: 100%;
-  background-position: center center; }
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover; }
 
 .btn-info {
   color: lightblue;

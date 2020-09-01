@@ -30,7 +30,7 @@
     <button class="nav-link dropdown-toggle btn btn-dark" id="lang" role="button" data-toggle="dropdown" aria-haspopup="true"
             aria-expanded="false">
         <figure class="text-center">
-            <img class="flag-icon" src="~/images/ico/@(Localizer["gb"].Value).svg" />
+            <img class="flag-icon" alt="@Localizer["English"]" src="~/images/ico/@(Localizer["gb"].Value).svg" />
             <figcaption class="light-caption">@Localizer["English"]</figcaption>
         </figure>
     </button>
@@ -39,7 +39,7 @@
               asp-action="SetLanguage" asp-route-returnUrl="@returnUrl"
               method="post" role="form" asp-route-culture="@Localizer["es"].Value">
             <a class="dropdown-item" onclick="$('#selectLanguage').submit();">
-                <img class="flag-icon" src="~/images/ico/@(Localizer["cl"].Value).svg" /> @Localizer["Español"]
+                <img class="flag-icon" alt="@Localizer["Español"]" src="~/images/ico/@(Localizer["cl"].Value).svg" /> @Localizer["Español"]
             </a>
         </form>
     </div>

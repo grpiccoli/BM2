@@ -99,15 +99,15 @@ var showInfo = function (_e: any) {
 <tr><th scope="row">${titles[5]}</th><td></td></tr>
 <tr><td>Sernapesca</td>
 <td align="right">
-<a target="_blank" href="https://www.sernapesca.cl">
+<a target="_blank" href="https://www.sernapesca.cl" rel="noopener">
 <img src="../images/ico/sernapesca.svg" height="20" /></a></td></tr>
 <tr><td>PER Mitílidos</td>
 <td align="right">
-<a target="_blank" href="https://www.mejillondechile.cl">
+<a target="_blank" href="https://www.mejillondechile.cl" rel="noopener">
 <img src="../images/ico/mejillondechile.min.png" height="20" /></a></td></tr>
 <tr><td>Subpesca</td>
 <td align="right">
-<a target="_blank" href="https://www.subpesca.cl">
+<a target="_blank" href="https://www.subpesca.cl" rel="noopener">
 <img src="../images/ico/subpesca.png" height="20" /></a></td></tr>`;
     infowindow.setContent(content);
     infowindow.open(map, this);

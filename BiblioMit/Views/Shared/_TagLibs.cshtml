@@ -3,98 +3,76 @@
 @using BiblioMit.Services
 
 @{
-    var style = $"{Model.Item1}Styles";
-    var script = $"{Model.Item1}Scripts";
-    bool dev = false;
-    @*<environment exclude="Development">
-        @{
-            dev = false;
-        }
-    </environment>*@
-    foreach (var lib in Model.Item2)
+    string style = $"{Model.Item1}Styles";
+    string script = $"{Model.Item1}Scripts";
+    foreach (string lib in Model.Item2)
     {
         var bundles = Bundler.GetBundles(lib);
         var continuar = false;
-        if (bundles != null && bundles.Any()) 
-        { 
+        if (bundles != null && bundles.Any())
+        {
             foreach (var bundle in bundles)
             {
-                var file = bundle.OutputFileName.Replace("wwwroot", "~");
-                if (file.Contains(".css"))
+                string file = bundle.OutputFileName.Replace("wwwroot", "~");
+                string ext = System.IO.Path.GetExtension(file);
+                switch (ext)
                 {
-                    if (dev)
-                    {
-                        foreach (var input in bundle.InputFiles)
-                        {
-                            this.Block(style, @<link href="@input.Insert(0, "~/")" rel="stylesheet" asp-append-version="true" />);
-                        }
-                    }
-                    else
-                    {
+                    case ".css":
                         this.Block(style, @<link href="@file" rel="stylesheet" asp-append-version="true" />);
-                    }
-                }
-                else
-                {
-                    if (dev)
-                    {
-                        foreach (var input in bundle.InputFiles)
-                        {
-                            this.Block(script, @<script src="@input.Insert(0, "~/")" asp-append-version="true"></script>);
-                        }
-                    }
-                    else
-                    {
+                        break;
+                    case ".js":
                         this.Block(script, @<script src="@file" asp-append-version="true"></script>);
-                    }
+                        break;
+                    case ".woff2":
+                    case ".woff":
+                    case ".ttf":
+                        this.Block(style, @<link href="@file" rel="preload" as="font" type="font/@ext.TrimStart('.')" asp-append-version="true" />);
+                        break;
                 }
                 continuar = true;
             }
         }
-        if (continuar) { continue;}
+        if (continuar) { continue; }
         var l = Libman.GetLibs(lib);
-        if (l != null) { foreach (var file in l.Files)
+        if (l != null && l.Files.Any())
         {
-            if (dev)
+            foreach (var file in l.Files)
             {
-                if (file.Contains(".css"))
-                {
-                    this.Block(style, @<link href="@($"{l.Destination.Replace("wwwroot", "")}/{file}")" rel="stylesheet" />);
-                }
-                else if (file.Contains(".js"))
-                {
-                    this.Block(script, @<script src="@($"{l.Destination.Replace("wwwroot", "")}/{file}")"></script>);
-                }
-            }
-            else
-            {
-                var url = "unpkg.com";
-                switch (l.Provider)
+                var url = string.Empty;
+                var provider = l.Provider ?? "jsdelivr";
+                switch (provider)
                 {
                     case "cdnjs":
-                    l.Library = l.Library.Replace("@", "/");
-                    url = "cdnjs.cloudflare.com/ajax/libs";
-                    break;
-                    case "":
+                        l.Library = l.Library.Replace("@", "/");
+                        url = "cdnjs.cloudflare.com/ajax/libs";
+                        break;
+                    case "unpkg":
+                        url = "unpkg.com";
+                        break;
+                    case "jsdelivr":
+                        url = "cdn.jsdelivr.net/npm";
+                        break;
                     default:
-                    l.Provider = "unpkg";
-                    break;
+                        break;
                 }
-                if (file.Contains(".css"))
+                var f = $"{l.Destination}/{file}";
+                var href = $"{Context.Request.Scheme}://{url}/{l.Library}/{file}";
+                var ext = System.IO.Path.GetExtension(file);
+                switch (ext)
                 {
-                    this.Block(style, @<link href="@($"{Context.Request.Scheme}://{url}/{l.Library}/{file}")" rel="stylesheet"
-                                  asp-fallback-href="@($"{l.Destination.Replace("wwwroot", "")}/{file}")"
-                                  asp-subresource-integrity-href="@($"{l.Destination}/{file}")"
-                                      />);
-                }
-                else if (file.Contains(".js"))
-                {
-                    this.Block(script, @<script src="@($"{Context.Request.Scheme}://{url}/{l.Library}/{file}")"
-                                    asp-fallback-src="@($"{l.Destination.Replace("wwwroot", "")}/{file}")"
-                                    asp-subresource-integrity-src="@($"{l.Destination}/{file}")"
-                                        ></script>);
+                    case ".css":
+                        this.Block(style, @<link href="@href" rel="stylesheet" asp-subresource-integrity-href="@f" asp-fallback-href="@f"/>);
+                        break;
+                    case ".js":
+                        this.Block(script, @<script src="@href" asp-subresource-integrity-src="@f" asp-fallback-src="@f" ></script>);
+                        break;
+                    case ".woff2":
+                    case ".woff":
+                    case ".ttf":
+                        this.Block(style, @<link href="@href" rel="preload" as="font" type="font/@ext.TrimStart('.')" crossorigin="anonymous" />);
+                        break;
                 }
             }
-        }}
+        }
     }
 }

@@ -117,7 +117,7 @@
                     }
                     else
                     {
-                        <a target="_blank" href="@Html.DisplayFor(modelItem => ((BiblioMit.Models.Entities.Centres.ResearchCentre)item.ConsessionOrResearch).Url)">
+                        <a target="_blank" rel="noopener" href="@Html.DisplayFor(modelItem => ((BiblioMit.Models.Entities.Centres.ResearchCentre)item.ConsessionOrResearch).Url)">
                     @Html.DisplayFor(modelItem => item.ConsessionOrResearch.Name)
                         </a>
                     }
@@ -136,10 +136,10 @@
                                 </span>
                             </a>
                             <p style="font-size:smaller">
-                                <a target="_blank" href="@Html.DisplayFor(modelItem => ((BiblioMit.Models.Entities.Centres.ResearchCentre)item.ConsessionOrResearch).Url)">
+                                <a target="_blank" rel="noopener" href="@Html.DisplayFor(modelItem => ((BiblioMit.Models.Entities.Centres.ResearchCentre)item.ConsessionOrResearch).Url)">
                                 <strong>@Html.DisplayFor(modelItem => item.ConsessionOrResearch.Name)</strong>
                                     </a><br/>
-                                <a target="_blank" href="https://www.google.com/maps/search/?api=1&query=@item.ConsessionOrResearch.Address">@Html.DisplayFor(modelItem => item.ConsessionOrResearch.Address)</a>
+                                <a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=@item.ConsessionOrResearch.Address">@Html.DisplayFor(modelItem => item.ConsessionOrResearch.Address)</a>
                             </p>
                         </div>
                         <div  style="float:left;width:45vw;">
@@ -165,7 +165,7 @@
                     </div>
                 </td>
                 <td class="hidden-xs" title="Horario: @Html.DisplayFor(modelItem => item.OpenHr) - @Html.DisplayFor(modelItem => item.CloseHr) Hrs">
-                    <a target="_blank" href="https://www.google.com/maps/search/?api=1&query=@item.ConsessionOrResearch.Address">@Html.DisplayFor(modelItem => item.ConsessionOrResearch.Address)</a>
+                    <a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=@item.ConsessionOrResearch.Address">@Html.DisplayFor(modelItem => item.ConsessionOrResearch.Address)</a>
                 </td>
                 @if (User.IsInRole("Manager"))
                 {

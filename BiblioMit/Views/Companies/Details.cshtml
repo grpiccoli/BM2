@@ -63,7 +63,7 @@
                             <a style="font-size:smaller" asp-controller="Centres" asp-action="Details" asp-route-id="@item.Id">Detalles</a>
                         </td>
                         <td style="vertical-align:middle">
-                            <a target="_blank" href="https://www.google.cl/maps/place/@item.Address, @item.Commune.Name">@item.Address, @item.Commune.GetFullName()</a><br/>
+                            <a target="_blank" rel="noopener" href="https://www.google.cl/maps/place/@item.Address, @item.Commune.Name">@item.Address, @item.Commune.GetFullName()</a><br/>
                         </td>
                         <td style="font-family:'Arial Narrow'">
                             @foreach (Contact contact in item.Contacts)

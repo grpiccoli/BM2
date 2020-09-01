@@ -81,6 +81,12 @@
     ]
   },
   {
+    "outputFileName": "wwwroot/js/modernizr-custom.min.js",
+    "inputFiles": [
+      "scripts/modernizr-custom.js"
+    ]
+  },
+  {
     "outputFileName": "wwwroot/js/tablePopover.min.js",
     "inputFiles": [
       "scripts/tablePopover.js"

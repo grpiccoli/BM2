@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "defaultProvider": "unpkg",
+  "defaultProvider": "jsdelivr",
   "libraries": [
     {
       "library": "@aspnet/signalr@1.1.4",
@@ -19,12 +19,6 @@
         "webfonts/fa-regular-400.woff",
         "webfonts/fa-regular-400.ttf"
       ]
-    },
-    {
-      "provider": "cdnjs",
-      "library": "modernizr@2.8.3",
-      "destination": "wwwroot/lib/modernizr",
-      "files": [ "modernizr.min.js" ]
     },
     {
       "provider": "cdnjs",

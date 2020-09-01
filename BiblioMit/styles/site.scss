@@ -499,3 +499,30 @@ ul.correct-ul > li {
         }
     }
 }*/
+
+.webp {
+    #ribbons-chorito {
+        background-image: url("/images/ribbons/chorito.min.webp")
+    }
+
+    #ribbons-research {
+        background-image: url("/images/ribbons/research.min.webp")
+    }
+
+    #ribbons-library {
+        background-image: url("/images/ribbons/library_banner_1140_1140x225.min.webp")
+    }
+}
+.no-webp {
+    #ribbons-library {
+        background-image: url("/images/ribbons/library_banner_1140_1140x225.min.jpg")
+    }
+
+    #ribbons-research {
+        background-image: url("/images/ribbons/research.min.jpg")
+    }
+
+    #ribbons-chorito {
+        background-image: url("/images/ribbons/chorito.min.jpg")
+    }
+}

@@ -69,7 +69,7 @@
                 @Html.DisplayNameFor(model => model.Address)
             </dt>
             <dd>
-                <a target="_blank" href="https://www.google.cl/maps/search/?api=1&query=@( Model.Polygon.Vertices.First().Longitude + "," + Model.Polygon.Vertices.First().Latitude)">@Html.DisplayFor(model => model.Address)</a>
+                <a target="_blank" rel="noopener" href="https://www.google.cl/maps/search/?api=1&query=@( Model.Polygon.Vertices.First().Longitude + "," + Model.Polygon.Vertices.First().Latitude)">@Html.DisplayFor(model => model.Address)</a>
             </dd>
             <dt>
                 @Html.DisplayNameFor(model => model.Company)
@@ -218,8 +218,8 @@ window.onload = function initMap() {
                     '<h4>Concesi&oacuten ' + String(array[i][1]) + '</h4>' +
                     '<div id="bodyContent">' +
                     '<p><b>Localidad : ' + String(array[i][4]) + '</b></p>' +
-                    '<p align="right">Fuentes: <a target="_blank" href="http://www.sernapesca.cl"><img src="~/images/ico/sernapesca.svg" width="100" /></a>' +
-                    '<text> | </text><a target="_blank" href="http://www.subpesca.cl"><img src="~/images/ico/subpesca.svg" width="100" /></a>.</p>' +
+                    '<p align="right">Fuentes: <a target="_blank" href="http://www.sernapesca.cl" rel="noopener"><img src="~/images/ico/sernapesca.svg" width="100" /></a>' +
+                    '<text> | </text><a target="_blank" href="http://www.subpesca.cl" rel="noopener"><img src="~/images/ico/subpesca.svg" width="100" /></a>.</p>' +
                     '</div>' +
     '</div>');
                 infowindow.open(map, marker);

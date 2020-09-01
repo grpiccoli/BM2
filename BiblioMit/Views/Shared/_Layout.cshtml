@@ -2,7 +2,10 @@
 <html lang="@Localizer["en"]">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+    <meta http-equiv="MSThemeCompatible" content="Yes" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no, user-scalable=yes, maximum-scale=5" />
     <title>@ViewData["Title"] - BiblioMit</title>
     <base href="~/" />
     <script>
@@ -19,6 +22,7 @@
         };
     </script>
     <meta name="author" content="Epic Solutions" />
+    <meta name="description" content="@Localizer["Library and digital repository for Mytilus chilensis Mussel species"]" />
     <open-graph-website site-name="BiblioMit"
                         title="@ViewData["Title"]"
                         main-image="@(new OpenGraphImage(
@@ -31,7 +35,7 @@
         @{
             var website = new WebSite()
             {
-                AlternateName = "Biblioteca y repositorio digital de Mytilus chilensis",
+                AlternateName = Localizer["Library and digital repository for Mytilus chilensis Mussel species"].Value,
                 Name = "BiblioMit - " + ViewData["Title"],
                 Url = new Uri($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")
             };
@@ -42,7 +46,7 @@
     @Html.Raw(new TwitterCardSummaryLargeImage
 {
     Title = "BiblioMit",
-    Description = "Biblioteca y repositorio digital de Mytilus chilensis",
+    Description = Localizer["Library and digital repository for Mytilus chilensis Mussel species"].Value,
     CreatorUsername = "@guille_arp",
     SiteUsername = "@guille_arp"
 })
@@ -66,7 +70,32 @@
         <meta name="google-site-verification" content="g-pGvrm_POLRtvTDGYJTTkKtecLY11qo0zOeNVMY2Eg" />
     </environment>
     <partial name="_Favicons" />
-    <partial name="_TagLibs" model='("TOP", new HashSet<string> { "jquery", "bootstrap", "@fortawesome/fontawesome-free", "site", "modal-action" })' />
+
+    <link rel="dns-prefetch" href="https://www.google.com">
+    <link rel="preconnect" href="https://www.google.com" crossorigin="anonymous">
+
+    <link rel="dns-prefetch" href="https://www.google.cl">
+    <link rel="preconnect" href="https://www.google.cl" crossorigin="anonymous">
+
+    <link rel="dns-prefetch" href="https://www.google.co.nz">
+    <link rel="preconnect" href="https://www.google.co.nz" crossorigin="anonymous">
+
+    <link rel="dns-prefetch" href="https://stats.g.doubleclick.net">
+    <link rel="preconnect" href="https://stats.g.doubleclick.net" crossorigin="anonymous">
+
+    <link rel="dns-prefetch" href="https://static.xx.fbcdn.net">
+    <link rel="preconnect" href="https://static.xx.fbcdn.net" crossorigin="anonymous">
+
+    <link rel="dns-prefetch" href="https://www.facebook.com">
+    <link rel="preconnect" href="https://www.facebook.com" crossorigin="anonymous">
+
+    <link rel="dns-prefetch" href="https://connect.facebook.net">
+    <link rel="preconnect" href="https://connect.facebook.com" crossorigin="anonymous">
+
+    <link rel="dns-prefetch" href="https://www.google-analytics.com">
+    <link rel="preconnect" href="https://www.google-analytics.com" crossorigin="anonymous">
+
+    <partial name="_TagLibs" model='("TOP", new HashSet<string> { "jquery", "bootstrap", "@fortawesome/fontawesome-free", "site", "modal-action", "modernizr-custom" })' />
     @this.WriteBlocks("TOPStyles")
     @this.WriteBlocks("Styles")
     @RenderSection("Styles", required: false)
@@ -139,8 +168,8 @@
                     </div>
                 </div>
                 <div class="col-12 col-md-6">
-                    <a target="_blank" href="https://www.epicsolutions.cl" class="float-right">
-                        <img src="~/epic_light_hor.svg" alt="epic solutions" class="img-responsive" height="20" /> &copy; @DateTime.Now.Year - BiblioMit
+                    <a target="_blank" href="https://www.epicsolutions.cl" class="float-right" rel="noopener">
+                        <img src="~/epic_light_hor.svg" alt="epic solutions" class="img-responsive" height="20" asp-append-version="true" /> &copy; @DateTime.Now.Year - BiblioMit
                     </a>
                 </div>
             </div>

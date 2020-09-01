@@ -16,16 +16,19 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using WebEssentials.AspNetCore.Pwa;
 
 namespace BiblioMit
 {
@@ -141,6 +144,8 @@ namespace BiblioMit
                 ).AddJsonOptions(o => 
                     o.JsonSerializerOptions.IgnoreNullValues = true);
 
+            services.AddProgressiveWebApp(new PwaOptions { EnableCspNonce = true });
+
             services.ConfigureNonBreakingSameSiteCookies();
 
             services.AddHsts(options =>
@@ -201,10 +206,21 @@ namespace BiblioMit
             var di = new DirectoryInfo(Path.Combine(env?.WebRootPath, string.Join(ch, path)));
 
             app.UseHttpsRedirection();
+            FileExtensionContentTypeProvider provider = new FileExtensionContentTypeProvider();
+            provider.Mappings[".webmanifest"] = "application/manifest+json";
 
             app.UseDefaultFiles();
 
-            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                ContentTypeProvider = provider,
+                OnPrepareResponse = ctx =>
+                {
+                    const int durationInSecond = 60 * 60 * 24 * 365;
+                    ctx.Context.Response.Headers[HeaderNames.CacheControl] =
+                        "public,max-age=" + durationInSecond;
+                }
+            });
 
             app.UseCookiePolicy();
 
