@@ -1,6 +1,6 @@
 ﻿@model string
-@{ var version = string.IsNullOrWhiteSpace(Model) ? "4" : Model; }
-@if (int.Parse(version[0].ToString()) >= 4)
+@{ string version = string.IsNullOrWhiteSpace(Model) ? "4" : Model; }
+@if (version[0] == '4')
 {
     @this.Blocks("TOPScripts",
     @<script src="https://www.amcharts.com/lib/@version/core.js"></script>,
