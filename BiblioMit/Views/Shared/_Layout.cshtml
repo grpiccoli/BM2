@@ -5,7 +5,7 @@
     <meta http-equiv="MSThemeCompatible" content="Yes" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no, user-scalable=yes, maximum-scale=5" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no, maximum-scale=5" />
     <title>@ViewData["Title"] - BiblioMit</title>
     <base href="~/" />
     <script>
@@ -54,17 +54,16 @@
     @*<script src="~/js/google-ads.js"></script>*@
     <environment exclude="Development">
         <script>
-            (function (w, d, s, l, i) {
-                w[l] = w[l] || []; w[l].push({
-                    'gtm.start':
-                        new Date().getTime(), event: 'gtm.js'
-                }); var f = d.getElementsByTagName(s)[0],
-                    j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
-                        'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
-            })(window, document, 'script', 'dataLayer', 'GTM-W7K9PRH');</script>
+            (function (e, t, n, i, s, a, c) {
+                e[n] = e[n] || function () { (e[n].q = e[n].q || []).push(arguments) }
+                ; a = t.createElement(i); c = t.getElementsByTagName(i)[0]; a.async = true; a.src = s; c.parentNode.insertBefore(a, c)
+            })(window, document, "galite", "script", "https://cdn.jsdelivr.net/npm/ga-lite@2/dist/ga-lite.min.js");
+            galite('create', 'UA-46146363-2', 'auto');
+            galite('send', 'pageview');
+        </script>
         <!-- End Google Tag Manager -->
         <!-- Global site tag (gtag.js) - Google Analytics -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-46146363-2"></script>
+        @*<script async src="https://www.googletagmanager.com/gtag/js?id=UA-46146363-2"></script>*@
         @*<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>*@
         @*<script src="~/js/google-ads.min.js" asp-append-version="true"></script>*@
         <meta name="google-site-verification" content="g-pGvrm_POLRtvTDGYJTTkKtecLY11qo0zOeNVMY2Eg" />
@@ -102,10 +101,10 @@
 </head>
 <body>
     <!-- Google Tag Manager (noscript) -->
-    <noscript>
-        <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W7K9PRH"
-                height="0" width="0" style="display:none;visibility:hidden"></iframe>
-    </noscript>
+    @*<noscript>
+            <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W7K9PRH"
+                    height="0" width="0" style="display:none;visibility:hidden"></iframe>
+        </noscript>*@
     <!-- End Google Tag Manager (noscript) -->
     <header>
         <div class="fixed-top">

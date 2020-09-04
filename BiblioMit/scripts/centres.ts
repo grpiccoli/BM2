@@ -54,7 +54,7 @@ if (esp) {
     choiceOps.itemSelectText = 'Presione para seleccionar';
     choiceOps.maxItemText = (maxItemCount: number) => `Máximo ${maxItemCount} valores`;
 }
-var epsmb = document.getElementById('area');
+var epsmb = document.getElementById('psmb');
 var ecompany = document.getElementById('company');
 //psmb load choices
 choiceOps.placeholderValue = esp ? 'Seleccione comunas' : 'Select communes';
@@ -141,11 +141,11 @@ var processMapData = function (dato: any) {
         rut: dato.rut,
         bsnssName: dato.bsnssName
     }
-    if (!(dato.rut in companies)) companies[dato.rut] = {};
+    if (!(dato.rut in companies)) companies[dato.rut] = [];
     companies[dato.rut].push(dato.id);
-    if (!(dato.comunaid in psmbs)) psmbs[dato.comunaid] = {};
-    if (!(dato.provinciaid in psmbs)) psmbs[dato.provinciaid] = {};
-    if (!(dato.regionid in psmbs)) psmbs[dato.regionid] = {};
+    if (!(dato.comunaid in psmbs)) psmbs[dato.comunaid] = [];
+    if (!(dato.provinciaid in psmbs)) psmbs[dato.provinciaid] = [];
+    if (!(dato.regionid in psmbs)) psmbs[dato.regionid] = [];
     companies[dato.rut].push(dato.id);
     marker.addListener('click', showInfo);
     markers[dato.id] = marker;
@@ -193,14 +193,14 @@ var clickMap = function(e: any) {
 }
 //get lists of choices
 var getList = async function (name: string) {
-    return await fetch(`/ambiental/${name}list`)
+    return await fetch(`/json/${name}list.json`)
         .then(r => r.json())
         .catch(e => console.error(e, name));
 }
 var init = async function () {
     var name = isresearch ? 'research' : 'farm';
     var name2 = isresearch ? 'institution' : 'company';
-    var mappromise = fetch(`/ambiental/${name}data`)
+    var mappromise = fetch(`/json/${name}data.json`)
         .then(r => r.json())
         .then(data => data.map(processMapData))
         .then(m => {

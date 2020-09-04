@@ -45,6 +45,19 @@ namespace BiblioMit.Services
             WriteJson(nameof(AmbientalController.CuencaList));
             WriteJson(nameof(AmbientalController.ComunaList));
             WriteJson(nameof(AmbientalController.TLList));
+
+            WriteJson(nameof(AmbientalController.ComunaResearchList));
+            WriteJson(nameof(AmbientalController.ComunaFarmList));
+            WriteJson(nameof(AmbientalController.ProvinciaResearchList));
+            WriteJson(nameof(AmbientalController.ProvinciaFarmList));
+            WriteJson(nameof(AmbientalController.RegionList));
+            WriteJson(nameof(AmbientalController.InstitutionList));
+            WriteJson(nameof(AmbientalController.CompanyList));
+            WriteJson(nameof(AmbientalController.ResearchList));
+            WriteJson(nameof(AmbientalController.FarmList));
+            WriteJson(nameof(AmbientalController.ResearchData));
+            WriteJson(nameof(AmbientalController.FarmData));
+
             PlanktonUpdate();
         }
         public void PlanktonUpdate()

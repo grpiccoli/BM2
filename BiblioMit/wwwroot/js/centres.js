@@ -85,7 +85,7 @@ if (esp) {
     choiceOps.itemSelectText = 'Presione para seleccionar';
     choiceOps.maxItemText = function (maxItemCount) { return "M\u00E1ximo " + maxItemCount + " valores"; };
 }
-var epsmb = document.getElementById('area');
+var epsmb = document.getElementById('psmb');
 var ecompany = document.getElementById('company');
 choiceOps.placeholderValue = esp ? 'Seleccione comunas' : 'Select communes';
 var psmb = new Choices(epsmb, choiceOps);
@@ -158,14 +158,14 @@ var processMapData = function (dato) {
         bsnssName: dato.bsnssName
     };
     if (!(dato.rut in companies))
-        companies[dato.rut] = {};
+        companies[dato.rut] = [];
     companies[dato.rut].push(dato.id);
     if (!(dato.comunaid in psmbs))
-        psmbs[dato.comunaid] = {};
+        psmbs[dato.comunaid] = [];
     if (!(dato.provinciaid in psmbs))
-        psmbs[dato.provinciaid] = {};
+        psmbs[dato.provinciaid] = [];
     if (!(dato.regionid in psmbs))
-        psmbs[dato.regionid] = {};
+        psmbs[dato.regionid] = [];
     companies[dato.rut].push(dato.id);
     marker.addListener('click', showInfo);
     markers[dato.id] = marker;
@@ -212,7 +212,7 @@ var getList = function (name) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4, fetch("/ambiental/" + name + "list")
+                case 0: return [4, fetch("/json/" + name + "list.json")
                         .then(function (r) { return r.json(); })
                         .catch(function (e) { return console.error(e, name); })];
                 case 1: return [2, _a.sent()];
@@ -226,7 +226,7 @@ var init = function () {
         return __generator(this, function (_a) {
             name = isresearch ? 'research' : 'farm';
             name2 = isresearch ? 'institution' : 'company';
-            mappromise = fetch("/ambiental/" + name + "data")
+            mappromise = fetch("/json/" + name + "data.json")
                 .then(function (r) { return r.json(); })
                 .then(function (data) { return data.map(processMapData); })
                 .then(function (m) {
