@@ -25,6 +25,11 @@
                 var yr = getVal("year");
                 var start = getVal("start");
                 var end = getVal("end");
+                var colors = {
+                    "Palena": "#ff9e01",
+                    "Llanquihue": "#ff6600",
+                    "Chiloé": "#ff0f00"
+                }
                 var url = '@Html.Raw(Url.Action("GetProvincias","Boletin",
                 new { tipo = (int)DeclarationType.Production, year = "YR", start = "STR", end = "END" }, Context.Request.Scheme))';
                 url = url.replace("YR", yr).replace("STR", start).replace("END", end);
@@ -37,7 +42,7 @@
                                 chartData.push({
                                     provincia: value.subs[x].provincia,
                                     ton: value.subs[x].ton,
-                                    color: value.color,
+                                    color: colors[value.provincia],
                                     pulled: true
                                 });
                             }
@@ -238,11 +243,8 @@
         //if ambiental hide provincias
         amb ? $(".prod").addClass("d-none") : $(".prod").removeClass("d-none");
         //change source img
-        var img = $("#src img").attr('src');
-        img = amb ? img.replace("sernapesca", "intemit") : img.replace("intemit", "sernapesca");
-        $("#src img").attr('src', img);
-        //change src href
-        $("#src").attr('href', amb ? "//intemit.cl" : "//sernapesca.cl");
+        $(".src").hide();
+        amb ? $("#src-intemit").show() : $("#src-sernapesca").show();
         //set disclaimer
         var disc = amb ? disclaimer[1] : disclaimer[0];
         setTxt("tdisc", disc);

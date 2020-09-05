@@ -3,76 +3,76 @@
 @using BiblioMit.Services
 
 @{
-    string style = $"{Model.Item1}Styles";
-    string script = $"{Model.Item1}Scripts";
-    foreach (string lib in Model.Item2)
+string style = $"{Model.Item1}Styles";
+string script = $"{Model.Item1}Scripts";
+foreach (string lib in Model.Item2)
+{
+    var bundles = Bundler.GetBundles(lib);
+    var continuar = false;
+    if (bundles != null && bundles.Any())
     {
-        var bundles = Bundler.GetBundles(lib);
-        var continuar = false;
-        if (bundles != null && bundles.Any())
+        foreach (var bundle in bundles)
         {
-            foreach (var bundle in bundles)
+            string file = bundle.OutputFileName.Replace("wwwroot", "~");
+            string ext = System.IO.Path.GetExtension(file);
+            switch (ext)
             {
-                string file = bundle.OutputFileName.Replace("wwwroot", "~");
-                string ext = System.IO.Path.GetExtension(file);
-                switch (ext)
-                {
-                    case ".css":
-                        this.Block(style, @<link href="@file" rel="stylesheet" asp-append-version="true" />);
-                        break;
-                    case ".js":
-                        this.Block(script, @<script src="@file" asp-append-version="true"></script>);
-                        break;
-                    case ".woff2":
-                    case ".woff":
-                    case ".ttf":
-                        this.Block(style, @<link href="@file" rel="preload" as="font" type="font/@ext.TrimStart('.')" asp-append-version="true" />);
-                        break;
-                }
-                continuar = true;
+                case ".css":
+                    this.Block(style, @<link href="@file" rel="stylesheet" asp-append-version="true" />);
+                    break;
+                case ".js":
+                    this.Block(script, @<script src="@file" asp-append-version="true"></script>);
+                    break;
+                case ".woff2":
+                case ".woff":
+                case ".ttf":
+                    this.Block(style, @<link href="@file" rel="preload" as="font" type="font/@ext.TrimStart('.')" asp-append-version="true" />);
+                    break;
             }
+            continuar = true;
         }
-        if (continuar) { continue; }
-        var l = Libman.GetLibs(lib);
-        if (l != null && l.Files.Any())
+    }
+    if (continuar) { continue; }
+    var l = Libman.GetLibs(lib);
+    if (l != null && l.Files.Any())
+    {
+        foreach (var file in l.Files)
         {
-            foreach (var file in l.Files)
+            var url = string.Empty;
+            var provider = l.Provider ?? "jsdelivr";
+            switch (provider)
             {
-                var url = string.Empty;
-                var provider = l.Provider ?? "jsdelivr";
-                switch (provider)
-                {
-                    case "cdnjs":
-                        l.Library = l.Library.Replace("@", "/");
-                        url = "cdnjs.cloudflare.com/ajax/libs";
-                        break;
-                    case "unpkg":
-                        url = "unpkg.com";
-                        break;
-                    case "jsdelivr":
-                        url = "cdn.jsdelivr.net/npm";
-                        break;
-                    default:
-                        break;
-                }
-                var f = $"{l.Destination}/{file}";
-                var href = $"{Context.Request.Scheme}://{url}/{l.Library}/{file}";
-                var ext = System.IO.Path.GetExtension(file);
-                switch (ext)
-                {
-                    case ".css":
-                        this.Block(style, @<link href="@href" rel="stylesheet" asp-subresource-integrity-href="@f" asp-fallback-href="@f"/>);
-                        break;
-                    case ".js":
-                        this.Block(script, @<script src="@href" asp-subresource-integrity-src="@f" asp-fallback-src="@f" ></script>);
-                        break;
-                    case ".woff2":
-                    case ".woff":
-                    case ".ttf":
-                        this.Block(style, @<link href="@href" rel="preload" as="font" type="font/@ext.TrimStart('.')" crossorigin="anonymous" />);
-                        break;
-                }
+                case "cdnjs":
+                    l.Library = l.Library.Replace("@", "/");
+                    url = "cdnjs.cloudflare.com/ajax/libs";
+                    break;
+                case "unpkg":
+                    url = "unpkg.com";
+                    break;
+                case "jsdelivr":
+                    url = "cdn.jsdelivr.net/npm";
+                    break;
+                default:
+                    break;
+            }
+            var f = $"{l.Destination}/{file}";
+            var href = $"{Context.Request.Scheme}://{url}/{l.Library}/{file}";
+            var ext = System.IO.Path.GetExtension(file);
+            switch (ext)
+            {
+                case ".css":
+                    this.Block(style, @<link href="@href" rel="stylesheet" asp-subresource-integrity-href="@f" asp-fallback-href="@f"/>);
+                    break;
+                case ".js":
+                    this.Block(script, @<script src="@href" asp-subresource-integrity-src="@f" asp-fallback-src="@f" ></script>);
+                    break;
+                case ".woff2":
+                case ".woff":
+                case ".ttf":
+                    this.Block(style, @<link href="@href" rel="preload" as="font" type="font/@ext.TrimStart('.')" crossorigin="anonymous" />);
+                    break;
             }
         }
     }
+}
 }
