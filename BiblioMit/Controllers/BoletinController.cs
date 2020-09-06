@@ -86,6 +86,7 @@ namespace BiblioMit.Views
             GetAssays(config.Reg).Where(a => a.SamplingDate >= config.Start && a.SamplingDate <= config.End);
         private IQueryable<PlanktonAssay> GetAssays(int reg) => _context.PlanktonAssays.Where(a => a.Psmb.Commune.Province.RegionId == reg);
         [AllowAnonymous]
+        [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" })]
         public async Task<JsonResult> GetXlsx(int year, int start, int end)
         {
             var config = new Config(year, start, end)
@@ -165,6 +166,7 @@ namespace BiblioMit.Views
             return Json(graphs);
         }
         [AllowAnonymous]
+        [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "tipo", "year", "start", "end" })]
         public JsonResult GetProvincias(int tipo, int year, int start, int end)
         {
             var config = new Config(year, start, end);
@@ -224,6 +226,7 @@ namespace BiblioMit.Views
             };
         }
         [AllowAnonymous]
+        [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" })]
         public JsonResult GetComunas(int tipo, int year, int start, int end, bool tb)
         {
             if (!tb && tipo == (int)DeclarationType.Production) tipo += 10;
@@ -299,6 +302,7 @@ namespace BiblioMit.Views
         }
 
         [AllowAnonymous]
+        [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" })]
         public JsonResult GetMeses(int tipo, int year, int start, int end)
         {
             var config = new Config(year, start, end);
@@ -400,6 +404,7 @@ namespace BiblioMit.Views
             return View();
         }
         [AllowAnonymous]
+        [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" })]
         public JsonResult GetAttr(int tp)
         {
             var m = (DeclarationType)tp;
@@ -412,6 +417,7 @@ namespace BiblioMit.Views
             });
         }
         [AllowAnonymous]
+        [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "tipo", "year", "start", "end" })]
         public JsonResult GetRange(int yr)
         {
             var years = _context.DeclarationDates.Select(a => a.Date.Year).Distinct();

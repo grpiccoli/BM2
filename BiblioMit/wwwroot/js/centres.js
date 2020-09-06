@@ -62,7 +62,7 @@ var getBounds = function (positions) {
     return bounds;
 };
 var type = document.getElementById('type').value;
-var isresearch = type === '5';
+var isresearch = type === '2';
 var selected = 'red';
 var lang = $("html").attr("lang");
 var esp = lang === 'es';
@@ -214,7 +214,7 @@ var getList = function (name) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4, fetch("/json/" + name + "list.json")
+                case 0: return [4, fetch("/api/static/json/" + name + "list.json")
                         .then(function (r) { return r.json(); })
                         .catch(function (e) { return console.error(e, name); })];
                 case 1: return [2, _a.sent()];
@@ -228,7 +228,7 @@ var init = function () {
         return __generator(this, function (_a) {
             name = isresearch ? 'research' : 'farm';
             name2 = isresearch ? 'institution' : 'company';
-            mappromise = fetch("/json/" + name + "data.json")
+            mappromise = fetch("/api/static/json/" + name + "data.json")
                 .then(function (r) { return r.json(); })
                 .then(function (data) { return data.map(processMapData); })
                 .then(function (m) {

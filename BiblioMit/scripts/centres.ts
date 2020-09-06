@@ -29,7 +29,7 @@ var getBounds = function (positions: any[]) {
     return bounds;
 }
 var type = (<HTMLInputElement>document.getElementById('type')).value;
-var isresearch = type === '5';
+var isresearch = type === '2';
 var selected = 'red';
 //get language
 var lang = $("html").attr("lang");
@@ -195,14 +195,14 @@ var clickMap = function(e: any) {
 }
 //get lists of choices
 var getList = async function (name: string) {
-    return await fetch(`/json/${name}list.json`)
+    return await fetch(`/api/static/json/${name}list.json`)
         .then(r => r.json())
         .catch(e => console.error(e, name));
 }
 var init = async function () {
     var name = isresearch ? 'research' : 'farm';
     var name2 = isresearch ? 'institution' : 'company';
-    var mappromise = fetch(`/json/${name}data.json`)
+    var mappromise = fetch(`/api/static/json/${name}data.json`)
         .then(r => r.json())
         .then(data => data.map(processMapData))
         .then(m => {

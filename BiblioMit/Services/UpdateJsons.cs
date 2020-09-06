@@ -1,5 +1,6 @@
 ﻿using BiblioMit.Controllers;
 using BiblioMit.Data;
+using BiblioMit.Models.VM;
 using BiblioMit.Services.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -35,7 +36,7 @@ namespace BiblioMit.Services
             _environment = environment;
             _localizer = localizer;
             _ambiental = new AmbientalController(_context, _localizer);
-            _jsonPath = Path.Combine(_environment.ContentRootPath, "wwwroot", "json");
+            _jsonPath = Path.Combine(_environment.ContentRootPath, "json");
         }
         public void SeedUpdate()
         {
@@ -46,19 +47,22 @@ namespace BiblioMit.Services
             WriteJson(nameof(AmbientalController.ComunaList));
             WriteJson(nameof(AmbientalController.TLList));
 
+            WriteJson(nameof(AmbientalController.RegionList));
+            CenterUpdate();
+            PlanktonUpdate();
+        }
+        public void CenterUpdate()
+        {
             WriteJson(nameof(AmbientalController.ComunaResearchList));
             WriteJson(nameof(AmbientalController.ComunaFarmList));
             WriteJson(nameof(AmbientalController.ProvinciaResearchList));
             WriteJson(nameof(AmbientalController.ProvinciaFarmList));
-            WriteJson(nameof(AmbientalController.RegionList));
             WriteJson(nameof(AmbientalController.InstitutionList));
             WriteJson(nameof(AmbientalController.CompanyList));
             WriteJson(nameof(AmbientalController.ResearchList));
             WriteJson(nameof(AmbientalController.FarmList));
             WriteJson(nameof(AmbientalController.ResearchData));
             WriteJson(nameof(AmbientalController.FarmData));
-
-            PlanktonUpdate();
         }
         public void PlanktonUpdate()
         {

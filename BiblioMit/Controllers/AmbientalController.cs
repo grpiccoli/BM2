@@ -5,16 +5,13 @@ using BiblioMit.Data;
 using BiblioMit.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System;
 using Range = BiblioMit.Models.Range;
-using System.Threading.Tasks;
 using BiblioMit.Models.Entities.Semaforo;
 using BiblioMit.Blazor;
 using BiblioMit.Extensions;
 using Microsoft.Extensions.Localization;
 using BiblioMit.Models.VM;
-using Schema.NET;
 
 namespace BiblioMit.Controllers
 {
@@ -136,7 +133,6 @@ namespace BiblioMit.Controllers
             var singlabel = _localizer["Catchment Area"] + " ";
             return Json(Comuna(singlabel));
         }
-        [AllowAnonymous]
         public IActionResult ProvinciaResearchList() => Json(_context.Regions
             .Select(c => new ChoicesGroup
             {
@@ -149,7 +145,6 @@ namespace BiblioMit.Controllers
                             Label = com.Name + ", " + c.Name
                         })
             }));
-        [AllowAnonymous]
         public IActionResult ComunaResearchList() => Json(_context.Provinces
             .Select(c => new ChoicesGroup
             {
@@ -164,7 +159,6 @@ namespace BiblioMit.Controllers
             }));
         public IActionResult FarmData() => Json(SelectPsmbs(_context.PsmbAreas
             .Where(c => c.PolygonId.HasValue)));
-        [AllowAnonymous]
         public IActionResult ResearchData() => Json(_context.ResearchCentres
                     .Where(c => c.PolygonId.HasValue)
                     .Select(c => new GMapPolygon
@@ -195,7 +189,6 @@ namespace BiblioMit.Controllers
                         Value = p.Id,
                         Label = p.BusinessName + " (" + p.GetRUT() + ")"
                     }));
-        [AllowAnonymous]
         public IActionResult ResearchList() => Json(_context.ResearchCentres
                     .Where(p => p.PolygonId.HasValue)
                     .Select(p => new ChoicesItem
@@ -203,7 +196,6 @@ namespace BiblioMit.Controllers
                         Value = p.Id,
                         Label =  p.Name + " (" + p.Acronym + ")"
                     }));
-        [AllowAnonymous]
         public IActionResult InstitutionList() => Json(_context.Companies
                     .Where(p => p.Psmbs.Any(p => p.Discriminator == Models.Entities.Centres.PsmbType.ResearchCentre))
                     .Select(p => new ChoicesItem
@@ -211,9 +203,7 @@ namespace BiblioMit.Controllers
                         Value = p.Id,
                         Label = p.BusinessName + " (" + p.Acronym + ")"
                     }));
-        [AllowAnonymous]
         public JsonResult OceanVarList() => Json(Variable.t.Enum2ChoicesGroup("v").FirstOrDefault());
-        [AllowAnonymous]
         public JsonResult GroupVarList()
         {
             var group = " (" + _localizer["Group"] + ")";
@@ -255,6 +245,7 @@ namespace BiblioMit.Controllers
             };
             return Json(species);
         }
+        [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" })]
         public JsonResult TLData(int a, int psmb, int sp, int? v
             //, DateTime start, DateTime end
             )
@@ -588,7 +579,6 @@ namespace BiblioMit.Controllers
                     }
                 }
             });
-        [AllowAnonymous]
         public JsonResult CuencaData()
         {
             var title = _localizer["Catchment Area"] + " ";
@@ -604,7 +594,6 @@ namespace BiblioMit.Controllers
                    })
                }));
         }
-        [AllowAnonymous]
         public JsonResult ComunaData()
         {
             var title = _localizer["Commune"] + " ";
@@ -655,6 +644,7 @@ namespace BiblioMit.Controllers
             return Json(plankton.Select(p => new { p.Id, SamplingDate = p.SamplingDate.ToShortDateString(), p.Temperature, p.Oxigen, p.Ph, p.Salinity }));
         }
         [AllowAnonymous]
+        [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" })]
         public IActionResult Data(int area, char type, int id, DateTime start, DateTime end)
         {
             int order = area / 99_996 + 24_998 / 24_999;

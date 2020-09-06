@@ -134,6 +134,8 @@ namespace BiblioMit
             services.AddServerSideBlazor();
             services.AddTransient<IEnvironmental, EnvironmentalService>();
 
+            services.AddResponseCaching();
+
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Latest)
                 .AddViewLocalization(
@@ -230,6 +232,22 @@ namespace BiblioMit
             });
 
             app.UseRouting();
+
+            app.UseResponseCaching();
+
+            app.Use(async (context, next) =>
+            {
+                context.Response.GetTypedHeaders().CacheControl =
+            new CacheControlHeaderValue()
+            {
+                Public = true,
+                MaxAge = TimeSpan.FromSeconds(60)
+            };
+                context.Response.Headers[HeaderNames.Vary] =
+                    new string[] { "Accept-Encoding" };
+
+                await next().ConfigureAwait(false);
+            });
 
             app.UseRequestLocalization(app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>().Value);
 
