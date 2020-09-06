@@ -102,6 +102,7 @@ var polygons = {};
 var markers = {};
 var companies = {};
 var psmbs = {};
+var markerCluster;
 var bnds = new google.maps.LatLngBounds();
 var showInfo = function (_e) {
     var id = this.zIndex;
@@ -155,18 +156,25 @@ var processMapData = function (dato) {
         provincia: dato.provincia,
         code: dato.code,
         rut: dato.rut,
-        bsnssName: dato.bsnssName
+        businessName: dato.businessName
     };
     if (!(dato.rut in companies))
         companies[dato.rut] = [];
     companies[dato.rut].push(dato.id);
-    if (!(dato.comunaid in psmbs))
-        psmbs[dato.comunaid] = [];
-    if (!(dato.provinciaid in psmbs))
-        psmbs[dato.provinciaid] = [];
-    if (!(dato.regionid in psmbs))
-        psmbs[dato.regionid] = [];
-    companies[dato.rut].push(dato.id);
+    if (!(dato.comunaId in psmbs)) {
+        psmbs[dato.comunaId] = [];
+    }
+    psmbs[dato.comunaId].push(dato.id);
+    var provincia = Math.floor(dato.comunaId / 100);
+    if (!(provincia in psmbs)) {
+        psmbs[provincia] = [];
+    }
+    psmbs[provincia].push(dato.id);
+    var region = Math.floor(provincia / 10);
+    if (!(region in psmbs)) {
+        psmbs[region] = [];
+    }
+    psmbs[region].push(dato.id);
     marker.addListener('click', showInfo);
     markers[dato.id] = marker;
     return marker;
@@ -186,21 +194,41 @@ try {
 catch (e) { }
 var passive = supportsPassiveOption ? { passive: true } : false;
 var filter = function () {
-    Object.values(markers).forEach(function (m) {
-        m.setMap(null);
-    });
-    if (Object.keys(company).length > 1)
-        company.getValue(false).forEach(function (c) {
-            companies[c].forEach(function (s) {
-                markers[s].setMap(map);
-            });
+    var selCompanies = company.getValue(false);
+    var selPsmb = psmb.getValue(false);
+    var anyCompany = selCompanies.length > 0;
+    var anyPsmb = selPsmb.length > 0;
+    if (anyCompany || anyPsmb) {
+        markerCluster.clearMarkers();
+        Object.values(markers).forEach(function (m) {
+            m.setMap(null);
         });
-    if (Object.keys(psmbs).length > 1)
-        psmb.getValue(false).forEach(function (c) {
-            psmbs[c].forEach(function (s) {
-                markers[s].setMap(map);
+        var toShow = [];
+        if (anyCompany)
+            selCompanies.forEach(function (c) {
+                if (companies[c.value])
+                    companies[c.value].forEach(function (s) {
+                        markers[s].setMap(map);
+                        toShow.push(markers[s]);
+                    });
             });
+        if (anyPsmb)
+            selPsmb.forEach(function (c) {
+                if (psmbs[c.value])
+                    psmbs[c.value].forEach(function (s) {
+                        markers[s].setMap(map);
+                        toShow.push(markers[s]);
+                    });
+            });
+        console.log(toShow);
+        markerCluster.addMarkers(toShow);
+    }
+    else {
+        Object.values(markers).forEach(function (m) {
+            m.setMap(map);
         });
+        markerCluster.addMarkers(Object.values(markers));
+    }
 };
 epsmb.addEventListener('addItem', function (_) { return filter(); }, passive);
 epsmb.addEventListener('removeItem', function (_) { return filter(); }, passive);
@@ -233,7 +261,7 @@ var init = function () {
                 .then(function (data) { return data.map(processMapData); })
                 .then(function (m) {
                 map.fitBounds(bnds);
-                new MarkerClusterer(map, m, { imagePath: '/images/markers/m' });
+                markerCluster = new MarkerClusterer(map, m, { imagePath: '/images/markers/m' });
             });
             comunalist = getList('comuna' + name);
             provincialist = getList('provincia' + name);

@@ -18,8 +18,9 @@ namespace BiblioMit.Models.VM
     }
     public class GMapPolygonCentre : GMapPolygon
     {
-        public string Rut { get; set; }
+        public int Rut { get; set; }
         public string BusinessName { get; set; }
+        public int ComunaId { get; set; }
     }
     public abstract class GMapPolygonBase
     {

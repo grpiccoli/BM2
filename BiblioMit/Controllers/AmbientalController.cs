@@ -155,17 +155,37 @@ namespace BiblioMit.Controllers
                             Label = com.Name + ", " + c.Name
                         })
             }));
-        public IActionResult FarmData() => Json(SelectPsmbs(_context.PsmbAreas
-            .Where(c => c.PolygonId.HasValue)));
+        public IActionResult FarmData() => Json(_context.PsmbAreas
+            .Where(c => c.PolygonId.HasValue)
+            .Select(c => new GMapPolygonCentre
+            {
+                Id = c.Id,
+                Name = c.Code + " " + c.Name,
+                Comuna = c.Commune.Name,
+                ComunaId = c.CommuneId.Value,
+                Provincia = c.Commune.Province.Name,
+                Code = c.Code,
+                BusinessName = c.Company.BusinessName,
+                Rut = c.Company.Id,
+                Position = c.Polygon
+                        .Vertices.Select(o => new GMapCoordinate
+                        {
+                            Lat = o.Latitude,
+                            Lng = o.Longitude
+                        })
+            }));
         public IActionResult ResearchData() => Json(_context.ResearchCentres
                     .Where(c => c.PolygonId.HasValue)
-                    .Select(c => new GMapPolygon
+                    .Select(c => new GMapPolygonCentre
                     {
                         Id = c.Id,
                         Name = c.Name + " (" + c.Acronym + ")",
                         Comuna = c.Commune.Name,
+                        ComunaId = c.CommuneId.Value,
                         Provincia = c.Commune.Province.Name,
                         Region = c.Commune.Province.Region.Name,
+                        BusinessName = c.Company.BusinessName,
+                        Rut = c.Company.Id,
                         Position = c.Polygon
                         .Vertices.Select(o => new GMapCoordinate
                         {
@@ -191,7 +211,7 @@ namespace BiblioMit.Controllers
                     .Where(p => p.PolygonId.HasValue)
                     .Select(p => new ChoicesItem
                     {
-                        Value = p.Id,
+                        Value = p.CompanyId,
                         Label =  p.Name + " (" + p.Acronym + ")"
                     }));
         public IActionResult InstitutionList() => Json(_context.Companies

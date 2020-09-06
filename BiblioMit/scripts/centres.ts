@@ -74,6 +74,7 @@ var polygons: any = {};
 var markers: any = {};
 var companies: any = {};
 var psmbs: any = {};
+var markerCluster: any;
 var bnds: google.maps.LatLngBounds = new google.maps.LatLngBounds();
 var showInfo = function (_e: any) {
     var id = this.zIndex;
@@ -139,14 +140,24 @@ var processMapData = function (dato: any) {
         provincia: dato.provincia,
         code: dato.code,
         rut: dato.rut,
-        bsnssName: dato.bsnssName
+        businessName: dato.businessName
     }
     if (!(dato.rut in companies)) companies[dato.rut] = [];
     companies[dato.rut].push(dato.id);
-    if (!(dato.comunaid in psmbs)) psmbs[dato.comunaid] = [];
-    if (!(dato.provinciaid in psmbs)) psmbs[dato.provinciaid] = [];
-    if (!(dato.regionid in psmbs)) psmbs[dato.regionid] = [];
-    companies[dato.rut].push(dato.id);
+    if (!(dato.comunaId in psmbs)) {
+        psmbs[dato.comunaId] = [];
+    }
+    psmbs[dato.comunaId].push(dato.id);
+    var provincia = Math.floor(dato.comunaId / 100);
+    if (!(provincia in psmbs)) {
+        psmbs[provincia] = [];
+    }
+    psmbs[provincia].push(dato.id);
+    var region = Math.floor(provincia / 10);
+    if (!(region in psmbs)) {
+        psmbs[region] = [];
+    }
+    psmbs[region].push(dato.id);
     marker.addListener('click', showInfo);
     markers[dato.id] = marker;
     return marker;
@@ -167,21 +178,41 @@ try {
 var passive = supportsPassiveOption ? { passive: true } : false;
 //
 var filter = function () {
-    Object.values(markers).forEach((m: any) => {
-        m.setMap(null);
-    });
-    if (Object.keys(company).length > 1)
-    company.getValue(false).forEach((c: any) => {
-        companies[c].forEach((s: any) => {
-            markers[s].setMap(map);
+    var selCompanies = company.getValue(false);
+    var selPsmb = psmb.getValue(false);
+    var anyCompany = selCompanies.length > 0;
+    var anyPsmb = selPsmb.length > 0;
+    if (anyCompany || anyPsmb) {
+        markerCluster.clearMarkers();
+        Object.values(markers).forEach((m: any) => {
+            m.setMap(null);
         });
-    });
-    if (Object.keys(psmbs).length > 1)
-        psmb.getValue(false).forEach((c: any) => {
-        psmbs[c].forEach((s: any) => {
-            markers[s].setMap(map);
+        var toShow: any = [];
+        if (anyCompany)
+            selCompanies.forEach((c: any) => {
+                if (companies[c.value])
+                    companies[c.value].forEach((s: any) => {
+                        markers[s].setMap(map);
+                        toShow.push(markers[s]);
+                    });
+            });
+        if (anyPsmb)
+            selPsmb.forEach((c: any) => {
+                if (psmbs[c.value])
+                    psmbs[c.value].forEach((s: any) => {
+                        markers[s].setMap(map);
+                        toShow.push(markers[s]);
+                    });
+            });
+        console.log(toShow);
+        markerCluster.addMarkers(toShow);
+    } else {
+        Object.values(markers).forEach((m: any) => {
+            m.setMap(map);
         });
-    });
+        markerCluster.addMarkers(Object.values(markers));
+    }
+
 }
 //variable choice listeners
 epsmb.addEventListener('addItem', (_: any) => filter(), passive);
@@ -207,7 +238,7 @@ var init = async function () {
         .then(data => data.map(processMapData))
         .then(m => {
             map.fitBounds(bnds);
-            new MarkerClusterer(map, m, { imagePath: '/images/markers/m' })
+            markerCluster = new MarkerClusterer(map, m, { imagePath: '/images/markers/m' })
         });
     var comunalist = getList('comuna'+name);
     var provincialist = getList('provincia'+name);

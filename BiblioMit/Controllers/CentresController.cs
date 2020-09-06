@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -22,13 +22,14 @@ namespace BiblioMit.Controllers
         {
             _context = context;
         }
-        public async Task<IActionResult> GetMap(PsmbType type, int[] c, int[] i)
+        public IActionResult GetMap(PsmbType type, int[] c, int[] i)
         {
+            if (c == null || i == null) throw new ArgumentNullException($"Argument c {c} and i {i} cannot be null");
             var list = type switch
             {
-                PsmbType.Farm => await GetEntitiesAsync<Farm>(c, i, true).ConfigureAwait(false),
-                PsmbType.ResearchCentre => await GetEntitiesAsync<ResearchCentre>(c, i, true).ConfigureAwait(false),
-                _ => await GetEntitiesAsync<Psmb>(c, i, true).ConfigureAwait(false)
+                PsmbType.Farm => GetEntitiesAsync<Farm>(c, i),
+                PsmbType.ResearchCentre => GetEntitiesAsync<ResearchCentre>(c, i),
+                _ => GetEntitiesAsync<Psmb>(c, i)
             };
             return Json(list.Select(f =>
                     new GMapPolygonCentre
@@ -36,8 +37,9 @@ namespace BiblioMit.Controllers
                         Id = f.Code,
                         Name = f.Name,
                         BusinessName = f.Company.BusinessName,
-                        Rut = f.Company.GetRUT(),
+                        Rut = f.Company.Id,
                         Comuna = f.Commune.Name,
+                        ComunaId = f.CommuneId.Value,
                         Provincia = f.Commune.Province.Name,
                         Region = f.Commune.Province.Region.Name,
                         Code = f.Code,
@@ -49,38 +51,36 @@ namespace BiblioMit.Controllers
                         })
                     }));
         }
-        private async Task<IEnumerable<Psmb>> GetPsmbs<TEntity>(int[] c, int[] i) 
+        private IEnumerable<Psmb> GetPsmbs<TEntity>(int[] c, int[] i) 
             where TEntity : Psmb
         {
             ViewData["c"] = string.Join(",", c);
             ViewData["i"] = string.Join(",", i);
-            return await GetEntitiesAsync<TEntity>(c, i).ConfigureAwait(false);
+            return GetEntitiesAsync<TEntity>(c, i);
         }
-        private async Task<IEnumerable<TEntity>> GetEntitiesAsync<TEntity>(int[] c, int[] i, bool map = false)
+        private IEnumerable<TEntity> GetEntitiesAsync<TEntity>(int[] c, int[] i)
             where TEntity : Psmb
         {
-            var selc = c.ToList();
-            var seli = i.ToList();
             var centres = _context.Set<TEntity>()
-                .Include(a => a.Company)
-                .Include(a => a.Commune)
-                    .ThenInclude(a => a.Province)
-                        .ThenInclude(a => a.Region)
                         .Where(a => a.PolygonId.HasValue
                 && a.CommuneId.HasValue
                 && a.CompanyId.HasValue);
-            if (map) centres = centres.Include(a => a.Polygon).ThenInclude(a => a.Vertices);
-            var list = await centres.ToListAsync().ConfigureAwait(false);
-            return list.Where(
-                a => selc.Any() ? selc.Contains(a.CommuneId.Value) : true
-                && seli.Any() ? seli.Contains(a.CompanyId.Value) : true);
+            //if (map) centres = centres.Include(a => a.Polygon).ThenInclude(a => a.Vertices);
+            //var list = await centres.ToListAsync().ConfigureAwait(false);
+            foreach(var sc in c)
+            {
+                centres = centres.Where(a => a.CommuneId.Value == sc);
+            }
+            foreach (var si in i)
+            {
+                centres = centres.Where(a => a.CommuneId.Value == si);
+            }
+            return centres;
         }
-        public async Task<IActionResult> Producers(int[] c, int[] i) => 
-            View(await GetPsmbs<Farm>(c, i).ConfigureAwait(false));
+        public IActionResult Producers(int[] c, int[] i) => View(GetPsmbs<Farm>(c, i));
         // GET: Centres
         [AllowAnonymous]
-        public async Task<IActionResult> Research(int[] c, int[] i) =>
-            View(await GetPsmbs<ResearchCentre>(c, i).ConfigureAwait(false));
+        public IActionResult Research(int[] c, int[] i) => View(GetPsmbs<ResearchCentre>(c, i));
         // GET: Centres/Details/5
         public async Task<IActionResult> Details(int? id)
         {
