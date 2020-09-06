@@ -642,22 +642,17 @@ namespace BiblioMit.Controllers
                     .Where(c => c.Commune.CatchmentAreaId.HasValue && c.PolygonId.HasValue && c.PlanktonAssays.Any())));
         public IActionResult BuscarInformes(int id, string start, string end)
         {
+            int order = id / 99_996 + 24_998 / 24_999;
             var i = Convert.ToDateTime(start, CultureInfo.InvariantCulture);
             var f = Convert.ToDateTime(end, CultureInfo.InvariantCulture);
             var plankton = _context.PlanktonAssays.Where(p => p.SamplingDate >= i && p.SamplingDate <= f);
-            if (id < 4)
+            plankton = order switch
             {
-                plankton = plankton.Where(p => p.Psmb.Commune.CatchmentAreaId == id);
-            }
-            else if (id < 100_000)
-            {
-                plankton = plankton.Where(p => p.PsmbId == id);
-            }
-            else
-            {
-                plankton = plankton.Where(p => p.Psmb.CommuneId == id);
-            }
-            return Json(plankton.Select(p => new { p.Id, p.SamplingDate, p.Temperature, p.Oxigen, p.Ph, p.Salinity }));
+                0 => plankton.Where(e => e.Psmb.Commune.CatchmentAreaId == id),
+                1 => plankton.Where(e => e.PsmbId == id),
+                _ => plankton.Where(e => e.Psmb.CommuneId == id)
+            };
+            return Json(plankton.Select(p => new { p.Id, SamplingDate = p.SamplingDate.ToShortDateString(), p.Temperature, p.Oxigen, p.Ph, p.Salinity }));
         }
         [AllowAnonymous]
         public IActionResult Data(int area, char type, int id, DateTime start, DateTime end)

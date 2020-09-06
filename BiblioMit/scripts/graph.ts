@@ -506,7 +506,7 @@ var CreateTableFromJSON = function(json: any) {
         tr = table.insertRow(-1);
         for (var j = 0; j < col.length; j++) {
             var tabCell = tr.insertCell(-1);
-            tabCell.innerHTML = json[i][col[j]];
+            if (json[i][col[j]]) tabCell.innerHTML = json[i][col[j]];
         }
     }
     // FINALLY ADD THE NEWLY CREATED TABLE WITH JSON DATA TO A CONTAINER.

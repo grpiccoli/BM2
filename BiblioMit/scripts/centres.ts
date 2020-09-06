@@ -167,15 +167,17 @@ try {
 var passive = supportsPassiveOption ? { passive: true } : false;
 //
 var filter = function () {
-    markers.forEach((m: any) => {
+    Object.values(markers).forEach((m: any) => {
         m.setMap(null);
     });
+    if (Object.keys(company).length > 1)
     company.getValue(false).forEach((c: any) => {
         companies[c].forEach((s: any) => {
             markers[s].setMap(map);
         });
     });
-    psmb.getValue(false).forEach((c: any) => {
+    if (Object.keys(psmbs).length > 1)
+        psmb.getValue(false).forEach((c: any) => {
         psmbs[c].forEach((s: any) => {
             markers[s].setMap(map);
         });

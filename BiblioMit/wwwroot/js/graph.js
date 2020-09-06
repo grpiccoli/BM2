@@ -535,7 +535,8 @@ var CreateTableFromJSON = function (json) {
         tr = table.insertRow(-1);
         for (var j = 0; j < col.length; j++) {
             var tabCell = tr.insertCell(-1);
-            tabCell.innerHTML = json[i][col[j]];
+            if (json[i][col[j]])
+                tabCell.innerHTML = json[i][col[j]];
         }
     }
     var divContainer = document.getElementById("results");

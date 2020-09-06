@@ -186,19 +186,21 @@ try {
 catch (e) { }
 var passive = supportsPassiveOption ? { passive: true } : false;
 var filter = function () {
-    markers.forEach(function (m) {
+    Object.values(markers).forEach(function (m) {
         m.setMap(null);
     });
-    company.getValue(false).forEach(function (c) {
-        companies[c].forEach(function (s) {
-            markers[s].setMap(map);
+    if (Object.keys(company).length > 1)
+        company.getValue(false).forEach(function (c) {
+            companies[c].forEach(function (s) {
+                markers[s].setMap(map);
+            });
         });
-    });
-    psmb.getValue(false).forEach(function (c) {
-        psmbs[c].forEach(function (s) {
-            markers[s].setMap(map);
+    if (Object.keys(psmbs).length > 1)
+        psmb.getValue(false).forEach(function (c) {
+            psmbs[c].forEach(function (s) {
+                markers[s].setMap(map);
+            });
         });
-    });
 };
 epsmb.addEventListener('addItem', function (_) { return filter(); }, passive);
 epsmb.addEventListener('removeItem', function (_) { return filter(); }, passive);
