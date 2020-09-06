@@ -31,29 +31,21 @@ namespace BiblioMit.Controllers
         }
 
         // GET: Contacts
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             IQueryCollection q = Request.Query;
 
-            var contacts = from c in _context.Contacts
-                           .Include(c => c.ConsessionOrResearch)
-                            .ThenInclude(c => c.Company)
-                           .Include(c => c.ConsessionOrResearch)
-                            .ThenInclude(c => c.Polygon)
-                           .Include(c => c.ConsessionOrResearch)
-                            .ThenInclude(c => c.Commune)
-                           select c;
-            var comuna = _context.Communes
-                .Include(c => c.Province)
-                    .ThenInclude(c => c.Region);
-            ViewData["comunas"] = comuna;
+            IQueryable<Contact> contacts = _context.Contacts;
+            ViewData["comunas"] = _context.Communes;
             string[] temp = q["c"];
             ViewData["c"] = temp;
-            if (q["c"].Any())
+            if (temp.Any())
             {
-                contacts = contacts.Where(c => q["c"].ToString()
-                .Contains(Convert.ToString(c.ConsessionOrResearch.CommuneId, CultureInfo.InvariantCulture),
-                    StringComparison.InvariantCultureIgnoreCase));
+                foreach(var c in temp)
+                {
+                    if(int.TryParse(c, out int r))
+                        contacts = contacts.Where(o => o.ConsessionOrResearch.CommuneId.Value == r);
+                }
             }
 
             var isAuthorized = User.IsInRole("Administrador") && 
@@ -68,8 +60,7 @@ namespace BiblioMit.Controllers
                 contacts = contacts.Where(c => c.Status  == ContactStatus.Approved
                                             || c.OwnerId == currentUserId);
             }
-
-            return View(await contacts.ToListAsync().ConfigureAwait(false));
+            return View(contacts);
         }
 
         // GET: Contacts/Details/5

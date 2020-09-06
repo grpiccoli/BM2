@@ -46,11 +46,12 @@ namespace BiblioMit.Controllers
         [AllowAnonymous]
         public IActionResult Gallery()
         {
-            var url = $"~/colecci-n-virtual/index.html";
-            if (Url.IsLocalUrl(url))
-                return Redirect(url);
-            else
-                return RedirectToAction("Index", "Home");
+            //var url = $"~/colecci-n-virtual/index.html";
+            //if (Url.IsLocalUrl(url))
+                //return Redirect(url);
+                return View();
+            //else
+            //    return RedirectToAction("Index", "Home");
         }
 
         public IActionResult GetImg(string f, string d)
