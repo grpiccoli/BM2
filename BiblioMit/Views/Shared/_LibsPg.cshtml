@@ -1,4 +1,4 @@
-﻿@model HashSet<string>
+﻿@model List<string>
 @{ 
     var pageName = ViewContext.RouteData.Values.ContainsKey("action") ?
         ViewContext.RouteData.Values["action"].ToString().Replace("_", "") :

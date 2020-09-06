@@ -56,7 +56,7 @@ namespace BiblioMit.Services
 
         public static LibManLibrary GetLibs(string lib)
         {
-            var libs = Libs.Libraries.FirstOrDefault(m => 
+            var libs = Libs.Libraries.SingleOrDefault(m => 
             m.Library.StartsWith($"{lib}@", StringComparison.Ordinal) || m.Library.StartsWith($"{lib}/", StringComparison.Ordinal));
             return libs;
         }

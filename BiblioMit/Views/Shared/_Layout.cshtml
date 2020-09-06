@@ -94,7 +94,7 @@
     <link rel="dns-prefetch" href="https://www.google-analytics.com">
     <link rel="preconnect" href="https://www.google-analytics.com" crossorigin="anonymous">
 
-    <partial name="_TagLibs" model='("TOP", new HashSet<string> { "jquery", "bootstrap", "@fortawesome/fontawesome-free", "site", "modal-action", "modernizr-custom" })' />
+    <partial name="_TagLibs" model='("TOP", new List<string> { "jquery", "bootstrap", "@fortawesome/fontawesome-free", "site", "modal-action", "modernizr-custom" })' />
     @this.WriteBlocks("TOPStyles")
     @this.WriteBlocks("Styles")
     @RenderSection("Styles", required: false)
