@@ -1,5 +1,5 @@
 ﻿@model IEnumerable<BiblioMit.Models.Entry>
-
+@using BiblioMit.Views 
 @{
 ViewData["Title"] = "Boletín";
 }
@@ -255,13 +255,13 @@ ViewData["Title"] = "Boletín";
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var comuna in (IQueryable<string[]>)ViewData["Comunas"])
+                                @foreach (var comuna in (IQueryable<CommuneList>)ViewData["Comunas"])
                                 {
                                     <tr>
-                                        <td class="text-left">@comuna[1]</td>
-                                        <td class="text-left">@comuna[0]</td>
-                                        <td class="dato divideColumnLeft yr-1 @comuna[0]"></td>
-                                        <td class="dato yr @comuna[0]"></td>
+                                        <td class="text-left">@comuna.Province</td>
+                                        <td class="text-left">@comuna.Commune</td>
+                                        <td class="dato divideColumnLeft yr-1 @comuna.Commune"></td>
+                                        <td class="dato yr @comuna.Commune"></td>
                                     </tr>
                                 }
                                 <tr>

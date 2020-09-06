@@ -300,15 +300,25 @@
                     var y1c = 0;
                     $.each(r, function (_i, value) {
                         if (value.year != null) {
-                        setTxt("yr." + value.comuna, Number(value.year).toLocaleString("@(Localizer["en-GB"])"));
+                            setTxt("yr." + value.comuna, Number(value.year).toLocaleString("@(Localizer["en-GB"])"));
+                            ys += value.year;
+                            if (value.year !== "0") { yc++; }
                         }
                         if (value.lastyr != null) {
-                        setTxt("yr-1." + value.comuna, Number(value.lastyr).toLocaleString("@(Localizer["en-GB"])"));
+                            setTxt("yr-1." + value.comuna, Number(value.lastyr).toLocaleString("@(Localizer["en-GB"])"));
+                            y1s += value.lastyr;
+                            if (value.lastyr !== "0") { y1c++; }
                         }
-                        ys += value.year;
-                        y1s += value.lastyr;
-                        if (value.year !== "0") { yc++; }
-                        if (value.lastyr !== "0") { y1c++; }
+                        if (value.aa_congelado != null) {
+                            var year = value.aa_congelado + value.ab_conserva + value.ac_refrigerado;
+                            setTxt("yr." + value.comuna, Number(year).toLocaleString("@(Localizer["en-GB"])"));
+                            ys += year;
+                            if (year !== "0") { yc++; }
+                            var lastyr = value.ba_congelado + value.bb_conserva + value.bc_refrigerado;
+                            setTxt("yr-1." + value.comuna, Number(lastyr).toLocaleString("@(Localizer["en-GB"])"));
+                            y1s += lastyr;
+                            if (lastyr !== "0") { y1c++; }
+                        }
                     });
                     var ty = amb ? ys / yc : ys;
                     var ty1 = amb ? y1s / y1c : y1s;
