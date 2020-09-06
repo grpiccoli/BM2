@@ -62,7 +62,7 @@ var getBounds = function (positions) {
     return bounds;
 };
 var type = document.getElementById('type').value;
-var isresearch = type === '2';
+var isresearch = type === '5';
 var selected = 'red';
 var lang = $("html").attr("lang");
 var esp = lang === 'es';

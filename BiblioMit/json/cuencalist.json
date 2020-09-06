@@ -1,1 +1,1 @@
-{"choices":[{"value":1,"selected":false,"label":"Catchment Area NORTE"},{"value":2,"selected":false,"label":"Catchment Area SUR"},{"value":3,"selected":false,"label":"Catchment Area CENTRO"}],"label":"Catchment Areas"}
+{"choices":[{"value":1,"label":"Catchment Area NORTE"},{"value":2,"label":"Catchment Area SUR"},{"value":3,"label":"Catchment Area CENTRO"}],"label":"Catchment Areas"}

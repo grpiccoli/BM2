@@ -136,7 +136,9 @@ namespace BiblioMit
 
             services.AddResponseCaching();
 
-            services.AddMvc()
+            services.AddMvc(options => {
+                options.MaxIAsyncEnumerableBufferLimit = 10_000;
+            })
                 .SetCompatibilityVersion(CompatibilityVersion.Latest)
                 .AddViewLocalization(
                 LanguageViewLocationExpanderFormat.Suffix)

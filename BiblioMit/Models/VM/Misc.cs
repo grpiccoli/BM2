@@ -57,6 +57,9 @@ namespace BiblioMit.Models.VM
     public class ChoicesItem : IChoices
     {
         public object Value { get; set; }
+    }
+    public class ChoicesItemSelected : ChoicesItem
+    {
         public bool Selected { get; set; }
     }
     public class ChoicesGroup : IChoices

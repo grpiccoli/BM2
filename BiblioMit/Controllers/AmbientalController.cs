@@ -32,7 +32,7 @@ namespace BiblioMit.Controllers
         private IQueryable<ChoicesItem> CuencaChoices()
         {
             var singlabel = _localizer["Catchment Area"] + " ";
-            return _context.CatchmentAreas.Select(c => new ChoicesItem
+            return _context.CatchmentAreas.Select(c => new ChoicesItemSelected
             {
                 Value = c.Id,
                 Label = singlabel + c.Name,
@@ -43,16 +43,14 @@ namespace BiblioMit.Controllers
             .Select(com => new ChoicesItem
             {
                 Value = com.Id,
-                Label = com.Name + " " + c.Name,
-                Selected = false
+                Label = com.Name + " " + c.Name
             }));
         private IQueryable<ChoicesItem> PsmbChoices() => _context.CatchmentAreas.SelectMany(c => c.Communes
         .SelectMany(com => com.Psmbs.Where(p => p.PolygonId.HasValue && p.PlanktonAssays.Any())
         .Select(p => new ChoicesItem
         {
             Value = p.Id,
-            Label = p.Code + " " + p.Name + " " + c.Name,
-            Selected = false
+            Label = p.Code + " " + p.Name + " " + c.Name
         })));
         private IQueryable<ChoicesItem> PublicAreaChoices() => CuencaChoices().Union(CommuneChoices());
         private IQueryable<ChoicesItem> PrivateAreaChoices() => PublicAreaChoices().Union(PsmbChoices());
@@ -667,11 +665,14 @@ namespace BiblioMit.Controllers
                     1 => phyto.Where(e => e.PlanktonAssay.PsmbId == area),
                     _ => phyto.Where(e => e.PlanktonAssay.Psmb.CommuneId == area)
                 };
-                return Json(phyto.Select(p => new AmData 
-                { 
-                    Date = p.PlanktonAssay.SamplingDate.ToString(_dateFormat, CultureInfo.InvariantCulture), 
-                    Value = p.C 
-                }));
+                return Json(phyto
+                    .GroupBy(e => e.PlanktonAssay.SamplingDate.Date)
+                    .OrderBy(g => g.Key)
+                    .Select(g => new AmData 
+                    { 
+                        Date = g.Key.ToString(_dateFormat, CultureInfo.InvariantCulture), 
+                        Value = g.Average(p => p.C)
+                    }));
             }
             else
             {
@@ -689,7 +690,9 @@ namespace BiblioMit.Controllers
                     .Where(a => a.Ph.HasValue)
                     .GroupBy(e => e.SamplingDate.Date)
                     .OrderBy(g => g.Key)
-                    .Select(g => new AmData { Date = g.Key.ToString(_dateFormat, CultureInfo.InvariantCulture), Value = Math.Round(g.Average(a => a.Ph.Value), 2) }),
+                    .Select(g => new AmData { 
+                        Date = g.Key.ToString(_dateFormat, CultureInfo.InvariantCulture), 
+                        Value = Math.Round(g.Average(a => a.Ph.Value), 2) }),
                     //ox
                     2 => assays
                     .Where(a => a.Oxigen.HasValue)

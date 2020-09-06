@@ -29,7 +29,7 @@ var getBounds = function (positions: any[]) {
     return bounds;
 }
 var type = (<HTMLInputElement>document.getElementById('type')).value;
-var isresearch = type === '2';
+var isresearch = type === '5';
 var selected = 'red';
 //get language
 var lang = $("html").attr("lang");
