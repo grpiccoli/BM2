@@ -5,6 +5,7 @@ ViewData["Title"] = "Boletín";
 }
 
 <partial name="_LibsPg" model='new HashSet<string> { "bootstrap-select", "bootstrap-select-localize" }' />
+<partial name="_Loader" />
 
 @section NavBar{
 <nav class="navbar navbar-dark secondary-nav d-block d-lg-none" style="background-color:#012169;">
@@ -162,7 +163,7 @@ ViewData["Title"] = "Boletín";
     <div id="config-panel" class="col-auto p-0">
         <nav class="nav nav-pills flex-column" aria-orientation="vertical">
             <a id="dates" href="#config" role="tab" data-toggle="tab"
-                class="nav-link nav-item active" aria-expanded="true">
+                class="nav-link nav-item active" aria-expanded="true" name="Fechas">
                 @Localizer["Dates"]
             </a>
             <a id="provinces" href="#Provincias" aria-expanded="false" role="tab" data-toggle="tab" class="prod nav-link nav-item" name="Provincias">@Localizer["Provinces"]</a>

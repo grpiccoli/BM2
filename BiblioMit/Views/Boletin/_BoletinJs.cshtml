@@ -1,6 +1,14 @@
 ﻿@using BiblioMit.Models.Entities.Digest
 
 <script>
+    //loader
+    var loaderStart = () => {
+        document.getElementById('preloader-background').style.display = "block";
+    }
+    var loaderStop = () => {
+        document.getElementById('preloader-background').style.display = "none";
+    }
+    loaderStart();
     //gráfico provincias
     var chart = AmCharts.makeChart("chart-provincias", {
         "type": "pie",
@@ -227,6 +235,7 @@
     });
 
     function tpChange(tab) {
+        loaderStart();
         var tp = getVal("tp");
         //is produccion
         var pro = false;
@@ -377,6 +386,7 @@
             setTxt("tt", r["name"]);
             setTxt("gt", r["group"]);
         });
+        loaderStop();
     }
 
     //on load
@@ -397,4 +407,5 @@
     //$(document).ajaxStop(function () {
     //    $('#loading').modal('hide');
     //});
+
 </script>
