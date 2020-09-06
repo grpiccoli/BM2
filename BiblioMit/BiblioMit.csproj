@@ -261,7 +261,8 @@
   </ItemGroup>-->
 
   <ItemGroup>
-	<Folder Include="json\" />
+	<Folder Include="json\en\" />
+	<Folder Include="json\es\" />
 	<Folder Include="Pages\Shared\" />
     <Folder Include="wwwroot\images\markers\" />
   </ItemGroup>

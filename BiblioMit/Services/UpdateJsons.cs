@@ -79,7 +79,7 @@ namespace BiblioMit.Services
             MethodInfo magicMethod = magicType.GetMethod(function);
             var result = (JsonResult)magicMethod.Invoke(_ambiental, Array.Empty<object>());
             var json = JsonConvert.SerializeObject(result.Value, Formatting.None, _jsonSerializerSettings);
-            File.WriteAllText(Path.Combine(_jsonPath, $"{name}.json"), json);
+            File.WriteAllText(Path.Combine(_jsonPath, CultureInfo.CurrentUICulture.TwoLetterISOLanguageName, $"{name}.json"), json);
         }
         public void Dispose()
         {

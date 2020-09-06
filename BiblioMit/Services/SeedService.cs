@@ -19,6 +19,7 @@ using Pluralize.NET.Core;
 using BiblioMit.Models.Entities.Digest;
 using BiblioMit.Models.Entities.Environmental;
 using BiblioMit.Services.Interfaces;
+using System.Globalization;
 
 namespace BiblioMit.Services
 {
@@ -192,6 +193,9 @@ namespace BiblioMit.Services
                 var path = "UNSYNC/bibliomit/DB";
                 if(Directory.Exists(path))
                     await AddBulkFiles(path).ConfigureAwait(false);
+                CultureInfo.CurrentUICulture = new CultureInfo("en");
+                _update.SeedUpdate();
+                CultureInfo.CurrentUICulture = new CultureInfo("es");
                 _update.SeedUpdate();
             }
             catch (Exception ex)
