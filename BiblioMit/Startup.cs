@@ -159,8 +159,8 @@ namespace BiblioMit
                 options.MaxAge = TimeSpan.FromDays(60);
             });
 
-            services.AddHttpsRedirection(options =>
-                options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect);
+            //services.AddHttpsRedirection(options =>
+            //    options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect);
 
             services.Configure<AuthMessageSenderOptions>(Configuration);
 
@@ -174,7 +174,7 @@ namespace BiblioMit
 
             services.AddUrlHelper();
 
-            services.AddCors();
+            //services.AddCors();
 
             services.AddSignalR(options => {
                 options.EnableDetailedErrors = true;
@@ -184,7 +184,7 @@ namespace BiblioMit
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (app == null || env == null) return;
             if (env.IsDevelopment())
@@ -198,18 +198,12 @@ namespace BiblioMit
                 app.UseHsts();
             }
 
-            app.UseSitemapMiddleware();
-            app.UseCors(o => o.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+            //app.UseSitemapMiddleware();
+            //app.UseCors(o => o.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
             app.UseDefaultFiles();
 
-            var path = new List<string> { "lib", "cldr-data", "main" };
-
-            var ch = _os == "Win32NT" ? @"\" : "/";
-
-            var di = new DirectoryInfo(Path.Combine(env?.WebRootPath, string.Join(ch, path)));
-
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             FileExtensionContentTypeProvider provider = new FileExtensionContentTypeProvider();
             provider.Mappings[".webmanifest"] = "application/manifest+json";
 
@@ -259,7 +253,7 @@ namespace BiblioMit
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapBlazorHub();
+                endpoints.MapBlazorHub().RequireAuthorization();
                 endpoints.MapFallbackToController("Index", "Home");
                 endpoints.MapRazorPages().RequireAuthorization();
                 endpoints.MapControllerRoute(
