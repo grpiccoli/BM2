@@ -121,8 +121,8 @@ namespace BiblioMit.Controllers
 
         [HttpPost]
         [Produces("application/json")]
-        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> CreateFito(IFormFile qqfile)
         {
             if (qqfile == null) return Json(new { success = false, error = "error file null" });
@@ -158,8 +158,8 @@ namespace BiblioMit.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         //[RequestFormSizeLimit(valueCountLimit: 200000, Order = 1)]
-        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> Create([Bind("InputFile,DeclarationType")] SernapescaEntry entry)
         {
             if (ModelState.IsValid)

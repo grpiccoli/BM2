@@ -456,7 +456,6 @@ namespace BiblioMit.Views
 
         // POST: Boletin/Create
         //[HttpPost]
-        //[ValidateAntiForgeryToken]
         //public ActionResult Create(IFormCollection collection)
         //{
         //    if (collection == null)
@@ -481,7 +480,6 @@ namespace BiblioMit.Views
 
         // POST: Boletin/Edit/5
         //[HttpPost]
-        //[ValidateAntiForgeryToken]
         //public ActionResult Edit(int id, IFormCollection collection)
         //{
         //    if (collection == null)
@@ -497,7 +495,6 @@ namespace BiblioMit.Views
 
         // POST: Boletin/Delete/5
         //[HttpPost]
-        //[ValidateAntiForgeryToken]
         //public ActionResult Delete(int id, IFormCollection collection)
         //{
         //    if (collection == null)
