@@ -54,6 +54,7 @@ namespace BiblioMit.Controllers
         [HttpPost]
         [Authorize(Roles = "Editor,Administrator")]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> AddEditAppRole(string id, AppRoleViewModel model)
         {
             if (model == null) return NotFound();
@@ -97,6 +98,7 @@ namespace BiblioMit.Controllers
         [HttpPost]
         [Authorize(Roles = "Administrator")]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> DeleteAppRole(string id, IFormCollection form)
         {
             if (!string.IsNullOrEmpty(id) && form != null)

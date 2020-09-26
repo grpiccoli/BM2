@@ -120,7 +120,8 @@ namespace BiblioMit.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-		public string Translate(string text, string to)
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
+        public string Translate(string text, string to)
         {
             var translated = _nodeService.Run("./wwwroot/js/translate.js", new string[] { text, to });
             return translated;
@@ -242,6 +243,7 @@ namespace BiblioMit.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult SetLanguage(string culture, Uri returnUrl)
         {
             if (!string.IsNullOrWhiteSpace(culture))

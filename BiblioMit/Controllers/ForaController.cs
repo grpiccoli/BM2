@@ -81,6 +81,7 @@ namespace BiblioMit.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Search(int id, string searchQuery)
         {
             return RedirectToAction("Topic", new { id, searchQuery });
@@ -96,6 +97,7 @@ namespace BiblioMit.Controllers
         [HttpPost]
         [Authorize(Roles = "Administrador", Policy = "Foros")]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> AddForum(AddForumModel model)
         {
             var imageUri = "/images/ico/bibliomit.svg";

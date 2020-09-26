@@ -121,6 +121,7 @@ namespace BiblioMit.Controllers
 
         [HttpPost]
         [Produces("application/json")]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateFito(IFormFile qqfile)
         {
@@ -157,6 +158,7 @@ namespace BiblioMit.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         //[RequestFormSizeLimit(valueCountLimit: 200000, Order = 1)]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("InputFile,DeclarationType")] SernapescaEntry entry)
         {
@@ -219,6 +221,7 @@ namespace BiblioMit.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> Edit(int id, 
             [Bind("Id,ApplicationUserId,IP,ProcessStart,ProcessTime,Stage,DeclarationType")] SernapescaEntry entry)
         {
@@ -275,6 +278,7 @@ namespace BiblioMit.Controllers
         // POST: Entries/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var entry = await _context.SernapescaEntries.SingleOrDefaultAsync(m => m.Id == id).ConfigureAwait(false);

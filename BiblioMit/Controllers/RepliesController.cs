@@ -52,6 +52,7 @@ namespace BiblioMit.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> AddReply(PostReplyModel model)
         {
             if (model == null) return NotFound();

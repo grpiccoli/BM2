@@ -75,6 +75,7 @@ namespace BiblioMit.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> AddUser(UserViewModel model)
         {
@@ -171,6 +172,7 @@ namespace BiblioMit.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         [Authorize(Roles = "Administrador,Editor")]
         public async Task<IActionResult> EditUser(string id, EditUserViewModel model)
         {
@@ -273,6 +275,7 @@ namespace BiblioMit.Controllers
         [HttpPost]
         [Authorize(Roles = "Administrador")]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> DeleteUser(string id, IFormCollection form)
         {
             if (!string.IsNullOrEmpty(id) && form != null)

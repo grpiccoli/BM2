@@ -255,6 +255,7 @@ namespace BiblioMit.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> Edit(int id, [Bind("Id,IndividualId,Comment,Magnification,Key")] Photo photo)
         {
             if (photo == null || id != photo.Id)
@@ -307,6 +308,7 @@ namespace BiblioMit.Controllers
         // POST: Photos/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var photo = await _context.Photos.SingleOrDefaultAsync(m => m.Id == id).ConfigureAwait(false);

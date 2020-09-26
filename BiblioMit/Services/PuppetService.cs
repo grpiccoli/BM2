@@ -2,11 +2,11 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using PuppeteerSharp.Media;
+//using PuppeteerSharp.Media;
 //using AntiCaptchaNetCore;
-using System.IO;
+//using System.IO;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Hosting;
+//using Microsoft.AspNetCore.Hosting;
 
 namespace BiblioMit.Services
 {

@@ -74,6 +74,7 @@ namespace BiblioMit.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> Create([Bind("Id,CentreId,Date,Salinity,Temp,O2")] Sampling sampling)
         {
             if (sampling == null) return NotFound();
@@ -134,6 +135,7 @@ namespace BiblioMit.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> AddIndividual([Bind("Id,SamplingId,Sex,Maturity,Length,Comment,Number,Depth")] Individual individual)
         {
             if (individual != null && ModelState.IsValid)
@@ -205,6 +207,7 @@ namespace BiblioMit.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> EditSoft([Bind("Id,SamplingId,SoftType,Tissues,Count,Configs,Check")] IndividualSoftTissueViewModel individual)
         {
             if (individual != null && ModelState.IsValid)
@@ -439,6 +442,7 @@ namespace BiblioMit.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> EditIndividual(int id, [Bind("Id,SamplingId,Sex,Maturity,Length,Comment")] Individual individual)
         {
             if (individual == null || id != individual.Id)
@@ -475,6 +479,7 @@ namespace BiblioMit.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> Edit(int id, [Bind("Id,CentreId,Date,Salinity,Temp,O2")] Sampling sampling)
         {
             if (sampling == null || id != sampling.Id)
@@ -529,6 +534,7 @@ namespace BiblioMit.Controllers
         // POST: Samplings/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var sampling = await _context.Samplings.SingleOrDefaultAsync(m => m.Id == id).ConfigureAwait(false);

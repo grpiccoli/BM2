@@ -81,6 +81,7 @@ namespace BiblioMit.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<JsonResult> Editar(int id, string description, string headers, string conversion, int places, string sep, bool negative)
         {
             if (string.IsNullOrWhiteSpace(sep)) throw new ArgumentException(_localizer["error"]);

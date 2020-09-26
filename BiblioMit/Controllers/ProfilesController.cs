@@ -69,6 +69,7 @@ namespace BiblioMit.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult UploadProfileImage(
             //IFormFile file
             )

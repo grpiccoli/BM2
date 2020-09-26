@@ -66,6 +66,7 @@ namespace BiblioMit.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> Login(LoginViewModel model, Uri returnUrl = null)
         {
             if (model == null) return NotFound();
@@ -133,6 +134,7 @@ namespace BiblioMit.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> LoginWith2fa(LoginWith2faViewModel model, bool rememberMe, Uri returnUrl = null)
         {
             if (model == null) return NotFound();
@@ -189,6 +191,7 @@ namespace BiblioMit.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> LoginWithRecoveryCode(LoginWithRecoveryCodeViewModel model, Uri returnUrl = null)
         {
             if (model == null) return NotFound();
@@ -250,6 +253,7 @@ namespace BiblioMit.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> Register(RegisterViewModel model, Uri returnUrl = null)
         {
             if (model == null) return NotFound();
@@ -284,6 +288,7 @@ namespace BiblioMit.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync().ConfigureAwait(false);
@@ -294,6 +299,7 @@ namespace BiblioMit.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult ExternalLogin(string provider, Uri returnUrl = null)
         {
             // Request a redirect to the external login provider.
@@ -437,6 +443,7 @@ namespace BiblioMit.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> ExternalLoginConfirmation(ExternalLoginViewModel model, Uri returnUrl = null)
         {
             if (model == null) return NotFound();
@@ -494,6 +501,7 @@ namespace BiblioMit.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
         {
             if (model == null) return NotFound();
@@ -541,6 +549,7 @@ namespace BiblioMit.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
         {
             if (model == null) return NotFound();

@@ -128,6 +128,7 @@ namespace BiblioMit.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         [Authorize(Roles = "Administrador",Policy ="Contactos")]
         public async Task<IActionResult> Create(ContactEditViewModel editModel)
         {
@@ -187,6 +188,7 @@ namespace BiblioMit.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         [Authorize(Roles = "Administrador,Editor",Policy = "Contactos")]
         public async Task<IActionResult> Edit(int id, ContactEditViewModel editModel)
         {
@@ -256,6 +258,7 @@ namespace BiblioMit.Controllers
         // POST: Contacts/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         [Authorize(Roles = "Administrador",Policy = "Contactos")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -275,6 +278,7 @@ namespace BiblioMit.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         [Authorize(Roles = "Administrador",Policy = "Contactos")]
         public async Task<IActionResult> SetStatus(int id, ContactStatus status)
         {

@@ -41,6 +41,7 @@ namespace BiblioMit.Views
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Download(string src)
         {
             var url = $"{Request.Scheme}://{Request.Host.Value}/files/Boletin/BOLETIN-{src}.pdf";

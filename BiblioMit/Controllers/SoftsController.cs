@@ -57,6 +57,7 @@ namespace BiblioMit.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> Create([Bind("Id,IndividualId,SoftType,Tissue,Comment,Count,Degree")] Soft soft)
         {
             if (soft == null) return NotFound();
@@ -92,6 +93,7 @@ namespace BiblioMit.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> Edit(int id, [Bind("Id,IndividualId,SoftType,Tissue,Comment,Count,Degree")] Soft soft)
         {
             if (soft == null || id != soft.Id)
@@ -145,6 +147,7 @@ namespace BiblioMit.Controllers
         // POST: Samplings/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var soft = await _context.Softs.SingleOrDefaultAsync(m => m.Id == id).ConfigureAwait(false);

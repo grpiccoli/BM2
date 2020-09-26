@@ -69,6 +69,7 @@ namespace BiblioMit.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Create([Bind("Id,BsnssName,Acronym")] CompanyViewModel company)
         {
@@ -119,6 +120,7 @@ namespace BiblioMit.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         [Authorize(Roles = "Administrador,Editor")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,BsnssName,Acronym")] Company company)
         {
@@ -172,6 +174,7 @@ namespace BiblioMit.Controllers
         // POST: Companies/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

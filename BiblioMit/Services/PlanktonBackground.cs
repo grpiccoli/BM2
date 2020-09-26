@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using BiblioMit.Services.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
@@ -15,11 +16,14 @@ namespace BiblioMit.Services
         private readonly ILogger _logger;
         private readonly IStringLocalizer _localizer;
         private Timer _timer;
+        private IPlanktonService _planktonService;
         public PlanktonBackground(
+            IPlanktonService planktonService,
             IServiceProvider services,
             IStringLocalizer<SeedBackground> localizer,
             ILogger<SeedBackground> logger)
         {
+            _planktonService = planktonService;
             _localizer = localizer;
             Services = services;
             _logger = logger;
