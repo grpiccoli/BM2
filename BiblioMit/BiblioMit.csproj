@@ -61,6 +61,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
     <PackageReference Include="Pluralize.NET.Core" Version="1.0.0" />
+    <PackageReference Include="PuppeteerSharp" Version="2.0.4" />
     <PackageReference Include="Radzen.Blazor" Version="2.11.16" />
     <PackageReference Include="ResXResourceReader.NetStandard" Version="1.0.1" />
     <PackageReference Include="Schema.NET" Version="7.2.0" />

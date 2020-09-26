@@ -58,6 +58,7 @@ namespace BiblioMit
                     Configuration.GetConnectionString($"{_os}Connection"),
                     sqlServerOptions => sqlServerOptions.CommandTimeout(10000)));
 
+            services.AddScoped<IPuppet, PuppetService>();
             services.AddHostedService<SeedBackground>();
             services.AddScoped<ISeed, SeedService>();
             services.AddScoped<IUpdateJsons, UpdateJsons>();
