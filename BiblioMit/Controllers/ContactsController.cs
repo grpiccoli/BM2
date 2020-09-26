@@ -1,12 +1,14 @@
 using BiblioMit.Authorization;
 using BiblioMit.Data;
 using BiblioMit.Models;
+using BiblioMit.Views;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -33,27 +35,25 @@ namespace BiblioMit.Controllers
         // GET: Contacts
         public async Task<IActionResult> Index()
         {
-            IQueryCollection q = Request.Query;
+            ViewData["comunas"] = _context.Communes
+                .Select(c => new ContactCommune
+                { 
+                    Id = c.Id,
+                    Commune = c.Name,
+                    Province = c.Province.Name
+                });
 
-            var contacts = from c in _context.Contacts
-                           .Include(c => c.ConsessionOrResearch)
-                            .ThenInclude(c => c.Company)
-                           .Include(c => c.ConsessionOrResearch)
-                            .ThenInclude(c => c.Polygon)
-                           .Include(c => c.ConsessionOrResearch)
-                            .ThenInclude(c => c.Commune)
-                           select c;
-            var comuna = _context.Communes
-                .Include(c => c.Province)
-                    .ThenInclude(c => c.Region);
-            ViewData["comunas"] = comuna;
-            string[] temp = q["c"];
-            ViewData["c"] = temp;
-            if (q["c"].Any())
+            IQueryable<Contact> contacts = _context.Contacts
+                .Include(c => c.ConsessionOrResearch);
+
+            IQueryCollection q = Request.Query;
+            string[] tmp = q["c"];
+            ViewData["c"] = tmp;
+
+            foreach (var c in tmp)
             {
-                contacts = contacts.Where(c => q["c"].ToString()
-                .Contains(Convert.ToString(c.ConsessionOrResearch.CommuneId, CultureInfo.InvariantCulture),
-                    StringComparison.InvariantCultureIgnoreCase));
+                if (int.TryParse(c, out int r))
+                    contacts = contacts.Where(o => o.ConsessionOrResearch.CommuneId.Value == r);
             }
 
             var isAuthorized = User.IsInRole("Administrador") && 
@@ -65,10 +65,9 @@ namespace BiblioMit.Controllers
             // or you are the owner.
             if (!isAuthorized)
             {
-                contacts = contacts.Where(c => c.Status  == ContactStatus.Approved
+                contacts = contacts.Where(c => c.Status == ContactStatus.Approved
                                             || c.OwnerId == currentUserId);
             }
-
             return View(await contacts.ToListAsync().ConfigureAwait(false));
         }
 
@@ -333,5 +332,9 @@ namespace BiblioMit.Controllers
 
             return editModel;
         }
+    }
+    public class ContactCommune : CommuneList
+    {
+        public int Id { get; set; }
     }
 }

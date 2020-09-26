@@ -39,10 +39,11 @@ namespace BiblioMit.Controllers
 
         public IActionResult Manual()
         {
-            var url = "~/MANUAL_DE_USO_BIBLIOMIT/MANUAL_DE_USO_BIBLIOMIT.html";
-            if (Url.IsLocalUrl(url))
-                return Redirect(url);
-            else return RedirectToAction("Index", "Home");
+            //var url = "~/MANUAL_DE_USO_BIBLIOMIT/MANUAL_DE_USO_BIBLIOMIT.html";
+            //if (Url.IsLocalUrl(url))
+            //    return Redirect(url);
+            //else return RedirectToAction("Index", "Home");
+            return View();
         }
 
         public IActionResult Analytics()
@@ -128,7 +129,7 @@ namespace BiblioMit.Controllers
         [HttpGet]
         public IActionResult Search()
         {
-            return PartialView("_CustomSearch");
+            return View();
         }
 
         public IActionResult Index()

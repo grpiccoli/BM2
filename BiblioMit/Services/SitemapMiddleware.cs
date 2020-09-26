@@ -47,15 +47,15 @@ namespace BiblioMit.Services
                         if(test1 && test2)
                         {
                             cnt++;
-                            sitemapContent += "<url>";
-                            sitemapContent += string.Format(CultureInfo.InvariantCulture,
+                            sitemapContent += "<url>"
+                            + string.Format(CultureInfo.InvariantCulture,
                                 "<loc>{0}/{1}/{2}</loc>", _rootUrl,
                             controller.Name.ToUpperInvariant()
-                            .Replace("controller", "", StringComparison.CurrentCultureIgnoreCase), 
-                            method.Name.ToUpperInvariant());
-                            sitemapContent += string.Format(CultureInfo.InvariantCulture,
-                                "<lastmod>{0}</lastmod>", DateTime.UtcNow.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
-                            sitemapContent += "</url>";
+                            .Replace("controller", "", StringComparison.CurrentCultureIgnoreCase),
+                            method.Name.ToUpperInvariant())
+                            + string.Format(CultureInfo.InvariantCulture,
+                                "<lastmod>{0}</lastmod>", DateTime.UtcNow.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))
+                            + "</url>";
                         }
                     }
                 }

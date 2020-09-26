@@ -355,7 +355,7 @@ namespace BiblioMit.Views
         [AllowAnonymous]
         public ActionResult Boletin(int? yr, int? start, int? end, int? reg, int? ver, int? tp)
         {
-            if (!reg.HasValue) reg = 10;
+            if (!reg.HasValue) reg = 110;
             if (!ver.HasValue) ver = 3;
             if (!tp.HasValue) tp = 1;
 
@@ -392,14 +392,16 @@ namespace BiblioMit.Views
                 },
                 "Id", "Name", tp);
 
-            var centros = _context.Psmbs
-                .Include(c => c.Commune)
-                .ThenInclude(c => c.Province)
-                .Where(c => c.Declarations.Any() && c.Commune.Province.RegionId == reg)
-                .Select(c => c.Commune).Distinct();
+            var centros = _context.Communes
+                .Where(c => c.Province.RegionId == reg
+                && c.Psmbs.Any(p => p.Declarations.Any()));
 
             ViewData["Comunas"] = centros.OrderBy(c => c.Province.Name).ThenBy(c => c.Name)
-                .Select(c => new string[] { c.Name, c.Province.Name });
+                .Select(c => new CommuneList 
+                { 
+                    Commune = c.Name, 
+                    Province = c.Province.Name 
+                });
             ViewData["Ver"] = ver;
             return View();
         }
@@ -513,6 +515,11 @@ namespace BiblioMit.Views
         //        return View();
         //    }
         //}
+    }
+    public class CommuneList
+    {
+        public string Commune { get; set; }
+        public string Province { get; set; }
     }
     public class Config
     {

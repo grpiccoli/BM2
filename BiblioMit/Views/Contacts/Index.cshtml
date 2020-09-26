@@ -1,6 +1,8 @@
-@model IEnumerable<BiblioMit.Models.Contact>
-@using BiblioMit.Authorization;
-@using Microsoft.AspNetCore.Authorization;
+@model IEnumerable<Contact>
+@using BiblioMit.Models
+@using BiblioMit.Authorization
+@using BiblioMit.Controllers
+@using Microsoft.AspNetCore.Authorization
 
 @{
     ViewData["Title"] = "Contactos";
@@ -18,25 +20,18 @@
     <div class="form-actions no-color">
         <div class="form-group col-12 col-lg-6">
             <div class="input-group">
-                    <select name="c" class="selectpicker form-control" multiple="" 
-                            data-live-search="true" data-actions-box="true" tabindex="-98" 
-                            value="@ViewData["c"]" title="Filtrar por Región, Provincia o Comuna">
-                        <optgroup label="Comunas">
-                            @foreach (Commune u in (ViewData["comunas"] as IEnumerable<BiblioMit.Models.Commune>))
-                            {
-                            if ((ViewData["c"] as string[]).Contains(Convert.ToString(u.Id)))
-                            {
-                            <option selected data-subtext="@u.Province.GetFullName()" 
-                                    value="@u.Id">@u.Name</option>
-                            }
-                            else
-                            {
-                            <option data-subtext="@u.Province.GetFullName()" 
-                                    value="@u.Id">@u.Name</option>
-                            }
-                            }
-                        </optgroup>
-                    </select>
+                <select name="c" class="selectpicker form-control" multiple=""
+                        data-live-search="true" data-actions-box="true" tabindex="-98"
+                        value="@ViewData["c"]" title="Filtrar por Región, Provincia o Comuna">
+                    <optgroup label="Comunas">
+                        @foreach (ContactCommune u in (IQueryable<ContactCommune>)ViewData["comunas"])
+                        {
+                        <option selected="@((ViewData["c"] as string[]).Contains(Convert.ToString(u.Id)))" 
+                                data-subtext="@u.Province"
+                                value="@u.Id">@u.Commune</option>
+                        }
+                    </optgroup>
+                </select>
                 <span class="input-group-btn">
                     <button type="submit" value="Buscar" class="btn btn-info"><i class="glyphicon glyphicon-filter"></i>  Filtrar</button>
                 </span>
@@ -52,7 +47,7 @@
                 Tipo
             </th>
             <th class="hidden-xs">
-                @Html.DisplayNameFor(model => model.ConsessionOrResearch.Company.BusinessName) / @Html.DisplayNameFor(model => model.ConsessionOrResearch.Company.GetRUT())
+                @Html.DisplayNameFor(model => model.ConsessionOrResearch.Company.BusinessName) / @Html.DisplayNameFor(model => model.ConsessionOrResearch.Company.Id)
             </th>
             <th class="hidden-xs">
                 Centro o Concesi&oacute;n
@@ -95,8 +90,8 @@
                             @{ var acr = string.IsNullOrWhiteSpace(item.ConsessionOrResearch.Company.Acronym) ? "bibliomit" : item.ConsessionOrResearch.Company.Acronym; }
                             <img src="~/images/ico/@(acr).svg" style="height:50px;" />
                             @*<span style="font-size:48px;" class="bib-@item.ConsessionOrResearch.Company.Acronym">
-            <span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span><span class="path6"></span>
-        </span>*@
+                                    <span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span><span class="path6"></span>
+                                </span>*@
                             <p style="font-size:smaller">
                                 @item.ConsessionOrResearch.Company.Acronym
                             </p>
@@ -106,7 +101,7 @@
                         @Html.DisplayFor(modelItem => item.ConsessionOrResearch.Company.BusinessName)
                         <br />
                         @Html.DisplayFor(modelItem => item.ConsessionOrResearch.Company.Id)-@item.ConsessionOrResearch.Company.Id.RUTGetDigit()
-                        <br/>
+                        <br />
                         <a style="font-size:smaller" asp-controller="Companies" asp-action="Details" asp-route-id="@item.ConsessionOrResearch.CompanyId">Detalles</a>
                     </div>
                 </td>
@@ -118,14 +113,14 @@
                     else
                     {
                         <a target="_blank" rel="noopener" href="@Html.DisplayFor(modelItem => ((BiblioMit.Models.Entities.Centres.ResearchCentre)item.ConsessionOrResearch).Url)">
-                    @Html.DisplayFor(modelItem => item.ConsessionOrResearch.Name)
+                            @Html.DisplayFor(modelItem => item.ConsessionOrResearch.Name)
                         </a>
                     }
-                    <br/>
+                    <br />
                     <a style="font-size:smaller" asp-controller="Centres" asp-action="Details" asp-route-id="@item.ConsessionOrResearchId">Detalles</a>
                 </td>
                 <td class="hidden-xs">
-                    <strong>@Html.DisplayFor(modelItem => item.Position)</strong><br/>@Html.DisplayFor(modelItem => item.Description)
+                    <strong>@Html.DisplayFor(modelItem => item.Position)</strong><br />@Html.DisplayFor(modelItem => item.Description)
                 </td>
                 <td>
                     <div class="hidden-lg hidden-md hidden-sm">
@@ -137,30 +132,30 @@
                             </a>
                             <p style="font-size:smaller">
                                 <a target="_blank" rel="noopener" href="@Html.DisplayFor(modelItem => ((BiblioMit.Models.Entities.Centres.ResearchCentre)item.ConsessionOrResearch).Url)">
-                                <strong>@Html.DisplayFor(modelItem => item.ConsessionOrResearch.Name)</strong>
-                                    </a><br/>
+                                    <strong>@Html.DisplayFor(modelItem => item.ConsessionOrResearch.Name)</strong>
+                                </a><br />
                                 <a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=@item.ConsessionOrResearch.Address">@Html.DisplayFor(modelItem => item.ConsessionOrResearch.Address)</a>
                             </p>
                         </div>
-                        <div  style="float:left;width:45vw;">
+                        <div style="float:left;width:45vw;">
                             <p style="margin-bottom:0px">
                                 <strong>@Html.DisplayFor(modelItem => item.Name) @Html.DisplayFor(modelItem => item.Last)</strong>
-                                <br/>
+                                <br />
                                 @Html.DisplayFor(modelItem => item.Description)
-                                <br/>
+                                <br />
                                 @Html.DisplayFor(modelItem => item.Email)
-                                <br/>
+                                <br />
                                 <a title="Horario: @Html.DisplayFor(modelItem => item.OpenHr) - @Html.DisplayFor(modelItem => item.CloseHr) Hrs" href="tel:+@Html.DisplayFor(modelItem => item.Phone)">@String.Format("{0:(+##) # #### ####}", item.Phone) </a>
-                                <br/>
+                                <br />
                                 <a asp-action="Details" asp-route-id="@item.Id">Detalles</a>
                             </p>
                         </div>
                     </div>
                     <div class="hidden-xs" style="white-space:nowrap;width:100%">
                         <strong>@Html.DisplayFor(modelItem => item.Name) @Html.DisplayFor(modelItem => item.Last)</strong>
-                        <br/>
+                        <br />
                         @Html.DisplayFor(modelItem => item.Email)
-                        <br/>
+                        <br />
                         <a title="Horario: @Html.DisplayFor(modelItem => item.OpenHr) - @Html.DisplayFor(modelItem => item.CloseHr) Hrs" href="tel:+@Html.DisplayFor(modelItem => item.Phone)">@String.Format("{0:(+##) # #### ####}", item.Phone) </a>
                     </div>
                 </td>
@@ -175,13 +170,13 @@
                 }
                 <td class="hidden-xs">
                     @if (AuthorizationService.AuthorizeAsync(User,
-                                                       item, ContactOperations.Update).GetAwaiter().GetResult().Succeeded)
+                                                      item, ContactOperations.Update).GetAwaiter().GetResult().Succeeded)
                     {
                         <a asp-action="Edit" asp-route-id="@item.Id">Editar</a><text> | </text>
                     }
                     <a asp-action="Details" asp-route-id="@item.Id">Detalles</a>
                     @if (AuthorizationService.AuthorizeAsync(User,
-                                                         item, ContactOperations.Delete).GetAwaiter().GetResult().Succeeded)
+                                                        item, ContactOperations.Delete).GetAwaiter().GetResult().Succeeded)
                     {
                         <text> | </text>
                         <a asp-action="Delete" asp-route-id="@item.Id">Eliminar</a>
