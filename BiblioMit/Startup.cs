@@ -140,6 +140,7 @@ namespace BiblioMit
 
             services.AddMvc(options => {
                 options.MaxIAsyncEnumerableBufferLimit = 10_000;
+                options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
             })
                 .SetCompatibilityVersion(CompatibilityVersion.Latest)
                 .AddViewLocalization(

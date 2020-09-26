@@ -13,6 +13,7 @@ namespace BiblioMit.Services
 {
     public class PlanktonBackground : IHostedService, IDisposable
     {
+        private bool _disposed;
         private readonly ILogger _logger;
         private readonly IStringLocalizer _localizer;
         private Timer _timer;
@@ -51,7 +52,21 @@ namespace BiblioMit.Services
         }
         public void Dispose()
         {
-            _timer?.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        // Protected implementation of Dispose pattern.
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+            if (disposing)
+            {
+                _timer?.Dispose();
+            }
+            // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+            // TODO: set large fields to null.
+            _disposed = true;
         }
         private static DateTime GetNextMidnight()
         {
