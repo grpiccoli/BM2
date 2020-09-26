@@ -59,6 +59,7 @@ namespace BiblioMit
                     sqlServerOptions => sqlServerOptions.CommandTimeout(10000)));
 
             services.AddScoped<IPuppet, PuppetService>();
+            services.AddScoped<IPlanktonService, PlanktonService>();
             services.AddHostedService<SeedBackground>();
             services.AddScoped<ISeed, SeedService>();
             services.AddScoped<IUpdateJsons, UpdateJsons>();
