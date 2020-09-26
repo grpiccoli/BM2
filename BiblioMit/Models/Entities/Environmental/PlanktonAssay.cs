@@ -61,6 +61,7 @@ namespace BiblioMit.Models
         public int? AreaCode { get; set; }
         [ParseSkip]
         public int? PlanktonUserId { get; set; }
+        [ParseSkip]
         public virtual PlanktonUser PlanktonUser { get; set; }
         [ParseSkip]
         public virtual ICollection<Phytoplankton> Phytoplanktons { get; } = new List<Phytoplankton>();

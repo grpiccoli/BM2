@@ -4,6 +4,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using BiblioMit.Services;
 
 namespace BiblioMit
 {
@@ -39,6 +41,10 @@ namespace BiblioMit
                     //    new MinDataRate(bytesPerSecond: 100, gracePeriod: TimeSpan.FromSeconds(10));
                 })
                 .UseUrls("http://localhost:5008/")
-                .UseStartup<Startup>());
+                .UseStartup<Startup>())
+            .ConfigureServices(services => 
+            {
+                services.AddHostedService<PlanktonBackground>();
+            });
     }
 }
