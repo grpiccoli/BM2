@@ -32,7 +32,7 @@ namespace BiblioMit.Extensions
             double? num = null;
             if (decimalSeparator.HasValue)
             {
-                text = Regex.Replace(text, @$"[^\d]\{decimalSeparator.Value}", "");
+                text = Regex.Replace(text, @$"[^\d\{decimalSeparator.Value}]", "");
                 if (string.IsNullOrEmpty(text)) return null;
                 var orders = text.Split(decimalSeparator.Value);
                 if(orders.Length > 1)
