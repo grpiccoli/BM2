@@ -29,6 +29,10 @@ namespace BiblioMit.Controllers
             _context = context;
             _dateFormat = "yyyy-MM-dd";
         }
+        public IActionResult PullPlankton()
+        {
+            return View();
+        }
         private IQueryable<ChoicesItem> CuencaChoices()
         {
             var singlabel = _localizer["Catchment Area"] + " ";

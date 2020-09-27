@@ -20,6 +20,7 @@ using BiblioMit.Models.Entities.Digest;
 using BiblioMit.Models.Entities.Environmental;
 using BiblioMit.Services.Interfaces;
 using System.Globalization;
+using BiblioMit.Models.Entities.Environmental.Plancton;
 
 namespace BiblioMit.Services
 {
@@ -171,6 +172,8 @@ namespace BiblioMit.Services
                     await Insert<SpeciesPhytoplankton>(tsvPath).ConfigureAwait(false);
                 if (!_context.Stations.Any())
                     await Insert<Station>(tsvPath).ConfigureAwait(false);
+                if (!_context.PlanktonUsers.Any())
+                    await Insert<PlanktonUser>(tsvPath).ConfigureAwait(false);
 
                 tsvPath = Path
                     .Combine(_environment.ContentRootPath, "Data", "Semaforo");

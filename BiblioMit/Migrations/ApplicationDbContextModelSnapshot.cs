@@ -474,7 +474,7 @@ namespace BiblioMit.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PlanktonUser");
+                    b.ToTable("PlanktonUsers");
                 });
 
             modelBuilder.Entity("BiblioMit.Models.Entry", b =>

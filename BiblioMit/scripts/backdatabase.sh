@@ -16,6 +16,8 @@ sqlcmd -h -1 -s "^" -W -k 1 -r 1 -S localhost -U SA -P JGdtaStFe7LXf4A3 -d aspne
 sqlcmd -h -1 -s "^" -W -k 1 -r 1 -S localhost -U SA -P JGdtaStFe7LXf4A3 -d aspnet-BiblioMit-3E10FA62-82AF-4FA8-91A7-71A1040A7646 -Q 'SELECT * FROM dbo.PlanktonAssayEmails' | tr '^' '\t' | grep '^[1-9]' | sed "s/NULL//g" | awk 'sub("$", "\r")' | iconv -f utf-8 -t utf-16 - > PlanktonAssayEmails.tsv
 #PlanktonAssays
 sqlcmd -h -1 -s "^" -W -k 1 -r 1 -S localhost -U SA -P JGdtaStFe7LXf4A3 -d aspnet-BiblioMit-3E10FA62-82AF-4FA8-91A7-71A1040A7646 -Q 'SELECT * FROM dbo.PlanktonAssays' | tr '^' '\t' | grep '^[1-9]' | sed "s/NULL//g" | awk 'sub("$", "\r")' | iconv -f utf-8 -t utf-16 - > PlanktonAssays.tsv
+#PlanktonUsers
+sqlcmd -h -1 -s "^" -W -k 1 -r 1 -S localhost -U SA -P JGdtaStFe7LXf4A3 -d aspnet-BiblioMit-3E10FA62-82AF-4FA8-91A7-71A1040A7646 -Q 'SELECT * FROM dbo.PlanktonUsers' | tr '^' '\t' | grep '^[1-9]' | sed "s/NULL//g" | awk 'sub("$", "\r")' | iconv -f utf-8 -t utf-16 - > PlanktonUsers.tsv
 #SamplingEntities
 sqlcmd -h -1 -s "^" -W -k 1 -r 1 -S localhost -U SA -P JGdtaStFe7LXf4A3 -d aspnet-BiblioMit-3E10FA62-82AF-4FA8-91A7-71A1040A7646 -Q 'SELECT * FROM dbo.SamplingEntities' | tr '^' '\t' | grep '^[1-9]' | sed "s/NULL//g" | awk 'sub("$", "\r")' | iconv -f utf-8 -t utf-16 - > SamplingEntities.tsv
 #SpeciesPhytoplanktons

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using BiblioMit.Models.Entities.Centres;
 using BiblioMit.Models.Entities.Digest;
 using BiblioMit.Models.Entities.Environmental;
+using BiblioMit.Models.Entities.Environmental.Plancton;
 
 namespace BiblioMit.Data
 {
@@ -238,6 +239,7 @@ namespace BiblioMit.Data
         public DbSet<GenusPhytoplankton> GenusPhytoplanktons { get; set; }
         public DbSet<IdentityUserClaim<string>> IdentityUserClaim { get; set; }
         public DbSet<IdentityUserRole<string>> IdentityUserRole { get; set; }
+        public DbSet<PlanktonUser> PlanktonUsers { get; set; }
         public DbSet<Individual> Individuals { get; set; }
         public DbSet<Laboratory> Laboratories { get; set; }
         public DbSet<Larva> Larvas { get; set; }

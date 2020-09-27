@@ -47,9 +47,7 @@ namespace BiblioMit
             Configuration = configuration;
             _os = Environment.OSVersion.Platform.ToString();
         }
-
         public IConfiguration Configuration { get; }
-
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -59,6 +57,7 @@ namespace BiblioMit
                     sqlServerOptions => sqlServerOptions.CommandTimeout(10000)));
 
             services.AddScoped<IPuppet, PuppetService>();
+            services.AddHostedService<PlanktonBackground>();
             services.AddScoped<IPlanktonService, PlanktonService>();
             services.AddHostedService<SeedBackground>();
             services.AddScoped<ISeed, SeedService>();

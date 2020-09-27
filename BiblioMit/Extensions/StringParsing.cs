@@ -97,7 +97,7 @@ namespace BiblioMit.Extensions
         }
         public static DateTime? ParseDateTime(this string text)
         {
-            var formats = new string[] { "yyyyMMdd", "yyyy-MM-dd", "dd-MM-yyyy HH:mm", "dd-MM-yyyy", "dd-MM-yyyy HH:mm'&nbsp;'" };
+            var formats = new string[] { "yyyyMMdd", "yyyy-MM-dd", "dd-MM-yyyy HH:mm", "dd-MM-yyyy", "dd-MM-yyyy HH:mm'&nbsp;'", "dd-MM-yyyy HH:mm 'HRS.'" };
             var parsed = DateTime.TryParseExact(text, formats, new CultureInfo("es-CL"), DateTimeStyles.None, out DateTime date);
             if (parsed) return date;
             return null;

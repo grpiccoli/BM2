@@ -203,6 +203,7 @@
   
   <ItemGroup>
     <None Remove="compilerconfig.json.defaults" />
+    <None Remove="Data\Environmental\PlanktonUsers.tsv" />
     <None Remove="scripts\bibliomit.ts" />
     <None Remove="scripts\charts.ts" />
     <None Remove="scripts\chat.ts" />
@@ -264,6 +265,7 @@
   <ItemGroup>
 	<Folder Include="json\en\" />
 	<Folder Include="json\es\" />
+	<Folder Include="html\" />
 	<Folder Include="Pages\Shared\" />
     <Folder Include="wwwroot\images\markers\" />
   </ItemGroup>

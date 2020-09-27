@@ -104,21 +104,18 @@ namespace BiblioMit.Controllers
 
             return View(entry);
         }
-
         [HttpGet]
         public IActionResult Output(int id)
         {
             var model = _context.SernapescaEntries.FirstOrDefault(e => e.Id == id);
             return PartialView("_Output", model);
         }
-
         // GET: Entries/Create
         [HttpGet]
         public IActionResult CreateFito()
         {
             return View();
         }
-
         [HttpPost]
         [Produces("application/json")]
         [ValidateAntiForgeryToken]
@@ -152,7 +149,6 @@ namespace BiblioMit.Controllers
 
             return View();
         }
-
         // POST: Entries/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -197,7 +193,6 @@ namespace BiblioMit.Controllers
             ViewData[nameof(DeclarationType)] = DeclarationType.Supply.Enum2MultiSelect(Filters, "Name");
             return View(entry);
         }
-
         // GET: Entries/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -254,7 +249,6 @@ namespace BiblioMit.Controllers
             ViewData["ApplicationUserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", entry.ApplicationUserId);
             return View(entry);
         }
-
         // GET: Entries/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -274,7 +268,6 @@ namespace BiblioMit.Controllers
 
             return View(entry);
         }
-
         // POST: Entries/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -286,7 +279,6 @@ namespace BiblioMit.Controllers
             await _context.SaveChangesAsync().ConfigureAwait(false);
             return RedirectToAction(nameof(Index));
         }
-
         private bool EntryExists(int id)
         {
             return _context.SernapescaEntries.Any(e => e.Id == id);

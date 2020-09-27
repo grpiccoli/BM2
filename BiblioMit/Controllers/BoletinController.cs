@@ -2,7 +2,6 @@
 using BiblioMit.Extensions;
 using BiblioMit.Models;
 using BiblioMit.Models.Entities.Digest;
-using DocumentFormat.OpenXml.Presentation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -20,9 +19,7 @@ namespace BiblioMit.Views
     {
         private readonly ApplicationDbContext _context;
 
-        public BoletinController(
-            ApplicationDbContext context
-            )
+        public BoletinController(ApplicationDbContext context)
         {
             _context = context;
         }

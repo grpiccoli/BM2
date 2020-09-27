@@ -79,6 +79,26 @@ namespace BiblioMit.Services
             var pages = await browser.PagesAsync().ConfigureAwait(false);
             return pages[0];
         }
+        public async Task<Page> ForceGetPageAsync(Uri uri, List<string> block)
+        {
+            var open = true;
+            Page page = null;
+            while (open)
+            {
+                try
+                {
+                    page = await GetPageAsync(uri, block)
+                    .ConfigureAwait(false);
+                    open = false;
+                }
+                catch (TimeoutException ex)
+                {
+                    Console.WriteLine(ex);
+                    await page.Browser.CloseAsync().ConfigureAwait(false);
+                }
+            };
+            return page;
+        }
         public async Task<Page> GetPageAsync(Uri uri, List<string> block)
         {
             var browser = await GetBrowserAsync().ConfigureAwait(false);
