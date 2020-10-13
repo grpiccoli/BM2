@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using OfficeOpenXml;
@@ -47,7 +46,7 @@ namespace BiblioMit.Controllers
         }
 
         // GET: Entries
-        public async Task<IActionResult> Index(int? id, int? pg, int? rpp, string srt,
+        public IActionResult Index(int? id, int? pg, int? rpp, string srt,
             bool? asc, string[] val)
         {
             if (!pg.HasValue) pg = 1;
@@ -62,13 +61,16 @@ namespace BiblioMit.Controllers
 
             var applicationDbContext = asc.Value ?
                 pre
+                .Include(e => e.ApplicationUser)
                 .OrderBy(x => sort.GetValue(x))
+                .ToList()
                 .Skip((pg.Value - 1) * rpp.Value).Take(rpp.Value)
-                .Include(e => e.ApplicationUser) :
+                :
                 pre
+                .Include(e => e.ApplicationUser)
                 .OrderByDescending(x => sort.GetValue(x))
-                .Skip((pg.Value - 1) * rpp.Value).Take(rpp.Value)
-                .Include(e => e.ApplicationUser);
+                .ToList()
+                .Skip((pg.Value - 1) * rpp.Value).Take(rpp.Value);
 
             ViewData["Processing"] = id;
 
@@ -82,7 +84,7 @@ namespace BiblioMit.Controllers
             ViewData["Date"] = string.Format(CultureInfo.CurrentCulture, "'{0}'",
                 string.Join("','", _context.SernapescaEntries.Select(v => v.Date.Date.ToString("yyyy-M-d", CultureInfo.CurrentCulture)).Distinct().ToList()));
 
-            return View(await applicationDbContext.ToListAsync().ConfigureAwait(false));
+            return View(applicationDbContext);
         }
 
         // GET: Entries/Details/5

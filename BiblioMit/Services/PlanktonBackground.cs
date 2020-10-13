@@ -20,8 +20,8 @@ namespace BiblioMit.Services
         private readonly CancellationTokenSource _stoppingCts = new CancellationTokenSource();
         public PlanktonBackground(
             IServiceProvider services,
-            IStringLocalizer<SeedBackground> localizer,
-            ILogger<SeedBackground> logger)
+            IStringLocalizer<PlanktonBackground> localizer,
+            ILogger<PlanktonBackground> logger)
         {
             _localizer = localizer;
             Services = services;
@@ -33,8 +33,8 @@ namespace BiblioMit.Services
             _logger.LogInformation(
                 _localizer["Plankton Service running is working."]);
 
-            _timer = new Timer(FetchAssays, null, TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(-1));
-            //_timer = new Timer(FetchAssays, null, TimeToNextSaturdayMidnight(), TimeSpan.FromMilliseconds(-1));
+            //_timer = new Timer(FetchAssays, null, TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(-1));
+            _timer = new Timer(FetchAssays, null, TimeToNextSaturdayMidnight(), TimeSpan.FromMilliseconds(-1));
 
             return Task.CompletedTask;
         }

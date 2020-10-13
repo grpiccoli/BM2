@@ -516,11 +516,7 @@ var CreateTableFromJSON = function(json: any) {
 var fetchPlankton = function() {
     var sd = $('#start').val();
     var ed = $('#end').val();
-    var promises = psmb.getValue(true).map((p:any) => fetch('/ambiental/BuscarInformes', {
-        method: 'POST',
-        headers: new Headers({ 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }),
-        body: `id=${p}&start=${sd}&end=${ed}`
-    }).then(r => r.json()));
+    var promises = psmb.getValue(true).map((p: any) => fetch('/ambiental/BuscarInformes?' + `id=${p}&start=${sd}&end=${ed}`).then(r => r.json()));
     Promise.all(promises).then(j => {
         var divContainer = document.getElementById("results");
         divContainer.innerHTML = "";

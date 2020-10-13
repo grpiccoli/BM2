@@ -545,11 +545,7 @@ var CreateTableFromJSON = function (json) {
 var fetchPlankton = function () {
     var sd = $('#start').val();
     var ed = $('#end').val();
-    var promises = psmb.getValue(true).map(function (p) { return fetch('/ambiental/BuscarInformes', {
-        method: 'POST',
-        headers: new Headers({ 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }),
-        body: "id=" + p + "&start=" + sd + "&end=" + ed
-    }).then(function (r) { return r.json(); }); });
+    var promises = psmb.getValue(true).map(function (p) { return fetch('/ambiental/BuscarInformes?' + ("id=" + p + "&start=" + sd + "&end=" + ed)).then(function (r) { return r.json(); }); });
     Promise.all(promises).then(function (j) {
         var divContainer = document.getElementById("results");
         divContainer.innerHTML = "";
