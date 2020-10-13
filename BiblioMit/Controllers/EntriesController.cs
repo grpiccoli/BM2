@@ -62,14 +62,14 @@ namespace BiblioMit.Controllers
             var applicationDbContext = asc.Value ?
                 pre
                 .Include(e => e.ApplicationUser)
-                .OrderBy(x => sort.GetValue(x))
                 .ToList()
+                .OrderBy(x => sort.GetValue(x))
                 .Skip((pg.Value - 1) * rpp.Value).Take(rpp.Value)
                 :
                 pre
                 .Include(e => e.ApplicationUser)
-                .OrderByDescending(x => sort.GetValue(x))
                 .ToList()
+                .OrderByDescending(x => sort.GetValue(x))
                 .Skip((pg.Value - 1) * rpp.Value).Take(rpp.Value);
 
             ViewData["Processing"] = id;
