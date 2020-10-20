@@ -110,7 +110,7 @@ namespace BiblioMit.Services
                                         Console.WriteLine($"Added Plankton Assay FMA:{fma}");
                                     }
                                 }
-                                catch (Exception ex)
+                                catch (FormatException ex)
                                 {
                                     if(!ex.Message.Contains("El archivo ingresado no contiene registros ni tablas", StringComparison.Ordinal))
                                     {
