@@ -669,7 +669,8 @@ namespace BiblioMit.Controllers
         [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" })]
         public IActionResult Data(int area, char type, int id, DateTime start, DateTime end)
         {
-            int order = area / 99_996 + 24_998 / 24_999;
+            int order = _context.Psmbs.Find(area).Code / 99_996 + 24_998 / 24_999;
+
             if (!(type == 'v' && id != 4))
             {
                 var phyto = _context.Phytoplanktons.Where(e => e.PlanktonAssay.SamplingDate >= start && e.PlanktonAssay.SamplingDate <= end);

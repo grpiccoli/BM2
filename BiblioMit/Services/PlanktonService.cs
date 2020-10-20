@@ -112,7 +112,7 @@ namespace BiblioMit.Services
                                 }
                                 catch (Exception ex)
                                 {
-                                    if(!ex.Message.Contains("El archivo ingresado no contiene registros ni tablas"))
+                                    if(!ex.Message.Contains("El archivo ingresado no contiene registros ni tablas", StringComparison.Ordinal))
                                     {
                                         using var sw = new StreamWriter(file, true);
                                         sw.WriteLine(HttpUtility.HtmlEncode($"Usuario Plancton: {user.Name}"));
