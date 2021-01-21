@@ -21,7 +21,7 @@ $('form input#RUT')
     var url = "/Clientes/ClientExists/RUT";
     url = url.replace("RUT", $(this).val().toString().replace(new RegExp("-.*"), "")
         .replace(new RegExp("\\.", "g"), ""));
-    $.get(url, {}, function (r) {
+    $.get(url, {}, (r) => {
         if (r.response === "True" && $(document).find("title").text() === 'Nuevo Cliente - CLM') {
             $('form input#RUT').parents(".form-group").addClass("has-error");
             $('[data-valmsg-for="RUT"]').html('Cliente ya ingresado a la base de datos');
@@ -42,7 +42,7 @@ $('form input#RUT')
                         $('[data-valmsg-for="RUT"]').empty();
                         $('#Name').val(toTitleCase(result.razon_social.toString().toLowerCase()));
                         $('#Giros.selectpicker')
-                            .selectpicker('val', result.actividades.map(function (a) { return a.codigo; }));
+                            .selectpicker('val', result.actividades.map((a) => a.codigo));
                         $("input[type=submit]").prop('disabled', false);
                     }
                 });

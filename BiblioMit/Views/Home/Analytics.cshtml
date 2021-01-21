@@ -9,30 +9,31 @@
 <div class="chartdiv w-100" style="height:500px;"></div>
 
 @this.Block("Scripts", @<script>
-    var start = $("#start").val();
-    var end = $("#end").val();
-    //am4core.useTheme(am4themes_kelly);
     var chart = am4core.create("chartdiv", am4charts.XYChart);
-    chart.language.locale = am4lang_es_ES;
-    var dataSource = chart.dataSource;
-    dataSource.url = "/home/getanalyticsdata?freq=month";
-    var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
-    dateAxis.dataFields.category = "date";
-    dateAxis.dateFormats.setKey("year", "yy");
-    dateAxis.periodChangeDateFormats.setKey("month", "MMM yy");
-    dateAxis.tooltipDateFormat = "dd MMM, yyyy";
-    dateAxis.renderer.minGridDistance = 40;
+    chart.dataSource.url = "/home/getanalyticsdatamonth";
+    var dateAxis = chart.xAxes.push(new am4charts.CategoryAxis());
     var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
-    var series = chart.series.push(new am4charts.LineSeries());
-    series.dataFields.valueY = "views";
-    series.dataFields.dateX = "date";
-    series.tooltipText = "Visitas totales: [bold]{valueY}[/]";
-    series.tooltip.pointerOrientation = "vertical";
-    chart.cursor = new am4charts.XYCursor();
-    chart.cursor.xAxis = dateAxis;
+    dateAxis.dataFields.category = "date";
+    am4core.useTheme(am4themes_kelly);
+    chart.language.locale = am4lang_es_ES;
     chart.scrollbarY = new am4core.Scrollbar();
     chart.scrollbarX = new am4core.Scrollbar();
+    chart.zoomOutButton.align = "left";
+    chart.zoomOutButton.valign = "bottom";
+    //dateAxis.dateFormats.setKey('year', 'yy');
+    //dateAxis.periodChangeDateFormats.setKey('month', 'MMM yy');
+    //dateAxis.tooltipDateFormat = 'MMM, yyyy';
+    //dateAxis.renderer.minGridDistance = 40;
+    chart.cursor = new am4charts.XYCursor();
     chart.exporting.menu = new am4core.ExportMenu();
+
+    var serie = chart.series.push(new am4charts.LineSeries());
+    serie.dataFields.valueY = "value";
+    serie.dataFields.categoryX = "date";
+    serie.name = "views";
+    series.tooltipText = "Visitas totales: [bold]{valueY}[/]";
+    series.tooltip.pointerOrientation = "vertical";
+    chart.cursor.xAxis = dateAxis;
     </script>)
 
 <partial name="_AmCharts" />

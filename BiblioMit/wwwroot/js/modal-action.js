@@ -9,7 +9,7 @@ $(function () {
         $(this).removeData('bs.modal');
         $('#modal-action .modal-content').empty();
     });
-    $('#modal-action').change(function (_) {
+    $('#modal-action').change(_ => {
         $.validator.unobtrusive.parse('form#modal-form');
     });
 });

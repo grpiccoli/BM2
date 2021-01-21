@@ -1,20 +1,20 @@
-var connection = new signalR.HubConnectionBuilder()
+const connection = new signalR.HubConnectionBuilder()
     .withUrl("/chatHub")
     .build();
-connection.on("ReceiveMessage", function (user, message) {
-    var msg = message.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    var encodedMsg = user + ": " + msg;
-    var li = document.createElement("li");
+connection.on("ReceiveMessage", (user, message) => {
+    const msg = message.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const encodedMsg = user + ": " + msg;
+    const li = document.createElement("li");
     $(li).addClass("self");
     li.textContent = encodedMsg;
     $("#messagesList").append(li);
 });
-connection.start().catch(function (err) { return console.error(err.toString()); });
+connection.start().catch((err) => console.error(err.toString()));
 if ($("#sendButton").length !== 0) {
-    $("#sendButton").click(function (event) {
-        var user = $("#userInput").val();
-        var message = $("#messageInput").val();
-        connection.invoke("SendMessage", user, message).catch(function (err) { return console.error(err.toString()); });
+    $("#sendButton").click((event) => {
+        const user = $("#userInput").val();
+        const message = $("#messageInput").val();
+        connection.invoke("SendMessage", user, message).catch((err) => console.error(err.toString()));
         event.preventDefault();
     });
 }
@@ -23,7 +23,7 @@ var myStorage = localStorage;
 if (!myStorage.getItem('chatID')) {
     myStorage.setItem('chatID', createUUID());
 }
-setTimeout(function (_) {
+setTimeout(_ => {
     element.addClass('enter');
 }, 1000);
 element.click(openElement);
@@ -46,7 +46,7 @@ function closeElement() {
     element.find('.header button').off('click', closeElement);
     element.find('#sendMessage').off('click', sendNewMessage);
     element.find('.text-box').off('keydown', onMetaAndEnter).prop("disabled", true).blur();
-    setTimeout(function (_) {
+    setTimeout(_ => {
         element.find('.chat').removeClass('enter').show();
         element.click(openElement);
     }, 500);

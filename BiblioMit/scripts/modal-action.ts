@@ -1,5 +1,5 @@
 ﻿$(function () {
-    $('#modal-action').on('show.bs.modal', function (event) {
+    $('#modal-action').on('show.bs.modal', function (event:any) {
         var button = $(event.relatedTarget); // Button that triggered the modal
         var url = button.attr("href");
         var modal = $(this);

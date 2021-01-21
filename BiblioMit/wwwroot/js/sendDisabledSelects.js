@@ -1,4 +1,4 @@
-$('form').on('submit', function (_) {
+$('form').on('submit', _ => {
     $('select').prop('disabled', false);
 });
 //# sourceMappingURL=sendDisabledSelects.js.map

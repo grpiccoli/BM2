@@ -16,6 +16,8 @@ using System.IO;
 using System.Globalization;
 using BiblioMit.Services;
 using Microsoft.Extensions.Localization;
+using System.Collections.Generic;
+using BiblioMit.Models.VM;
 
 namespace BiblioMit.Controllers
 {
@@ -50,54 +52,144 @@ namespace BiblioMit.Controllers
         {
             return View();
         }
-
-        public IActionResult GetAnalyticsData(string freq)
+        public IActionResult GetAnalyticsDataMonth()
         {
             using var service = GetService();
             var st = new DateTime(2018, 8, 28);
+            var now = DateTime.Now;
+            var cnt = new Dictionary<string,int>();
 
-            var request = new GetReportsRequest
-            {
-                ReportRequests = new[]
-                {
-                    new ReportRequest
+            foreach (var request in Enumerable
+                .Range(0, 1 + (now.Year - st.Year) / 2)
+                .Select(offset => {
+                    var end = st.AddYears((offset + 1) * 2);
+                    var enddate = end > now ? "today" :
+                    end.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                    return new GetReportsRequest
                     {
-                        ViewId = "180792983",
-                        Metrics = new[] { new Metric { Expression = "ga:entrances" } },
-                        Dimensions = new[]
+                        ReportRequests = new[]
                         {
-                            new Dimension { Name = "ga:landingPagePath" },
-                            new Dimension { Name = "ga:date" }
-                        },
-                        DateRanges = new[] { new DateRange { StartDate = st.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), EndDate = "today" } },
-                        OrderBys = new [] { new OrderBy { FieldName = "ga:date", SortOrder = "ASCENDING" } }
+                                new ReportRequest
+                                {
+                                    ViewId = "180792983",
+                                    Metrics = new[] { new Metric { Expression = "ga:entrances" } },
+                                    Dimensions = new[]
+                                    {
+                                        new Dimension { Name = "ga:landingPagePath" },
+                                        new Dimension { Name = "ga:date" }
+                                    },
+                                    DateRanges = new[] { new DateRange {
+                                    StartDate = st.AddYears(offset*2).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+                                    EndDate =  enddate } },
+                                    OrderBys = new[] { new OrderBy { FieldName = "ga:date", SortOrder = "ASCENDING" } }
+                                }
+                    }
+                    };
+                }))
+            {
+                var batchRequest = service.Reports.BatchGet(request);
+                var response = batchRequest.Execute();
+
+                foreach (var r in response.Reports.First().Data.Rows)
+                {
+                    var date = r.Dimensions[1].Substring(0, r.Dimensions[1].Length - 2).Insert(4, "-");
+                    if (cnt.ContainsKey(date))
+                    {
+                        cnt[date] += int.Parse(r.Metrics.First().Values.First(), CultureInfo.InvariantCulture);
+                    }
+                    else
+                    {
+                        cnt[date] = 0;
                     }
                 }
-            };
+            }
 
-            var batchRequest = service.Reports.BatchGet(request);
-            var response = batchRequest.Execute();
+            //response.Reports.SelectMany(r => r.Data.Rows
+            //.Select(r =>
+            //{
+            //    DateTime.TryParseExact(r.Dimensions[1], "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime d);
+            //    return new
+            //    {
+            //        month = d.ToString("yyyy-MM", CultureInfo.InvariantCulture),
+            //        date = d.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+            //        views = int.Parse(r.Metrics.First().Values.First(), CultureInfo.InvariantCulture)
+            //    };
+            //}));;
+            return Json(cnt.Select(x => new AmData
+            { Date = x.Key, Value = x.Value }));
+            //return freq switch
+            //{
+            //    "day" => Json(logins),
+            //    "month" =>
+            //        Json(logins.GroupBy(l => l.month).Select(g => new { date = g.Key, views = g.Sum(s => s.views) })),
+            //    _ => Json(logins.Sum(l => l.views))
+            //};
+        }
+        public IActionResult GetAnalyticsData()
+        {
+            using var service = GetService();
+            var st = new DateTime(2018, 8, 28);
+            var now = DateTime.Now;
+            var cnt = 0;
 
-            var logins =
-                response.Reports.First().Data.Rows
-                .Select(r =>
-                {
-                    DateTime.TryParseExact(r.Dimensions[1], "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime d);
-                    return new
+            foreach (var request in Enumerable
+                .Range(0, 1 + (now.Year - st.Year) / 2)
+                .Select(offset => {
+                    var end = st.AddYears((offset + 1) * 2);
+                    var enddate = end > now ? "today" : 
+                    end.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                    return new GetReportsRequest
                     {
-                        month = d.ToString("yyyy-MM", CultureInfo.InvariantCulture),
-                        date = d.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
-                        views = int.Parse(r.Metrics.First().Values.First(), CultureInfo.InvariantCulture)
+                        ReportRequests = new[]
+                        {
+                                new ReportRequest
+                                {
+                                    ViewId = "180792983",
+                                    Metrics = new[] { new Metric { Expression = "ga:entrances" } },
+                                    Dimensions = new[]
+                                    {
+                                        new Dimension { Name = "ga:landingPagePath" },
+                                        new Dimension { Name = "ga:date" }
+                                    },
+                                    DateRanges = new[] { new DateRange {
+                                    StartDate = st.AddYears(offset*2).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+                                    EndDate =  enddate } },
+                                    OrderBys = new[] { new OrderBy { FieldName = "ga:date", SortOrder = "ASCENDING" } }
+                                }
+                    }
                     };
-                });
-
-            return freq switch
+                }))
             {
-                "day" => Json(logins),
-                "month" =>
-                    Json(logins.GroupBy(l => l.month).Select(g => new { date = g.Key, views = g.Sum(s => s.views) })),
-                _ => Json(logins.Sum(l => l.views))
-            };
+                var batchRequest = service.Reports.BatchGet(request);
+                var response = batchRequest.Execute();
+
+                foreach(var r in response.Reports.First().Data.Rows)
+                {
+                    cnt += int.Parse(r.Metrics.First().Values.First(), CultureInfo.InvariantCulture);
+                }
+            }
+
+            //response.Reports.SelectMany(r => r.Data.Rows
+            //.Select(r =>
+            //{
+            //    DateTime.TryParseExact(r.Dimensions[1], "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime d);
+            //    return new
+            //    {
+            //        month = d.ToString("yyyy-MM", CultureInfo.InvariantCulture),
+            //        date = d.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+            //        views = int.Parse(r.Metrics.First().Values.First(), CultureInfo.InvariantCulture)
+            //    };
+            //}));
+
+
+            return Json(cnt);
+            //return freq switch
+            //{
+            //    "day" => Json(logins),
+            //    "month" =>
+            //        Json(logins.GroupBy(l => l.month).Select(g => new { date = g.Key, views = g.Sum(s => s.views) })),
+            //    _ => Json(logins.Sum(l => l.views))
+            //};
         }
 
         public static AnalyticsReportingService GetService()
@@ -262,5 +354,10 @@ namespace BiblioMit.Controllers
 
             return LocalRedirect(returnUrl.ToString());
         }
+    }
+    public class VisitCount
+    {
+        public string Date { get; set; }
+        public int Views { get; set; }
     }
 }

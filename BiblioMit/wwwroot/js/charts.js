@@ -6,7 +6,7 @@ function Chart(type, selector, data, options) {
     var _chart;
     var _config = {
         startDuration: 0,
-        showBalloon: function () { },
+        showBalloon: () => { },
         export: {
             enabled: true
         },
@@ -31,10 +31,10 @@ function Chart(type, selector, data, options) {
         data["dataProvider"] = _data;
         return data;
     }
-    this.getSelector = function (_) {
+    this.getSelector = (_) => {
         return _selector;
     };
-    this.getChart = function (_) {
+    this.getChart = (_) => {
         return _chart;
     };
     init();

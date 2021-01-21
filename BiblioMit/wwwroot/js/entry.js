@@ -1,10 +1,10 @@
-var entry = new signalR.HubConnectionBuilder()
+const entry = new signalR.HubConnectionBuilder()
     .withUrl("/entryHub")
     .build();
-entry.on("Update", function (func, e) {
+entry.on("Update", (func, e) => {
     console.log(func, e);
     if (func === "log") {
-        var p = document.createElement("p");
+        const p = document.createElement("p");
         p.textContent = e;
         $("#log").html(p);
         document.getElementById("log").scrollTop = document.getElementById("log").scrollHeight;
@@ -25,5 +25,5 @@ entry.on("Update", function (func, e) {
         $("#progressHub").addClass(status);
     }
 });
-entry.start().catch(function (err) { return console.error(err.toString()); });
+entry.start().catch((err) => console.error(err.toString()));
 //# sourceMappingURL=entry.js.map

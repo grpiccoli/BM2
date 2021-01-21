@@ -1,5 +1,5 @@
 var drop = $("input");
-drop.on('dragenter', function (_) {
+drop.on('dragenter', _ => {
     $(".drop").css({
         "border": "4px dashed #09f",
         "background": "rgba(0, 153, 255, .05)"
@@ -7,7 +7,7 @@ drop.on('dragenter', function (_) {
     $(".cont").css({
         "color": "#09f"
     });
-}).on('dragleave dragend mouseout drop', function (_) {
+}).on('dragleave dragend mouseout drop', _ => {
     $(".drop").css({
         "border": "3px dashed #DADFE3",
         "background": "transparent"
@@ -21,8 +21,8 @@ function handleFileSelect(evt) {
     for (var i = 0; i < files.length; i++) {
         var f = files[i];
         var reader = new FileReader();
-        reader.onload = (function (theFile) {
-            return function (_) {
+        reader.onload = ((theFile) => {
+            return (_) => {
                 var file = theFile.name.slice(0, 12) + "...xlsx";
                 var filename = decodeURI(escape(file));
                 $(".tit").html('<span class="icon-excel"><span class="path1"></span><span class="path2"></span></span><br/>' + filename);

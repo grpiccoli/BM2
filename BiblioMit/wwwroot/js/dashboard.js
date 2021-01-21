@@ -17,7 +17,7 @@ $(document).ready(function () {
 });
 function generatePdf() {
     setExportStatus(true);
-    setTimeout(function () {
+    setTimeout(() => {
         processedCharts = 0;
         for (var c in charts) {
             addToExport(charts[c], handleUploadFiles);
@@ -37,7 +37,7 @@ function addToExport(c, uploadFunction) {
     var chart = c.getChart();
     var selector = c.getSelector();
     chart["export"].capture({}, function () {
-        this.toPNG({}, function (base64) {
+        this.toPNG({}, (base64) => {
             exportsData.images[selector] = base64;
             processedCharts++;
             if (processedCharts === charts.length) {

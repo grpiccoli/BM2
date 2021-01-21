@@ -6,7 +6,7 @@ $('input.number').keyup(function () {
     var input = parseInt($(this).val().toString().replace(/[\D\s\._\-]+/g, ""));
     if (input)
         input = 0;
-    $(this).val(function (_) {
+    $(this).val(_ => {
         return input === 0 ? "" : input.toLocaleString("es-CL");
     });
 });

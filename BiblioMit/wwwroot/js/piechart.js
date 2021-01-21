@@ -1,4 +1,4 @@
-AmCharts.addInitHandler(function (chart) {
+AmCharts.addInitHandler((chart) => {
     if (chart.legend === undefined || chart.legend.truncateLabels === undefined)
         return;
     var titleField = chart.titleField;

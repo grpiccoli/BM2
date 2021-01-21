@@ -669,7 +669,9 @@ namespace BiblioMit.Controllers
         [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" })]
         public IActionResult Data(int area, char type, int id, DateTime start, DateTime end)
         {
-            int order = _context.Psmbs.Find(area).Code / 99_996 + 24_998 / 24_999;
+            int order = 0;
+            if (area > 3) order++;
+            if (area > 100000) order++;
 
             if (!(type == 'v' && id != 4))
             {

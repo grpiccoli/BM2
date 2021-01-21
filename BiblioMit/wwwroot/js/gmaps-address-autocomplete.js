@@ -1,4 +1,4 @@
-google.maps.event.addDomListener(window, 'load', function () {
+google.maps.event.addDomListener(window, 'load', () => {
     var options = {
         types: ['address'],
         componentRestrictions: { country: "cl" }
