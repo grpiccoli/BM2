@@ -8,7 +8,7 @@
       "files": [ "dist/browser/signalr.min.js" ]
     },
     {
-      "library": "@fortawesome/fontawesome-free@5.15.2",
+      "library": "@fortawesome/fontawesome-free@5.15.3",
       "destination": "wwwroot/lib/@fortawesome/fontawesome-free",
       "files": [
         "css/all.min.css",
@@ -27,12 +27,12 @@
       "files": [ "moment.min.js", "locale/es.js" ]
     },
     {
-      "library": "ckeditor5@24.0.0",
+      "library": "ckeditor5@28.0.0",
       "destination": "wwwroot/lib/ckeditor5",
       "files": [ "package.json" ]
     },
     {
-      "library": "@amcharts/amcharts4@4.9.37",
+      "library": "@amcharts/amcharts4@4.10.19",
       "destination": "wwwroot/lib/@amcharts/amcharts4",
       "files": [
         "core.js",
@@ -57,17 +57,17 @@
       ]
     },
     {
-      "library": "fabric@4.3.0",
+      "library": "fabric@4.5.0",
       "destination": "wwwroot/lib/fabric",
       "files": [ "dist/fabric.min.js" ]
     },
     {
-      "library": "alasql@0.6.5",
+      "library": "alasql@1.7.2",
       "destination": "wwwroot/lib/alasql",
       "files": [ "dist/alasql.min.js" ]
     },
     {
-      "library": "clipboard@2.0.6",
+      "library": "clipboard@2.0.8",
       "destination": "wwwroot/lib/clipboard",
       "files": [ "dist/clipboard.min.js" ]
     },
@@ -88,7 +88,7 @@
       ]
     },
     {
-      "library": "bootstrap@4.6.0",
+      "library": "bootstrap@5.0.1",
       "destination": "wwwroot/lib/bootstrap",
       "files": [
         "dist/css/bootstrap.min.css",
@@ -121,7 +121,7 @@
       ]
     },
     {
-      "library": "dropzone@5.7.2",
+      "library": "dropzone@5.9.2",
       "destination": "wwwroot/lib/dropzone",
       "files": [ "dist/min/dropzone.min.js", "dist/min/dropzone.min.css" ]
     },
@@ -180,12 +180,12 @@
       "files": [ "jquery.rut.min.js" ]
     },
     {
-      "library": "jspdf@2.3.0",
+      "library": "jspdf@2.3.1",
       "destination": "wwwroot/lib/jspdf",
       "files": [ "dist/jspdf.umd.min.js", "dist/jspdf.es.min.js" ]
     },
     {
-      "library": "pdfmake@0.1.70",
+      "library": "pdfmake@0.1.71",
       "destination": "wwwroot/lib/pdfmake",
       "files": [ "build/pdfmake.min.js", "build/vfs_fonts.js" ]
     },
@@ -195,7 +195,7 @@
       "files": [ "dist/css/tableexport.min.css", "dist/js/tableexport.min.js" ]
     },
     {
-      "library": "jquery@3.5.1",
+      "library": "jquery@3.6.0",
       "destination": "wwwroot/lib/jquery",
       "files": [ "dist/jquery.min.js" ]
     },
@@ -217,7 +217,7 @@
       ]
     },
     {
-      "library": "jquery-validation-unobtrusive@3.2.11",
+      "library": "jquery-validation-unobtrusive@3.2.12",
       "destination": "wwwroot/lib/jquery-validation-unobtrusive",
       "files": [ "dist/jquery.validate.unobtrusive.min.js" ]
     },
@@ -235,12 +235,12 @@
       ]
     },
     {
-      "library": "@popperjs/core@2.6.0",
+      "library": "@popperjs/core@2.9.2",
       "destination": "wwwroot/lib/@popperjs/core",
       "files": [ "dist/umd/popper.min.js" ]
     },
     {
-      "library": "tippy.js@6.2.7",
+      "library": "tippy.js@6.3.1",
       "destination": "wwwroot/lib/tippy.js",
       "files": [ "dist/tippy-bundle.umd.js" ]
     },
@@ -268,7 +268,7 @@
       "files": [ "js/mdb.min.js", "css/mdb.min.css" ]
     },
     {
-      "library": "xlsx@0.16.9",
+      "library": "xlsx@0.17.0",
       "destination": "wwwroot/lib/xlsx",
       "files": [ "dist/xlsx.core.min.js" ]
     }
