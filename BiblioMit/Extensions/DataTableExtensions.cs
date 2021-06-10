@@ -7,6 +7,7 @@ namespace BiblioMit.Extensions
     {
         public static DataTable SetColumnsOrder(this DataTable table, params string[] columnNames)
         {
+            if (columnNames is null) throw new ArgumentNullException(nameof(columnNames));
             if(table != null)
             {
                 int columnIndex = 0;
@@ -20,7 +21,8 @@ namespace BiblioMit.Extensions
         }
         public static DataTable SetColumnsNames(this DataTable table, params string[] columnNames)
         {
-            if(table != null)
+            if (columnNames is null) throw new ArgumentNullException(nameof(columnNames));
+            if (table != null)
                 for (int i = 0; i < table.Columns.Count; i++)
                     table.Columns[i].ColumnName = columnNames[i];
             return table;

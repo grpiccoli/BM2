@@ -7,13 +7,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -48,20 +45,20 @@ namespace BiblioMit.Services
             streamWriter.Close();
 
             var dateQueryFormat = "dd/MM/yyyy";
-            CookieContainer cookieJar = new CookieContainer();
-            using HttpClientHandler handler = new HttpClientHandler
+            CookieContainer cookieJar = new();
+            using HttpClientHandler handler = new()
             {
                 UseCookies = true,
                 UseDefaultCredentials = false,
                 CookieContainer = cookieJar,
                 AllowAutoRedirect = false
             };
-            using HttpClient client = new HttpClient(handler);
+            using HttpClient client = new(handler);
             foreach (PlanktonUser user in await _context.PlanktonUsers.ToListAsync(stoppingToken).ConfigureAwait(false))
             {
-                Uri login = new Uri("http://sispal.plancton.cl/clientes/clipal_validausuario.asp");
+                Uri login = new("http://sispal.plancton.cl/clientes/clipal_validausuario.asp");
                 using FormUrlEncodedContent credentials = 
-                    new FormUrlEncodedContent(
+                    new(
                         new Dictionary<string, string>
                         {
                             { "usuario", user.Name },
@@ -92,7 +89,7 @@ namespace BiblioMit.Services
                                 { "B1", "Buscar" }
                             });
                         var response = await client.PostAsync(searcher, query, stoppingToken).ConfigureAwait(false);
-                        var html = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                        var html = await response.Content.ReadAsStringAsync(stoppingToken).ConfigureAwait(false);
                         var regex = new Regex(@"psmb_informe_ue_xls\.asp\?codigo\=([0-9]+)");
                         foreach (Match match in regex.Matches(html))
                         {
@@ -104,7 +101,7 @@ namespace BiblioMit.Services
                                 var assayhtml = await client.GetAsync(assayurl, stoppingToken).ConfigureAwait(false);
                                 try
                                 {
-                                    var import = await _import.AddAsync(await assayhtml.Content.ReadAsStreamAsync().ConfigureAwait(false)).ConfigureAwait(false);
+                                    var import = await _import.AddAsync(await assayhtml.Content.ReadAsStreamAsync(stoppingToken).ConfigureAwait(false)).ConfigureAwait(false);
                                     if (import.IsCompletedSuccessfully)
                                     {
                                         Console.WriteLine($"Added Plankton Assay FMA:{fma}");

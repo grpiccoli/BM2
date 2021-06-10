@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Localization;
+using System.Collections.ObjectModel;
 
 namespace BiblioMit.Areas.Identity.Pages.Account
 {
@@ -36,7 +37,7 @@ namespace BiblioMit.Areas.Identity.Pages.Account
         [BindProperty]
         public LoginInputModel Input { get; set; }
 
-        public List<AuthenticationScheme> ExternalLogins { get; } = new List<AuthenticationScheme>();
+        public Collection<AuthenticationScheme> ExternalLogins { get; } = new Collection<AuthenticationScheme>();
 
         public Uri ReturnUrl { get; set; }
 
@@ -56,8 +57,11 @@ namespace BiblioMit.Areas.Identity.Pages.Account
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme)
                 .ConfigureAwait(false);
 
-            ExternalLogins.AddRange((await _signInManager.GetExternalAuthenticationSchemesAsync()
-                .ConfigureAwait(false)).ToList());
+            foreach (var auth in await _signInManager.GetExternalAuthenticationSchemesAsync()
+                .ConfigureAwait(false))
+            {
+                ExternalLogins.Add(auth);
+            }
 
             ReturnUrl = returnUrl;
         }

@@ -24,9 +24,11 @@ namespace BiblioMit.Extensions
     public static class StringExtensions
     {
         private readonly static List<string> romanNumerals = 
-            new List<string> { "M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I" };
+            new()
+            { "M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I" };
         private readonly static List<int> numerals = 
-            new List<int> { 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1 };
+            new()
+            { 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1 };
         private const string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         public static string CheckSRI(this string local, Uri url)
         {
@@ -82,7 +84,7 @@ namespace BiblioMit.Extensions
             if (cell == null) return null;
             int startIndex = cell.IndexOfAny("0123456789".ToCharArray());
             string column = cell.Substring(0, startIndex);
-            var rowParsed = int.TryParse(cell.Substring(startIndex), out int row);
+            var rowParsed = int.TryParse(cell[startIndex..], out int row);
             return rowParsed ? $"{(column.GetColumn() + columns).GetColumn()}{row + rows}" : null;
         }
         public static List<int> AllIndexesOf(this string str, string value)
@@ -90,7 +92,7 @@ namespace BiblioMit.Extensions
             if (string.IsNullOrEmpty(value) || string.IsNullOrEmpty(str))
                 //throw new ArgumentException("El texto a buscar no puede estar vacío", nameof(value));
                 return null;
-            List<int> indexes = new List<int>();
+            List<int> indexes = new();
             for (int index = 0; ; index += value.Length)
             {
                 index = str.IndexOf(value, index, StringComparison.InvariantCultureIgnoreCase);
@@ -144,9 +146,9 @@ namespace BiblioMit.Extensions
 
             var url = new Uri(string.Format(CultureInfo.InvariantCulture,
                 "http://www.google.com/translate_t?hl={0}&ie=UTF8&text={1}&langpair={2}", targetLanguage, input, languagePair));
-            using HttpClient hc = new HttpClient();
+            using HttpClient hc = new();
             HttpResponseMessage result = hc.GetAsync(url).Result;
-            HtmlDocument doc = new HtmlDocument() { OptionReadEncoding = true };
+            HtmlDocument doc = new() { OptionReadEncoding = true };
             doc.Load(result.Content.ReadAsStreamAsync().Result);
             string resultado = "bla";
             var node = doc.DocumentNode.SelectSingleNode("//span[@id='result_box']/span");
@@ -173,7 +175,7 @@ namespace BiblioMit.Extensions
         {
             var textInfo = new CultureInfo("en-GB").TextInfo;
             return string.IsNullOrWhiteSpace(input) ? null :
-            input?[0].ToString(CultureInfo.InvariantCulture).ToUpperInvariant() + textInfo.ToLower(input?.Substring(1));
+            input[0].ToString(CultureInfo.InvariantCulture).ToUpperInvariant() + textInfo.ToLower(input[1..]);
         }
         public static string CleanCell(this string text) =>
             //first toupper to gain speed

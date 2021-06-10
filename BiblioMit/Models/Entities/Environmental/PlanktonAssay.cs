@@ -68,7 +68,7 @@ namespace BiblioMit.Models
         public override bool Equals(object obj)
         {
             if (obj is null) return this is null;
-            if (this is null) return obj is null;
+            if (this is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             return obj is PlanktonAssay q
             && Id == q.Id
@@ -89,7 +89,7 @@ namespace BiblioMit.Models
             && Ph == q.Ph
             && Salinity == q.Salinity;
         }
-        [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Tests for nullity")]
+
         public static bool operator ==(PlanktonAssay x, PlanktonAssay y)
         {
             if (x is null) return y is null;
@@ -100,7 +100,7 @@ namespace BiblioMit.Models
         public bool Equals(PlanktonAssay other)
         {
             if (other is null) return this is null;
-            if (this is null) return other is null;
+            if (this is null) return false;
             if (ReferenceEquals(this, other)) return true;
             return Id.Equals(other.Id)
             && Id.Equals(other.Id)

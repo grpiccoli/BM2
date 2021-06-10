@@ -4,6 +4,7 @@ namespace BiblioMit.Models.Entities.Digest
 {
     public enum DeclarationType
     {
+        None,
         [Display(
             Description = "Action whose purpose is the fixation of invertebrate larvae through the arrangement of collectors.",
             GroupName = "Farm",

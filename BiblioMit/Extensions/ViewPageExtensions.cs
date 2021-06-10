@@ -14,6 +14,7 @@ namespace BiblioMit.Extensions
         private static HashSet<Func<dynamic, HelperResult>> Libs { get; set; } = new HashSet<Func<dynamic, HelperResult>>();
         public static HtmlString Blocks(this RazorPageBase webPage, string name, params Func<dynamic, HelperResult>[] templates)
         {
+            if (templates is null) throw new ArgumentNullException(nameof(templates));
             var sb = new StringBuilder();
             foreach (var t in templates)
             {

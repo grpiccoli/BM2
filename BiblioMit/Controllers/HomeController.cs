@@ -92,7 +92,7 @@ namespace BiblioMit.Controllers
 
                 foreach (var r in response.Reports.First().Data.Rows)
                 {
-                    var date = r.Dimensions[1].Substring(0, r.Dimensions[1].Length - 2).Insert(4, "-");
+                    var date = r.Dimensions[1][0..^2].Insert(4, "-");
                     if (cnt.ContainsKey(date))
                     {
                         cnt[date] += int.Parse(r.Metrics.First().Values.First(), CultureInfo.InvariantCulture);

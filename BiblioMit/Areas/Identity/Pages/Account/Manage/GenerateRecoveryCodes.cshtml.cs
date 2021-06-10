@@ -26,7 +26,7 @@ namespace BiblioMit.Areas.Identity.Pages.Account.Manage
         }
 
         [TempData]
-        public List<string> RecoveryCodes { get; } = new List<string>();
+        internal List<string> RecoveryCodes { get; } = new List<string>();
 
         [TempData]
         public string StatusMessage { get; set; }

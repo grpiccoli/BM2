@@ -9,19 +9,24 @@ namespace BiblioMit.Extensions
     {
         public static int GetColumnByName(this ExcelWorksheet ws, string columnName)
         {
-            if (ws == null) throw new ArgumentNullException(nameof(ws));
-            return ws.Cells["1:1"].FirstOrDefault(c => c.Value.ToString().Equals(columnName, StringComparison.InvariantCultureIgnoreCase)).Start.Column;
+            if (ws is null) throw new ArgumentNullException(nameof(ws));
+            return ws.Cells["1:1"].FirstOrDefault(c => c.Value.ToString().Equals(columnName, StringComparison.OrdinalIgnoreCase)).Start.Column;
         }
         public static int GetColumnByNames(this ExcelWorksheet ws, List<string> columnNames)
         {
-            if (ws == null) throw new ArgumentNullException(nameof(ws));
+            if (ws is null)
+                throw new ArgumentNullException(nameof(ws));
+            if (columnNames is null)
+                throw new ArgumentNullException(nameof(columnNames));
+
             return ws.Cells["1:1"]
                 .FirstOrDefault(c => columnNames
                 .Contains(c.Value.ToString().CleanCell())).Start.Column;
         }
         public static int GetColumnByNames(this List<string> headers, List<string> columnNames)
         {
-            if (headers == null || columnNames == null) throw new ArgumentNullException(nameof(headers));
+            if (headers is null) throw new ArgumentNullException(nameof(headers));
+            if (columnNames is null) throw new ArgumentNullException(nameof(columnNames));
             foreach (var name in columnNames)
             {
                 int index = headers.IndexOf(name);
@@ -32,7 +37,7 @@ namespace BiblioMit.Extensions
         public static int GetRowByValue(this ExcelWorksheet ws, char col, string columnName)
         {
             if (ws == null) throw new ArgumentNullException(nameof(ws));
-            return ws.Cells[$"{col}:{col}"].FirstOrDefault(c => c.Value.ToString().Equals(columnName, StringComparison.InvariantCultureIgnoreCase)).Start.Row;
+            return ws.Cells[$"{col}:{col}"].FirstOrDefault(c => c.Value.ToString().Equals(columnName, StringComparison.OrdinalIgnoreCase)).Start.Row;
         }
     }
 }

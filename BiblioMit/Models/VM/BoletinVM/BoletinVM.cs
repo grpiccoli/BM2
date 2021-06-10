@@ -11,6 +11,7 @@
 
     public enum Periodo
     {
+        None,
         Mensual = 1,
         Trimestral = 3,
         Anual = 12

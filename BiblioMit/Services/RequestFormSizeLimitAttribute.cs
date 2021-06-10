@@ -9,7 +9,6 @@ namespace BiblioMit.Services
     public sealed class RequestFormSizeLimitAttribute : Attribute, IAuthorizationFilter, IOrderedFilter
     {
         private readonly FormOptions _formOptions;
-
         public RequestFormSizeLimitAttribute(int valueCountLimit)
         {
             _formOptions = new FormOptions()

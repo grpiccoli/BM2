@@ -154,7 +154,7 @@ namespace BiblioMit.Services
                         .ConfigureAwait(false);
                     var fs = File.OpenRead(d);
                     ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-                    using ExcelPackage package = new ExcelPackage(fs);
+                    using ExcelPackage package = new(fs);
                     try 
                     {
                         var result = i switch
@@ -195,7 +195,7 @@ namespace BiblioMit.Services
             double pgrRow = 100 / rows;
             string msg = string.Empty;
             HttpContext context = _httpContext.HttpContext;
-            List<int> datesIds = new List<int>();
+            List<int> datesIds = new();
             string userId = string.Empty;
             if (context != null)
             {
@@ -491,7 +491,7 @@ namespace BiblioMit.Services
         }
         private async Task<Psmb> ParsePsmb(PlanktonAssay item)
         {
-            Farm newFarm = new Farm();
+            Farm newFarm = new();
             if(item.Name != null)
             item.Name = Regex.Replace(item.Name, @"[^A-Z0-9 ]", "");
             if(item.Acronym != null)
@@ -838,7 +838,7 @@ namespace BiblioMit.Services
                 {
                     if (ce == 0) continue;
                     Ear? e = (Ear?)matrix.GetValue(2, row).ParseInt();
-                    SpeciesPhytoplankton sp = new SpeciesPhytoplankton();
+                    SpeciesPhytoplankton sp = new();
                     if (!InSet[nameof(SpeciesPhytoplankton)].ContainsKey(fullName))
                     {
                         if (!InSet[nameof(GenusPhytoplankton)].ContainsKey(genusSp[0]))
@@ -944,7 +944,7 @@ namespace BiblioMit.Services
                 .Include(p => p.Station)
                 .FirstOrDefaultAsync(e => e.Id == item.Id)
                 .ConfigureAwait(false);
-            List<bool> toUpdate = new List<bool>
+            List<bool> toUpdate = new()
             {
                 item.Analist != null,
                 item.Emails.Any(e => e.Email != null),

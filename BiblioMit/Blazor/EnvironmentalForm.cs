@@ -10,7 +10,7 @@ namespace BiblioMit.Blazor
     {
         public DateTimeOffset? Start { get; set; }
         public DateTimeOffset? End { get; set; }
-        public List<int> Areas { get; } = new List<int>();
+        internal List<int> Areas { get; } = new List<int>();
         public IReadOnlyCollection<Variable> Variables { get; } = Variable.t.Enum2List().ToList();
         public IReadOnlyCollection<SelectListItem> Orders { get; set; }
         public IReadOnlyCollection<SelectListItem> Genus { get; set; }

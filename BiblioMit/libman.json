@@ -263,6 +263,11 @@
       "files": [ "dist/umd/tooltip.min.js" ]
     },
     {
+      "library": "mdb-ui-kit@3.6.0",
+      "destination": "wwwroot/mdb-ui-kit",
+      "files": [ "js/mdb.min.js", "css/mdb.min.css" ]
+    },
+    {
       "library": "xlsx@0.16.9",
       "destination": "wwwroot/lib/xlsx",
       "files": [ "dist/xlsx.core.min.js" ]

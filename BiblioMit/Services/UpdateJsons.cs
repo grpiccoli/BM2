@@ -21,7 +21,7 @@ namespace BiblioMit.Services
         private readonly AmbientalController _ambiental;
         private readonly IStringLocalizer<AmbientalController> _localizer;
         private readonly ApplicationDbContext _context;
-        private readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings
+        private readonly JsonSerializerSettings _jsonSerializerSettings = new()
         {
             ContractResolver = new CamelCasePropertyNamesContractResolver()
         };

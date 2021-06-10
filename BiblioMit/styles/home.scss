@@ -53,6 +53,12 @@
     background-size: cover;
 }
 
+@media only screen and (max-width: 768px){
+    .carousel-inner, .container-fill, .carousel, .item, .fill {
+        height: 125px;
+    }
+}
+
 .btn-info {
     color: lightblue;
     background-color: #3276b1;

@@ -353,7 +353,7 @@ namespace BiblioMit.Controllers
                 else if (info.LoginProvider == "Google")
                 {
                     var url = new Uri($"https://picasaweb.google.com/data/entry/api/user/{id}?alt=json");
-                    using HttpClient hc = new HttpClient();
+                    using HttpClient hc = new();
                     HttpResponseMessage json = await hc.GetAsync(url).ConfigureAwait(false);
                     string final = Encoding.UTF8.GetString(await json.Content.ReadAsByteArrayAsync().ConfigureAwait(false)).Trim().Trim('\0');
                     var data = JObject.Parse(final);
@@ -363,23 +363,23 @@ namespace BiblioMit.Controllers
                 {
                     var token = info.AuthenticationTokens.Single(x => x.Name == "access_token").Value;
                     var url = new Uri($"https://api.linkedin.com/v1/people/~?oauth2_access_token={token}&format=json");
-                    using HttpClient hc = new HttpClient();
+                    using HttpClient hc = new();
                     HttpResponseMessage json = await hc.GetAsync(url).ConfigureAwait(false);
                     string final = Encoding.UTF8.GetString(await json.Content.ReadAsByteArrayAsync().ConfigureAwait(false)).Trim().Trim('\0');
                     var data = JObject.Parse(final);
                     externalLogin.Name = (string)data["firstName"];
                     externalLogin.Last = (string)data["lastName"];
                     url = new Uri($"https://api.linkedin.com/v1/people/~/picture-urls::(original)?oauth2_access_token={token}");
-                    using HttpClient hc2 = new HttpClient();
+                    using HttpClient hc2 = new();
                     HttpResponseMessage response = await hc2.GetAsync(url).ConfigureAwait(false);
-                    HtmlDocument doc = new HtmlDocument();
+                    HtmlDocument doc = new();
                     doc.Load(await response.Content.ReadAsStreamAsync().ConfigureAwait(false));
                     externalLogin.ProfileImageUrl = new Uri(doc.DocumentNode.SelectSingleNode("//picture-url[@key='original']").InnerHtml);
                 }
                 else if (info.LoginProvider == "Microsoft")
                 {
                     var token = info.AuthenticationTokens.Single(x => x.Name == "access_token").Value;
-                    using HttpClient hc = new HttpClient();
+                    using HttpClient hc = new();
                     var bytes = await hc.GetStreamWithAuthAsync(token, new Uri("https://graph.microsoft.com/v1.0/{id}/photo/$value")).ConfigureAwait(false);
                     externalLogin.ProfileImageUrl = new Uri("data&colon;image/png;base64," + Convert.ToBase64String(bytes));
                 }

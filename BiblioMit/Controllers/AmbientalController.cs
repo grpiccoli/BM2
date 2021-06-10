@@ -178,6 +178,7 @@ namespace BiblioMit.Controllers
                             Lng = o.Longitude
                         })
             }));
+        [HttpGet]
         public IActionResult ResearchData() => Json(_context.ResearchCentres
                     .Where(c => c.PolygonId.HasValue)
                     .Select(c => new GMapPolygonCentre

@@ -33,8 +33,8 @@ namespace BiblioMit.Models
         #region Comparison
         public override bool Equals(object obj)
         {
-            if (obj is null) return this as object is null;
-            if (this as object is null) return obj is null;
+            if (obj is null) return this is null;
+            if (this is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             return obj is Psmb q
                 && q.Id == Id
@@ -42,16 +42,15 @@ namespace BiblioMit.Models
         }
         public static bool operator ==([AllowNull] Psmb x, [AllowNull] Psmb y)
         {
-            if (x as object is null) return y as object is null;
+            if (x is null) return y is null;
             return x.Equals(y);
         }
         public static bool operator !=([AllowNull] Psmb x, [AllowNull] Psmb y) => !(x == y);
-        public override int GetHashCode() =>
-            HashCode.Combine(Id, Discriminator);
+        public override int GetHashCode() => HashCode.Combine(Id, Discriminator);
         public bool Equals([AllowNull] Psmb other)
         {
-            if (other is null) return this as object is null;
-            if (this as object is null) return other is null;
+            if (other is null) return this is null;
+            if (this is null) return false;
             if (ReferenceEquals(this, other)) return true;
             return Id.Equals(other.Id)
             && Discriminator.Equals(other.Discriminator);
@@ -68,10 +67,7 @@ namespace BiblioMit.Models
         //AREA FARM
         [Display(Name = "Acronym")]
         public string Acronym { get; private set; }
-        public void SetAcronym(string value)
-        {
-            Acronym = value?.ParseAcronym();
-        }
+        public void SetAcronym(string value) => Acronym = value?.ParseAcronym();
         public virtual ICollection<PlanktonAssay> PlanktonAssays { get; } = new List<PlanktonAssay>();
         //CRAFT FARM
         [Display(Name = "Water body type")]
@@ -84,9 +80,6 @@ namespace BiblioMit.Models
         //BED FARM
         [Display(Name = "Samplings")]
         public virtual ICollection<Sampling> Samplings { get; } = new List<Sampling>();
-        public string GetFullName()
-        {
-            return $"{Code}, {Name}, {Commune.GetFullName()}";
-        }
+        public string GetFullName() => $"{Code}, {Name}, {Commune.GetFullName()}";
     }
 }

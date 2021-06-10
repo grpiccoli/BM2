@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using BiblioMit.Models;
@@ -22,10 +23,9 @@ namespace BiblioMit.Areas.Identity.Pages.Account.Manage
             _userManager = userManager;
             _signInManager = signInManager;
         }
-
         public List<UserLoginInfo> CurrentLogins { get; } = new List<UserLoginInfo>();
 
-        public List<AuthenticationScheme> OtherLogins { get; } = new List<AuthenticationScheme>();
+        public Collection<AuthenticationScheme> OtherLogins { get; } = new Collection<AuthenticationScheme>();
 
         public bool ShowRemoveButton { get; set; }
 
@@ -41,9 +41,11 @@ namespace BiblioMit.Areas.Identity.Pages.Account.Manage
             }
 
             CurrentLogins.AddRange(await _userManager.GetLoginsAsync(user).ConfigureAwait(false));
-            OtherLogins.AddRange((await _signInManager.GetExternalAuthenticationSchemesAsync().ConfigureAwait(false))
-                .Where(auth => CurrentLogins.All(ul => auth.Name != ul.LoginProvider))
-                .ToList());
+            foreach(var logging in (await _signInManager.GetExternalAuthenticationSchemesAsync().ConfigureAwait(false))
+                .Where(auth => CurrentLogins.All(ul => auth.Name != ul.LoginProvider)) )
+            {
+                OtherLogins.Add(logging);
+            }
             ShowRemoveButton = user.PasswordHash != null || CurrentLogins.Count > 1;
             return Page();
         }

@@ -35,6 +35,7 @@ namespace BiblioMit.Models
     }
     public enum LocalityType
     {
+        None,
         Region = 1,
         Province = 2,
         Commune = 3

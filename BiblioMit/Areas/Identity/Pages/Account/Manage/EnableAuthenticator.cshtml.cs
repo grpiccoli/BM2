@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
 using Microsoft.Extensions.Localization;
+using System.Collections.ObjectModel;
 
 namespace BiblioMit.Areas.Identity.Pages.Account.Manage
 {
@@ -42,7 +43,7 @@ namespace BiblioMit.Areas.Identity.Pages.Account.Manage
         public Uri AuthenticatorUri { get; set; }
 
         [TempData]
-        public List<string> RecoveryCodes { get; } = new List<string>();
+        public Collection<string> RecoveryCodes { get; } = new Collection<string>();
 
         [TempData]
         public string StatusMessage { get; set; }
@@ -99,8 +100,10 @@ namespace BiblioMit.Areas.Identity.Pages.Account.Manage
 
             if (await _userManager.CountRecoveryCodesAsync(user).ConfigureAwait(false) == 0)
             {
-                var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10).ConfigureAwait(false);
-                RecoveryCodes.AddRange(recoveryCodes.ToList());
+                foreach (var recoveryCode in await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10).ConfigureAwait(false)) 
+                {
+                    RecoveryCodes.Add(recoveryCode);
+                }
                 return RedirectToPage("./ShowRecoveryCodes");
             }
             else
@@ -136,7 +139,7 @@ namespace BiblioMit.Areas.Identity.Pages.Account.Manage
             }
             if (currentPosition < unformattedKey.Length)
             {
-                result.Append(unformattedKey.Substring(currentPosition));
+                result.Append(unformattedKey[currentPosition..]);
             }
 
             return result.ToString().ToUpperInvariant();

@@ -4,7 +4,7 @@ namespace BiblioMit.Data
 {
     public static class ClaimData
     {
-        public static List<string> UserClaims { get; } = new List<string>
+        internal static List<string> UserClaims { get; } = new List<string>
                                                             {
                                                                 "Instituciones",
                                                                 "Centros",

@@ -56,8 +56,8 @@ namespace BiblioMit.Models
         public virtual ICollection<DeclarationDate> DeclarationDates { get; } = new List<DeclarationDate>();
         public override bool Equals(object obj)
         {
-            if (obj is null) return this as object is null;
-            if (this as object is null) return obj is null;
+            if (obj is null) return this is null;
+            if (this is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             return obj is SernapescaDeclaration q
             && Id == q.Id
@@ -65,18 +65,17 @@ namespace BiblioMit.Models
             && OriginPsmbId == q.OriginPsmbId
             && DeclarationNumber == q.DeclarationNumber;
         }
-        [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Tests for nullity")]
         public static bool operator ==(SernapescaDeclaration x, SernapescaDeclaration y)
         {
-            if (x as object is null) return y as object is null;
+            if (x is null) return y is null;
             return x.Equals(y);
         }
         public static bool operator !=(SernapescaDeclaration x, SernapescaDeclaration y) => !(x == y);
         public override int GetHashCode() => HashCode.Combine(Id);
         public bool Equals(SernapescaDeclaration other)
         {
-            if (other as object is null) return this as object is null;
-            if (this as object is null) return other as object is null;
+            if (other is null) return this is null;
+            if (this is null) return false;
             if (ReferenceEquals(this, other)) return true;
             return Id.Equals(other.Id)
             && Id.Equals(other.Id)

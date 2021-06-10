@@ -2,6 +2,7 @@
 {
     public enum PsmbType
     {
+        None,
         PsmbArea = 1,
         Farm = 2,
         Plant = 3,

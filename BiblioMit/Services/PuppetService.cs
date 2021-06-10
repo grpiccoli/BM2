@@ -58,7 +58,7 @@ namespace BiblioMit.Services
         public static async Task<RevisionInfo> FetchAsync()
         {
             return await new BrowserFetcher()
-                .DownloadAsync(BrowserFetcher.DefaultRevision)
+                .DownloadAsync(BrowserFetcher.DefaultChromiumRevision)
                 .ConfigureAwait(false);
         }
         public async Task<Browser> GetBrowserAsync()

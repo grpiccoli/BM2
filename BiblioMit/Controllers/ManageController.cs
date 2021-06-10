@@ -510,7 +510,7 @@ namespace BiblioMit.Controllers
             }
             if (currentPosition < unformattedKey.Length)
             {
-                result.Append(unformattedKey.Substring(currentPosition));
+                result.Append(unformattedKey[currentPosition..]);
             }
 
             return result.ToString().ToUpperInvariant();

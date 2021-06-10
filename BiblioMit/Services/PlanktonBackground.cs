@@ -17,7 +17,7 @@ namespace BiblioMit.Services
         private readonly IStringLocalizer _localizer;
         private Timer _timer;
         private Task _executingTask;
-        private readonly CancellationTokenSource _stoppingCts = new CancellationTokenSource();
+        private readonly CancellationTokenSource _stoppingCts = new();
         public PlanktonBackground(
             IServiceProvider services,
             IStringLocalizer<PlanktonBackground> localizer,
@@ -28,7 +28,7 @@ namespace BiblioMit.Services
             _logger = logger;
         }
         public IServiceProvider Services { get; }
-        public Task StartAsync(CancellationToken stoppingToken)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation(
                 _localizer["Plankton Service running is working."]);

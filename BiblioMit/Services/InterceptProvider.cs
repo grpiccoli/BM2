@@ -23,10 +23,10 @@ namespace BiblioMit.Services
             if (string.IsNullOrEmpty(format))
                 format = "N";
             //string numericString = obj.ToString();
-            if (obj is int && format.Equals("U", StringComparison.InvariantCultureIgnoreCase))
+            if (obj is int && format.Equals("U", StringComparison.OrdinalIgnoreCase))
                 return obj.ToString().RUTFormat();
             // If this is a byte and the "R" format string, format it with Roman numerals.
-            if (obj is int && format.Equals("R", StringComparison.InvariantCultureIgnoreCase))
+            if (obj is int && format.Equals("R", StringComparison.OrdinalIgnoreCase))
                 return ((int)obj).ToRomanNumeral();
             // Use default for all other formatting.
             if (obj is IFormattable)

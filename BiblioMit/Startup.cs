@@ -154,6 +154,8 @@ namespace BiblioMit
 
             services.ConfigureNonBreakingSameSiteCookies();
 
+            services.AddDatabaseDeveloperPageExceptionFilter();
+
             services.AddHsts(options =>
             {
                 options.Preload = true;
@@ -192,7 +194,7 @@ namespace BiblioMit
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
+                app.UseMigrationsEndPoint();
             }
             else
             {
@@ -206,7 +208,7 @@ namespace BiblioMit
             app.UseDefaultFiles();
 
             //app.UseHttpsRedirection();
-            FileExtensionContentTypeProvider provider = new FileExtensionContentTypeProvider();
+            FileExtensionContentTypeProvider provider = new();
             provider.Mappings[".webmanifest"] = "application/manifest+json";
 
             app.UseDefaultFiles();

@@ -24,7 +24,7 @@ namespace BiblioMit.Services
             _logger = logger;
         }
         public IServiceProvider Services { get; }
-        public async Task StartAsync(CancellationToken stoppingToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation(
                 _localizer["Consume Scoped Service Hosted Service is working."]);

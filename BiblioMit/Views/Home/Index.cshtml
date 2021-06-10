@@ -12,7 +12,7 @@
             <div class="jumbotron">
                 <div class="container">
                     <div class="row justify-content-between">
-                        <div class="col-12 col-md">
+                        <div class="col-12 col-md d-none d-sm-block">
                             <a class="float-left" href="@Url.Action("Contact", "Home", null, null)" target="_blank" rel="noopener">
                                 <img src="~/images/ico/bibliomit.svg" alt="BiblioMit" style="max-height:60px;" />
                             </a>
@@ -38,7 +38,7 @@
                         <h3 class="mt-0 text-justify">
                             @Localizer["Electronic Library and Platform for Digital Management of <i>Mytilus chilensis</i> Resource."]
                         </h3>
-                        <p class="text-justify small">
+                        <p class="text-justify small d-none d-sm-block">
                             @Localizer["A Tool of"] <strong><a target="_blank" rel="noopener" href="https://www.amichile.com/">AmiChile</a></strong>,
                             @Localizer["financed by"] <strong><a target="_blank" rel="noopener" href="https://www.corfo.cl/">CORFO</a></strong>.
                             @Localizer["as part of the regional strategic program of mussels"] <strong><a target="_blank" rel="noopener" href="https://www.mejillondechile.cl/">PER</a></strong>
@@ -175,10 +175,10 @@
 </div>
 <hr />
 <div style="margin-left:10px;">
-    <div class="row">
+    <div class="row mb-3">
         <a asp-controller="Home" asp-action="Analytics" style="color:black"><i class="fas fa-poll fa-fw"></i> @Localizer["Web Analytics"]</a><p class="m-0">&emsp;@Localizer["Total number of visits"]&emsp;<span id="counter"></span></p>
     </div>
-    <div class="row">
+    <div class="row mb-3">
         <a target="_blank" rel="noopener" href="https://docs.google.com/forms/d/e/1FAIpQLSdtgpabkbTL8eXZ1PJuyNzEkyAtX_eIdX7_84cO6aAMHxUKyQ/viewanalytics" style="color:black"><i class="fas fa-poll fa-fw"></i> @Localizer["Results"]</a>
     </div>
     <div class="row">

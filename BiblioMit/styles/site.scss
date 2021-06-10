@@ -4,9 +4,11 @@
     /*padding-bottom: 20px;*/
 }
 
+.float-left-md{
+    float: left;
+}
 /* Wrapping element */
 /* Set some basic padding to keep content from hitting the edges */
-
 /* Carousel */
 .carousel-caption p {
     font-size: 20px;
@@ -151,6 +153,10 @@ nav button.dropdown-toggle::after {
 }*/
 
 @media screen and (max-width: 62em) {
+    .float-left-md {
+        float: none;
+    }
+
     .navbar-collapse {
         max-height: 60vh;
         overflow-y: auto;

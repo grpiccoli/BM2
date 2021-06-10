@@ -508,7 +508,6 @@ namespace BiblioMit.Controllers
             ViewData["interval"] = Convert.ToInt32(stopWatch.ElapsedMilliseconds / 500);
             return View(Agendas);
         }
-
         public Task<(IEnumerable<PublicationVM>, string, int)[]> GetPubsAsync(
             string[] src, string q, int rpp, int? pg, string sortBy, string order, string srtUach, int ggl)
         {
