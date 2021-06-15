@@ -135,6 +135,9 @@
   <data name="Thank you for chatting with us" xml:space="preserve">
     <value>Gracias por chatear con nostros</value>
   </data>
+  <data name="Total number of visits" xml:space="preserve">
+    <value>Número total de visitas</value>
+  </data>
   <data name="User Manual" xml:space="preserve">
     <value>Manual de uso</value>
   </data>

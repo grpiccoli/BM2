@@ -1,0 +1,31 @@
+﻿@model List<BiblioMit.Views.Shared.Components.Nav.NavDDwnVM>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark d-lg-block fixed-top m-0 p-0">
+    <div class="container-fluid m-0 p-0">
+        <!-- Navbar brand -->
+        <a class="navbar-brand p-3" href="#">
+            <div>
+                <img src="~/images/ico/bibliomit.svg"
+                     height="35" width="35"
+                     alt="bibliomit icon"
+                     loading="lazy" />
+            </div>
+            BiblioMit
+        </a>
+        <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#navbarApps" aria-controls="navbarApps" aria-expanded="false" aria-label="Ver herramientas">
+            <i class="fas fa-bars text-light"></i>
+        </button>
+        <!-- Collapsible wrapper -->
+        <div class="collapse navbar-collapse" id="navbarApps">
+            <ul class="navbar-nav me-auto mt-lg-0">
+                @foreach (var v in Model)
+                {
+                    <partial name="_NavDDwn" model='v' />
+                }
+            </ul>
+            <ul class="navbar-nav ms-auto d-flex flex-row">
+                <partial name="_LoginPartial" model="new LoginViewModel()" />
+            </ul>
+        </div>
+    </div>
+</nav>

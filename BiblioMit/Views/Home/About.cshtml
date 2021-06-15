@@ -5,102 +5,269 @@
 
 <partial name="_Libs" model='new List<string> { "nanogallery2" }' />
 
-<div class="row">
-    <div class="col-12 col-md-6">
-        <a class="float-left" href="@Url.Action("Contact", "Home", null, null)" target="_blank" rel="noopener">
-            <img src="~/images/ico/bibliomit.svg" alt="BiblioMit" class="img-fluid" style="max-height:4em" />
-            <h1 class="float-right align-bottom">
-                BiblioMit
-            </h1>
+@section Header{
+    <!-- Carousel wrapper -->
+    <div id="introCarousel" class="carousel slide carousel-fade shadow-2-strong" data-mdb-ride="carousel" 
+         style="top:-1rem;">
+        <!-- Indicators -->
+        <ol class="carousel-indicators">
+            <li data-mdb-target="#introCarousel" data-mdb-slide-to="0" class="active"></li>
+            <li data-mdb-target="#introCarousel" data-mdb-slide-to="1"></li>
+            <li data-mdb-target="#introCarousel" data-mdb-slide-to="2"></li>
+        </ol>
+
+        <!-- Inner -->
+        <div class="carousel-inner">
+            <!-- Single item -->
+            <div class="carousel-item active" style="
+    background-image: url('../images/backgrounds/mussels-shells-mytilus-watt-area-53131.min.jpg');
+    height:85vh;
+    min-height: 10rem;
+    background-size:cover;
+">
+                <div class="mask" style="background-color: rgba(100, 100, 100, 0.7);">
+                    <div class="d-flex justify-content-center align-items-center h-100">
+                        <div class="text-white text-center">
+                            <h3 class="mt-0 text-justify">
+                                @Localizer["Electronic Library and Platform for Digital Management of <i>Mytilus chilensis</i> Resource."]
+                            </h3>
+                            <p class="text-justify small d-none d-sm-block">
+                                @Localizer["A Tool of"] <strong><a target="_blank" rel="noopener" href="https://www.amichile.com/">AmiChile</a></strong>,
+                                @Localizer["financed by"] <strong><a target="_blank" rel="noopener" href="https://www.corfo.cl/">CORFO</a></strong>.
+                                @Localizer["as part of the regional strategic program of mussels"] <strong><a target="_blank" rel="noopener" href="https://www.mejillondechile.cl/">PER</a></strong>
+                                @Localizer["for"] <strong><a target="_blank" rel="noopener" href="http://www.intemit.cl/">INTEMIT</a></strong>
+                                @Localizer["and developed by"] <strong><a target="_blank" rel="noopener" href="http://www.epicsolutions.cl">Epic Solutions</a></strong> @Localizer["through"]
+                                <strong><a target="_blank" rel="noopener" href="http://www.capia.cl">CAPIA</a></strong>-<strong><a target="_blank" rel="noopener" href="http://www.ust.cl">UST</a></strong>.
+                            </p>
+                            <div class="row justify-content-between">
+                                <a class="col-md-1 m-0 p-0 mb-3" href="https://www.amichile.com/" target="_blank" rel="noopener">
+                                    <img src="~/images/ico/amichile.min.png" alt="AmiChile" height="37" width="74" />
+                                </a>
+                                <a class="col-md-2 m-0 p-0 mb-3" href="http://www.intemit.cl/" target="_blank" rel="noopener">
+                                    <img src="~/images/ico/intemit.min.svg" alt="Intemit" height="37" width="180" />
+                                </a>
+                                <a class="col-md-1 m-0 p-0 mb-3" href="http://www.ust.cl/" target="_blank" rel="noopener">
+                                    <img src="~/images/ico/ust_logo_firma.svg" alt="Icono UST" height="37" width="90" />
+                                </a>
+                                <a class="col-md-1 m-0 p-0 mb-3" href="http://www.capia.cl/" target="_blank" rel="noopener">
+                                    <img src="~/images/ico/capia.min.png" alt="CAPIA" height="37" width="86" />
+                                </a>
+                                <a class="col-md-1 m-0 p-0 mb-3" href="https://www.epicsolutions.cl/" target="_blank" rel="noopener">
+                                    <img src="~/images/ico/epic.min.png" alt="EPIC Solutions" height="37" width="66" />
+                                </a>
+                                <a class="col-md-2 m-0 p-0 mb-3" href="http://www.mejillondechile.cl/" target="_blank" rel="noopener">
+                                    <img src="~/images/ico/mejillondechile.min.png" alt="mejillon de chile" width="109" height="37" />
+                                </a>
+                                <a class="col-md-1 m-0 p-0" href="https://www.corfo.cl/" rel="noopener" target="_blank">
+                                    <img src="~/images/ico/corfo.svg" alt="corfo" class="logo-jumbo" width="95" height="37" />
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Single item -->
+            <div class="carousel-item" style="
+    background-image: url('../images/backgrounds/mussels-shells-mytilus-watt-area-53131.min.jpg');
+    height:85vh;
+    min-height: 5rem;
+    background-size:cover;
+">
+                <div class="mask" style="background-color: rgba(100, 100, 100, 0.7);">
+                    <div class="d-flex justify-content-center align-items-center h-100">
+                        <div class="text-white text-center">
+                            <h3 class="mt-0 text-justify">@ViewData["Message"]</h3>
+                            <p class="text-justify small d-none d-sm-block" style="max-width:fit-content;">
+                                @Localizer["A project from the <strong>Guild Association of Mussel Farmers of Chile</strong>"]
+                                (<strong>
+                                    <a target="_blank" href="http://www.amichile.com/" rel="noopener">
+                                        <img src="~/images/ico/amichile.min.png" alt="amichile" class="img-fluid" style="max-height:1.5em" />
+                                        AmiChile
+                                    </a>
+                                </strong>),
+                                @Localizer["financed by the <strong>Production Development Coorporation of Chile</strong>"]
+                                (<strong>
+                                    <a target="_blank" href="https://www.corfo.cl/" rel="noopener">
+                                        <img src="~/images/ico/corfo.min.png" alt="corfo" class="img-fluid" style="max-height:1.5em" />
+                                        CORFO
+                                    </a>
+                                </strong>),
+                                @Localizer[@"within the framework of project <i>Code 16 Node 70434 ""Science and Technology Node for the Mussel Farming Industry""</i> of the <strong>Strategic Regional Program for the Mussel Indutry</strong>"]
+                                (<strong>
+                                    <a target="_blank" href="http://www.mejillondechile.cl/" rel="noopener">
+                                        <img src="~/images/ico/mejillondechile.min.png" alt="mejillon de chile" class="img-fluid" style="max-height:1.5em" />
+                                        MejillondeChile
+                                    </a>
+                                </strong>)
+                                @Localizer["for the <strong>Technological Institute of Mussel Farming</strong>"]
+                                (<strong>
+                                    <a target="_blank" href="http://www.intemit.cl/" rel="noopener">
+                                        <img src="~/images/ico/intemit.min.png" alt="intemit" class="img-fluid" style="max-height:1.5em" />
+                                        INTEMIT
+                                    </a>
+                                </strong>)
+                                @Localizer["and developed by <strong>Guillermo Rodriguez Piccoli</strong>"]
+                                (<strong>
+                                    <a target="_blank" href="https://www.linkedin.com/in/guillermo-rodriguez-piccoli/" rel="noopener">
+                                        <img src="~/images/socmedia/LinkedIn.svg" alt="epic solutions" class="img-fluid" style="max-height:1.5em" />
+                                    </a>
+                                </strong>)
+                                @Localizer["at <strong>Epic Solutions Consulting</strong>"]
+                                (<strong>
+                                    <a target="_blank" href="http://www.epicsolutions.cl" rel="noopener">
+                                        <img src="~/images/ico/epic.min.png" alt="epic solutions" class="img-fluid" style="max-height:1.5em" />
+                                        Epic Solutions
+                                    </a>
+                                </strong>).
+                                @Localizer["and managed by the <strong>Centre of Applied Research for Aquaculture and Fishery</strong>"]
+                                (<strong>
+                                    <a target="_blank" href="http://www.capia.cl" rel="noopener">
+                                        <img src="~/images/ico/capia.min.png" alt="capia" class="img-fluid" style="max-height:1.5em" />
+                                        CAPIA
+                                    </a>
+                                </strong>)
+                                @Localizer["of <strong>Saint Thomas University Chile</strong>"]
+                                (<strong>
+                                    <a target="_blank" href="http://www.ust.cl" rel="noopener">
+                                        <img src="~/images/ico/ust.min.png" alt="ust" class="img-fluid" style="max-height:1.5em" />
+                                        UST
+                                    </a>
+                                </strong>)
+                                <br />
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Single item -->
+            <!-- Single item -->
+            <div class="carousel-item" style="
+    background-image: url('../images/backgrounds/mussels-shells-mytilus-watt-area-53131.min.jpg');
+    height:85vh;
+    min-height: 5rem;
+    background-size:cover;
+">
+                <div class="mask" style="background-color: rgba(100, 100, 100, 0.7);">
+                    <div class="d-flex justify-content-center align-items-center h-100">
+                        <div class="text-white text-center">
+                            <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/Xx-qk-a4-fA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Inner -->
+        <!-- Controls -->
+        <a class="carousel-control-prev" href="#introCarousel" role="button" data-mdb-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#introCarousel" role="button" data-mdb-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
         </a>
     </div>
-    <div class="col-6 col-md-3">
-        <a class="float-left" href="https://www.corfo.cl/" target="_blank" rel="noopener">
-            <img src="~/images/ico/corfo.svg" alt="corfo" class="img-fluid" style="max-height:4em"/>
-        </a>
-    </div>
-    <div class="col-6 col-md-3">
-        <a class="float-left" href="http://www.mejillondechile.cl/" target="_blank" rel="noopener">
-            <img src="~/images/ico/mejillondechile.min.png" alt="mejillon de chile" class="img-fluid" style="max-height:4em"/>
-        </a>
-    </div>
-</div>
-<div class="row">
-    <div class="col-12 col-md-6">
-        <h3>@ViewData["Message"]</h3>
-        <p class="text-justify">
-            @Localizer["A project from the <strong>Guild Association of Mussel Farmers of Chile</strong>"]
-            (<strong>
-                <a target="_blank" href="http://www.amichile.com/" rel="noopener">
-                    <img src="~/images/ico/amichile.min.png" alt="amichile" class="img-fluid" style="max-height:1.5em" />
-                    AmiChile
-                </a>
-            </strong>),
-            @Localizer["financed by the <strong>Production Development Coorporation of Chile</strong>"]
-            (<strong>
-                <a target="_blank" href="https://www.corfo.cl/" rel="noopener">
-                    <img src="~/images/ico/corfo.min.png" alt="corfo" class="img-fluid" style="max-height:1.5em" />
-                    CORFO
-                </a>
-            </strong>),
-            @Localizer[@"within the framework of project <i>Code 16 Node 70434 ""Science and Technology Node for the Mussel Farming Industry""</i> of the <strong>Strategic Regional Program for the Mussel Indutry</strong>"]
-            (<strong>
-                <a target="_blank" href="http://www.mejillondechile.cl/" rel="noopener">
-                    <img src="~/images/ico/mejillondechile.min.png" alt="mejillon de chile" class="img-fluid" style="max-height:1.5em" />
-                    MejillondeChile
-                </a>
-            </strong>)
-            @Localizer["for the <strong>Technological Institute of Mussel Farming</strong>"]
-            (<strong>
-                <a target="_blank" href="http://www.intemit.cl/" rel="noopener">
-                    <img src="~/images/ico/intemit.min.png" alt="intemit" class="img-fluid" style="max-height:1.5em" />
-                    INTEMIT
-                </a>
-            </strong>)
-            @Localizer["and developed by <strong>Guillermo Rodriguez Piccoli</strong>"]
-            (<strong>
-                <a target="_blank" href="https://www.linkedin.com/in/guillermo-rodriguez-piccoli/" rel="noopener">
-                    <img src="~/images/socmedia/LinkedIn.svg" alt="epic solutions" class="img-fluid" style="max-height:1.5em" />
-                </a>
-            </strong>)
-            @Localizer["at <strong>Epic Solutions Consulting</strong>"]
-            (<strong>
-                <a target="_blank" href="http://www.epicsolutions.cl" rel="noopener">
-                    <img src="~/images/ico/epic.min.png" alt="epic solutions" class="img-fluid" style="max-height:1.5em" />
-                    Epic Solutions
-                </a>
-            </strong>).
-            @Localizer["and managed by the <strong>Centre of Applied Research for Aquaculture and Fishery</strong>"]
-            (<strong>
-                <a target="_blank" href="http://www.capia.cl" rel="noopener">
-                    <img src="~/images/ico/capia.min.png" alt="capia" class="img-fluid" style="max-height:1.5em" />
-                    CAPIA
-                </a>
-            </strong>)
-            @Localizer["of <strong>Saint Thomas University Chile</strong>"]
-            (<strong>
-                <a target="_blank" href="http://www.ust.cl" rel="noopener">
-                    <img src="~/images/ico/ust.min.png" alt="ust" class="img-fluid" style="max-height:1.5em" />
-                    UST
-                </a>
-            </strong>)
-            <br />
-        </p>
-    </div>
-    <div class="col-12 col-md-6">
-        <iframe src="https://www.youtube.com/embed/Xx-qk-a4-fA" frameborder="0" allow="encrypted-media; autoplay" allowfullscreen style="width:100%;min-height:25vw"></iframe>
-    </div>
-</div>
+    <!-- Carousel wrapper -->
+    @*<div class="row">
+            <div class="col-12 col-sm-2 p-0">
+            </div>
+            <div class="col-12 col-md-8 align-middle">
+                <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="6000">
+                    <ol class="carousel-indicators" style="border-color:green">
+                        <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+                        <li data-target="#myCarousel" data-slide-to="1"></li>
+                        <li data-target="#myCarousel" data-slide-to="2"></li>
+                    </ol>
+                    <div class="carousel-inner" role="listbox">
+                        <div class="carousel-item active">
+                            <div id="ribbons-chorito" class="fill"></div>
+                            <div class="carousel-caption" role="option">
+                                <a class="btn btn-primary" href="@Url.Action("Producers", "Centres", null, null)">
+                                    <h4>@Localizer["Place your ad here"]</h4>
+                                </a>
+                                <p>
+                                    <strong style="color:darkgoldenrod">
+                                        @Localizer["Hundreds of companies related to miticulture"]
+                                    </strong>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <div id="ribbons-research" class="fill"></div>
+                            <div class="carousel-caption" role="option">
+                                <a class="btn btn-primary" href="@Url.Action("Research", "Centres", null, null)">
+                                    <h4> @Localizer["Researchers"] </h4>
+                                </a>
+                                <p>
+                                    <strong>
+                                        @Localizer["Databases of research groups in"] <i>Mytilus chilensis</i>.
+                                    </strong>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <div id="ribbons-library" class="fill"></div>
+                            <div class="carousel-caption" role="option">
+                                <a class="btn btn-primary" href="@Url.Action("Index", "Publications", null, null)">
+                                    <h4> @Localizer["Library"] </h4>
+                                </a>
+                                <p>
+                                    <strong>
+                                        @Localizer["Publications and written resources databases of <i>Mytilus chilensis</i>."]
+                                    </strong>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <a class="carousel-control-prev" href="#myCarousel" role="button" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="carousel-control-next" href="#myCarousel" role="button" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </div>
+            </div>
+            <div class="col-12 col-sm-2 p-0 pt-2">
+            </div>
+        </div>*@
+}
+
+@*<div class="row">
+        <div class="col-12 col-md-6">
+            <a class="float-left" href="@Url.Action("Contact", "Home", null, null)" target="_blank" rel="noopener">
+                <img src="~/images/ico/bibliomit.svg" alt="BiblioMit" class="img-fluid" style="max-height:4em" />
+                <h1 class="float-right align-bottom">
+                    BiblioMit
+                </h1>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a class="float-left" href="https://www.corfo.cl/" target="_blank" rel="noopener">
+                <img src="~/images/ico/corfo.svg" alt="corfo" class="img-fluid" style="max-height:4em" />
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a class="float-left" href="http://www.mejillondechile.cl/" target="_blank" rel="noopener">
+                <img src="~/images/ico/mejillondechile.min.png" alt="mejillon de chile" class="img-fluid" style="max-height:4em" />
+            </a>
+        </div>
+    </div>*@
 <div class="row">
     <div class="col-12">
         <h3>@Localizer["Objective"]:</h3>
         <p class="text-justify"><strong>BiblioMit</strong> @Localizer["is a management tool and connection portal between the mussel farming industry, academia, research and technology centers and institutes that have an essential role in the development of Applied Sciences for the Mussel Farming world"]</p>
         <p><strong>BiblioMit</strong> @Localizer["Consists of"]:</p>
         <ul class="text-justify fa-ul correct-ul">
-            <li><span class="fa-li"><i class="fas fa-comments fa-tw logo comments"></i></span>
+            <li>
+                <span class="fa-li"><i class="fas fa-comments fa-tw logo comments"></i></span>
                 @Localizer["A forum for connection and exchange of ideas between stakeholders"]
             </li>
-            <li><span class="fa-li"><i class="fas fa-search fa-tw logo search"></i></span>
+            <li>
+                <span class="fa-li"><i class="fas fa-search fa-tw logo search"></i></span>
                 @Localizer["A search engine for multiple sources of scientific literature for the mussel farming industry at a national level (downloadable in digital format), including"]:
                 <ul>
                     <li>
@@ -120,7 +287,8 @@
                     </li>
                 </ul>
             </li>
-            <li><span class="fa-li"><i class="fas fa-map-marker-alt fa-tw logo map-marker-alt"></i></span>
+            <li>
+                <span class="fa-li"><i class="fas fa-map-marker-alt fa-tw logo map-marker-alt"></i></span>
                 @Localizer["A collection of georeferenced data, including"]:
                 <ul>
                     <li>
@@ -134,7 +302,8 @@
                     </li>
                 </ul>
             </li>
-            <li><span class="fa-li"><i class="fas fa-camera-retro fa-tw logo camera-retro"></i></span>
+            <li>
+                <span class="fa-li"><i class="fas fa-camera-retro fa-tw logo camera-retro"></i></span>
                 @Localizer["Histopathological Database"]:
                 <ul>
                     <li>
@@ -145,7 +314,8 @@
                     </li>
                 </ul>
             </li>
-            <li><span class="fa-li"><i class="fas fa-chart-line fa-tw logo chart-line"></i></span>
+            <li>
+                <span class="fa-li"><i class="fas fa-chart-line fa-tw logo chart-line"></i></span>
                 @Localizer["Digest"]:
                 <ul>
                     <li>

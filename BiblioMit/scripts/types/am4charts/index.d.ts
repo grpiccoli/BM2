@@ -24,6 +24,7 @@ declare class am4charts {
     static XYChart: any;
     static XYCursor: any;
     static LineSeries: any;
+    static CategoryAxis: any;
 }
 
 declare const am4lang_es_ES: any;

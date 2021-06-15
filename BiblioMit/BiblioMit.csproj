@@ -41,6 +41,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0" />
     <PackageReference Include="Microsoft.Build.Framework" Version="16.10.0" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.10.0" />
@@ -191,14 +192,12 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Content Remove="compilerconfig.json" />
     <Content Remove="wwwroot\js\clock.min.js" />
     <Content Remove="wwwroot\js\gmaps.min.js" />
     <Content Remove="wwwroot\js\loader.min.js" />
   </ItemGroup>
   
   <ItemGroup>
-    <None Remove="compilerconfig.json.defaults" />
     <None Remove="Data\Environmental\PlanktonUsers.tsv" />
     <None Remove="scripts\bibliomit.ts" />
     <None Remove="scripts\charts.ts" />

@@ -1,0 +1,14 @@
+﻿@{
+    ViewData["Title"] = Localizer["Responses"];
+}
+@section Styles{
+    <style>
+        footer {
+            background: transparent !important;
+            opacity: 0.5;
+        }
+    </style>
+}
+
+@model string
+@Html.Raw(Model)

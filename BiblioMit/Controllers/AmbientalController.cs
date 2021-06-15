@@ -160,17 +160,17 @@ namespace BiblioMit.Controllers
                         })
             }));
         public IActionResult FarmData() => Json(_context.PsmbAreas
-            .Where(c => c.PolygonId.HasValue)
+            .Where(c => c.PolygonId.HasValue && c.CommuneId.HasValue && c.CompanyId.HasValue)
             .Select(c => new GMapPolygonCentre
             {
                 Id = c.Id,
-                Name = c.Code + " " + c.Name,
+                Name = c.Code + " " + c.Name ?? "",
                 Comuna = c.Commune.Name,
                 ComunaId = c.CommuneId.Value,
                 Provincia = c.Commune.Province.Name,
                 Code = c.Code,
-                BusinessName = c.Company.BusinessName,
-                Rut = c.Company.Id,
+                BusinessName = c.Company.BusinessName ?? "",
+                Rut = c.CompanyId.Value,
                 Position = c.Polygon
                         .Vertices.Select(o => new GMapCoordinate
                         {
@@ -180,7 +180,7 @@ namespace BiblioMit.Controllers
             }));
         [HttpGet]
         public IActionResult ResearchData() => Json(_context.ResearchCentres
-                    .Where(c => c.PolygonId.HasValue)
+                    .Where(c => c.PolygonId.HasValue && c.CommuneId.HasValue)
                     .Select(c => new GMapPolygonCentre
                     {
                         Id = c.Id,

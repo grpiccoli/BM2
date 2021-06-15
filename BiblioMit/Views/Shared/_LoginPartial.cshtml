@@ -2,66 +2,67 @@
 
 <partial name="_SelectLanguagePartial" />
 @*<vc:culture-switcher />*@
-<li class="nav-item dropdown">
-    <button class="nav-link dropdown-toggle btn btn-dark" role="button" id="login" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <figure class="text-center">
-            @if (SignInManager.IsSignedIn(User))
-            {
-                <i class="fas fa-user fa-tw logo user"></i>
-                <figcaption class="light-caption">@Localizer["Account"]</figcaption>
-            }
-            else
-            {
-                <i class="fas fa-plus fa-tw logo plus"></i>
-                <figcaption class="light-caption">@Localizer["Login"]</figcaption>
-            }
-        </figure>
-    </button>
-    <div class="dropdown-menu dropdown-menu-right">
+<li class="nav-item dropdown text-center m-0">
+    <a class="nav-link dropdown-toggle" href="#" role="button" id="login" data-mdb-toggle="dropdown"
+       aria-expanded="false">
         @if (SignInManager.IsSignedIn(User))
         {
-            <form class="navbar-form nav navbar-nav" asp-area="Identity"
-                  asp-page="/Account/Logout"
-                  asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })"
-                  method="post" id="logoutForm">
-                <a class="btn btn-link navbar-btn navbar-link dropdown-item" asp-controller="Manage"
-                   asp-action="Index" title="Manage">
-                    <figure class="text-center">
-                        <i class="fas fa-cog fa-tw logo cog"></i>
-                        <figcaption class="dark-caption">@Localizer["Manage"]</figcaption>
-                    </figure>
-                </a>
-                <button type="submit" class="btn btn-link navbar-btn navbar-link dropdown-item">
-                    <figure class="text-center">
-                        <i class="fas fa-times fa-tw logo times"></i>
-                        <figcaption class="dark-caption">@Localizer["Logout"]</figcaption>
-                    </figure>
-                </button>
-            </form>
+            <div>
+                <i class="fas fa-user m-0"></i>
+            </div>
+            <span class="small">@Localizer["Account"]</span>
         }
         else
         {
-            <form class="px-4 py-3" asp-controller="Account"
-                  asp-action="Login" asp-route-returnUrl="@Context.Request.Path"
-                  method="post" autocomplete="on">
-                <div class="form-group">
-                    <label asp-for="Email">@Localizer["Email"]</label>
-                    <input asp-for="Email" class="form-control" autocomplete="email">
-                </div>
-                <div class="form-group">
-                    <label asp-for="Password">@Localizer["Password"]</label>
-                    <input asp-for="Password" class="form-control" autocomplete="current-password">
-                </div>
-                <div class="form-check">
-                    <input asp-for="RememberMe" class="form-check-input">
-                    <label class="form-check-label" asp-for="RememberMe">
-                        @Localizer["Remember me"]
-                    </label>
-                </div>
-                <button type="submit" class="btn btn-primary">@Localizer["Sign in"]</button>
-                <div class="dropdown-divider"></div>
-                <a asp-controller="Account" asp-action="ForgotPassword" class="dropdown-item">@Localizer["Forgot password?"]</a>
-            </form>
+            <div>
+                <i class="fas fa-sign-in-alt m-0"></i>
+            </div>
+            <span class="small">@Localizer["Login"]</span>
         }
-    </div>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end m-0" aria-labelledby="SignIn">
+        <li>
+            @if (SignInManager.IsSignedIn(User))
+            {
+                <form class="navbar-form nav navbar-nav" asp-area="Identity"
+                      asp-page="/Account/Logout"
+                      asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })"
+                      method="post" id="logoutForm">
+                    <a class="dropdown-item" asp-controller="Manage"
+                       asp-action="Index" title="Manage">
+                            <i class="fas fa-cog fa-tw"></i>
+                            <span class="small">@Localizer["Manage"]</span>
+                    </a>
+                    <button type="submit" class="dropdown-item">
+                            <i class="fas fa-times fa-tw"></i>
+                            <span class="small">@Localizer["Logout"]</span>
+                    </button>
+                </form>
+            }
+            else
+            {
+                <form class="px-4 py-3" asp-controller="Account"
+                      asp-action="Login" asp-route-returnUrl="@Context.Request.Path"
+                      method="post" autocomplete="on">
+                    <div class="form-group">
+                        <label asp-for="Email">@Localizer["Email"]</label>
+                        <input asp-for="Email" class="form-control" autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Password">@Localizer["Password"]</label>
+                        <input asp-for="Password" class="form-control" autocomplete="current-password">
+                    </div>
+                    <div class="form-check">
+                        <input asp-for="RememberMe" class="form-check-input">
+                        <label class="form-check-label" asp-for="RememberMe">
+                            @Localizer["Remember me"]
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">@Localizer["Sign in"]</button>
+                    <div class="dropdown-divider"></div>
+                    <a asp-controller="Account" asp-action="ForgotPassword" class="dropdown-item">@Localizer["Forgot password?"]</a>
+                </form>
+            }
+        </li>
+    </ul>
 </li>

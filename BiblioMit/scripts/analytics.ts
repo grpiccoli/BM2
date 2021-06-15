@@ -1,0 +1,21 @@
+﻿var chart = am4core.create("chartdiv", am4charts.XYChart);
+chart.dataSource.url = "/home/getanalyticsdatamonth";
+var dateAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+dateAxis.dataFields.category = "date";
+am4core.useTheme(am4themes_kelly);
+chart.language.locale = am4lang_es_ES;
+chart.scrollbarY = new am4core.Scrollbar();
+chart.scrollbarX = new am4core.Scrollbar();
+chart.zoomOutButton.align = "left";
+chart.zoomOutButton.valign = "bottom";
+chart.cursor = new am4charts.XYCursor();
+chart.exporting.menu = new am4core.ExportMenu();
+
+var serie = chart.series.push(new am4charts.LineSeries());
+serie.dataFields.valueY = "value";
+serie.dataFields.categoryX = "date";
+serie.name = "views";
+serie.tooltipText = "Visitas totales: [bold]{valueY}[/]";
+serie.tooltip.pointerOrientation = "vertical";
+chart.cursor.xAxis = dateAxis;

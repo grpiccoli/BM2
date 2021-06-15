@@ -3,7 +3,8 @@
     var data = {
         text: text.replace(/[\n\r]+/g, " ").replace(/&nbsp;/g, " "),
         to: lang,
-        '__RequestVerificationToken': $("input[name='__RequestVerificationToken']").val() };
+        '__RequestVerificationToken': $("input[name='__RequestVerificationToken']").val()
+    };
     return await fetch('/home/translate', {
         method: 'post',
         headers: new Headers({ 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }),

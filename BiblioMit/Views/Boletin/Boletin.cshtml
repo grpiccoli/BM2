@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<BiblioMit.Models.Entry>
 @using BiblioMit.Views 
 @{
-ViewData["Title"] = "Boletín";
+    ViewData["Title"] = Localizer["Digest"];
 }
 
 <partial name="_LibsPg" model='new List<string> { "bootstrap-select", "bootstrap-select-localize" }' />
@@ -121,42 +121,88 @@ ViewData["Title"] = "Boletín";
             <div id="environmental" class="col text-center category border-bottom m-2">@Localizer["Environmental"]</div>
             <div id="downloads" class="col text-center category border-bottom m-2">@Localizer["Downloads"]</div>
         </div>
-        <nav class="nav nav-pills nav-justified">
-            <button id="seeds" role="button" data-toggle="tab"
-                    class="nav-item nav-link active tipo btn" data-value="1">
-                @Localizer["Seeds"]
-            </button>
-            <button id="harvest" role="button" data-toggle="tab"
-                    class="nav-item nav-link tipo btn" data-value="2">
-                @Localizer["Harvest"]
-            </button>
-            <button id="supply" role="button" data-toggle="tab"
-                    class="nav-item nav-link tipo btn" data-value="3">
-                @Localizer["Supply"]
-            </button>
-            <button id="production" role="button" data-toggle="tab"
-                    class="nav-item nav-link tipo btn" data-value="4">
-                @Localizer["Production"]
-            </button>
-            <button id="temperature" role="button" data-toggle="tab"
-                    class="nav-item nav-link tipo btn" data-value="5">
-                @Localizer["Temperature"]
-            </button>
-            <button id="salinity" role="button" data-toggle="tab"
-                    class="nav-item nav-link tipo btn" data-value="6">
-                @Localizer["Salinity"]
-            </button>
-            <a class="nav-item nav-link btn btn-outline-danger" id="downloadModal" data-toggle="modal"
-                asp-action="Download" data-target="#modal-action">
-                <i class="fas fa-file-pdf fa-tw"></i>&nbsp;@Localizer["Digest"]
-            </a>
-            @*<a id="downloadReport" class="nav-item nav-link btn btn-outline-danger" onclick="exportReport();">
-                    <i class="fas fa-file-pdf"></i> @Localizer["Digest"]
-                </a>*@
-            <button class="nav-item nav-link btn btn-outline-success" role="button" onclick="exportExcel();">
-                <i class="fas fa-file-excel fa-tw alert-success"></i> @Localizer["Data"]
-            </button>
-        </nav>
+        <ul class="nav nav-tabs nav-justified mb-3" id="ex1" role="tablist">
+                <li role="presentation" class="nav-item">
+                    <a class="nav-link active"
+                       id="ex3-tab-1"
+                        data-mdb-toggle="tab"
+                        href="#ex3-tabs-1"
+                        role="tab"
+                        aria-controls="ex3-tabs-1"
+                        aria-selected="true">
+                        @Localizer["Seeds"]
+                    </a>
+                </li>
+                <li role="presentation" class="nav-item">
+                    <a class="nav-link"
+      id="ex3-tab-2"
+      data-mdb-toggle="tab"
+      href="#ex3-tabs-2"
+      role="tab"
+      aria-controls="ex3-tabs-2"
+      aria-selected="false">
+                        @Localizer["Harvest"]
+                    </a>
+                </li>
+                <li role="presentation" class="nav-item">
+                    <a class="nav-link"
+      id="ex3-tab-2"
+      data-mdb-toggle="tab"
+      href="#ex3-tabs-2"
+      role="tab"
+      aria-controls="ex3-tabs-2"
+      aria-selected="false">
+                        @Localizer["Supply"]
+                    </a>
+                </li>
+                <li role="presentation" class="nav-item">
+                    <a class="nav-link"
+                       id="ex3-tab-2"
+                       data-mdb-toggle="tab"
+                       href="#ex3-tabs-2"
+                       role="tab"
+                       aria-controls="ex3-tabs-2"
+                       aria-selected="false">
+                        @Localizer["Production"]
+                    </a>
+                </li>
+                <li role="presentation" class="nav-item">
+                    <a class="nav-link"
+                       id="ex3-tab-2"
+                       data-mdb-toggle="tab"
+                       href="#ex3-tabs-2"
+                       role="tab"
+                       aria-controls="ex3-tabs-2"
+                       aria-selected="false">
+                        @Localizer["Temperature"]
+                    </a>
+                </li>
+                <li role="presentation" class="nav-item">
+                    <a class="nav-link"
+                       id="ex3-tab-2"
+                       data-mdb-toggle="tab"
+                       href="#ex3-tabs-2"
+                       role="tab"
+                       aria-controls="ex3-tabs-2"
+                       aria-selected="false">
+                        @Localizer["Salinity"]
+                    </a>
+                </li>
+                <li role="presentation" class="nav-item">
+                    <a class="nav-link" id="downloadModal" data-mdb-toggle="modal"
+                       asp-action="Download" data-target="#modal-action">
+                        <i class="fas fa-file-pdf fa-tw"></i>&nbsp;@Localizer["Digest"]
+                    </a>
+                </li>
+                @*<a id="downloadReport" class="nav-item nav-link btn btn-outline-danger" onclick="exportReport();">
+            <i class="fas fa-file-pdf"></i> @Localizer["Digest"]
+        </a>*@
+                <li role="presentation" class="nav-item">
+                    <a class="nav-link btn btn-outline-success" role="button" onclick="exportExcel();">
+                        <i class="fas fa-file-excel fa-tw alert-success"></i> @Localizer["Data"]
+                    </a>
+                </li>
+        </ul>
     </div>
 </div>
 <div class="row">
@@ -176,7 +222,7 @@ ViewData["Title"] = "Boletín";
         <div class="tab-content container-fluid h-100">
             <div id="config" class="tab-pane active form-horizontal" role="tabpanel">
                 <form id="dtconf" onchange="this.submit();">
-                    <div class="form-group">
+                    @*<div class="form-group">
                         <label class="col-12 col-md-6 col-lg-4">@Localizer["Choose year"]</label>
                         <div class="col-12 col-md-6 col-lg-4">
                             <div class="input-group">
@@ -185,40 +231,28 @@ ViewData["Title"] = "Boletín";
                                         <i class="far fa-calendar"></i>
                                     </span>
                                 </div>
-                                <select name="yr" id="year" title="Año" data-size="5"
-                                        class="selectpicker form-control periodo"
-                                        asp-items="ViewBag.Year"></select>
+                                <input name="yr" id="year" title="Año"
+                                        class="form-control periodo"
+                                       type="month" min=""/>
                             </div>
                         </div>
-                    </div>
+                    </div>*@
                     <div class="start form-group">
                         <label class="col-12 col-md-6 col-lg-4">@Localizer["Choose first month"]</label>
                         <div class="col-12 col-md-6 col-lg-4">
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">
-                                        <i class="fas fa-calendar-minus"></i>
-                                    </span>
-                                </div>
-                                <select name="start" id="start" title="Start" data-size="5"
+                                <input name="start" id="start" title="Start" data-size="5"
                                         class="selectpicker form-control periodo"
-                                        asp-items="ViewBag.Start"></select>
-                            </div>
+                                        asp-items="ViewBag.Start"
+                                       type="month" min="" max=""/>
                         </div>
                     </div>
                     <div class="start form-group">
                         <label class="col-12 col-md-6 col-lg-4">@Localizer["Choose final month"]</label>
                         <div class="col-12 col-md-6 col-lg-4">
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">
-                                        <i class="fas fa-calendar-plus"></i>
-                                    </span>
-                                </div>
-                                <select name="end" id="end" title="End" data-size="5"
+                                <input name="end" id="end" title="End" data-size="5"
                                         class="selectpicker form-control periodo"
-                                        asp-items="ViewBag.End"></select>
-                            </div>
+                                        asp-items="ViewBag.End"
+                                       type="month" min="" max=""/>
                         </div>
                     </div>
                     <select name="tp" id="tp"

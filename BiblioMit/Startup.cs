@@ -97,6 +97,7 @@ namespace BiblioMit
                 options.AccessDeniedPath = "/Identity/Account/AccessDenied";
                 options.Cookie.Name = "BiblioMit";
                 options.Cookie.HttpOnly = true;
+                options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None;
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
                 options.LoginPath = "/Identity/Account/Login";
                 options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
@@ -131,7 +132,8 @@ namespace BiblioMit
 
             services.AddRazorPages()
                 .AddViewLocalization()
-                .AddDataAnnotationsLocalization();
+                .AddDataAnnotationsLocalization()
+                .AddRazorRuntimeCompilation();
             services.AddServerSideBlazor();
             services.AddTransient<IEnvironmental, EnvironmentalService>();
 
@@ -201,6 +203,7 @@ namespace BiblioMit
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
+            app.UseCookiePolicy();
 
             //app.UseSitemapMiddleware();
             //app.UseCors(o => o.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
@@ -223,8 +226,6 @@ namespace BiblioMit
                         "public,max-age=" + durationInSecond;
                 }
             });
-
-            app.UseCookiePolicy();
 
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {

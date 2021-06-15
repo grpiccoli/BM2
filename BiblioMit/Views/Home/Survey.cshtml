@@ -1,0 +1,25 @@
+﻿@{
+    ViewData["Title"] = Localizer["Survey"];
+}
+
+@section Styles{
+    <style>
+        header {
+            height: calc(100vh - 66px);
+        }
+
+        iframe {
+            width: 100vw;
+            height: calc(100vh - 66px);
+        }
+    </style>
+}
+
+@section Header{
+    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdtgpabkbTL8eXZ1PJuyNzEkyAtX_eIdX7_84cO6aAMHxUKyQ/viewform?embedded=true"
+            width="640" height="3163"
+            frameborder="0" marginheight="0"
+            marginwidth="0">
+        Loading…
+    </iframe>
+}

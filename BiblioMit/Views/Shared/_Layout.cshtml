@@ -56,7 +56,7 @@
         <script>
             (function (e, t, n, i, s, a, c) {
                 e[n] = e[n] || function () { (e[n].q = e[n].q || []).push(arguments) }
-                ; a = t.createElement(i); c = t.getElementsByTagName(i)[0]; a.async = true; a.src = s; c.parentNode.insertBefore(a, c)
+                    ; a = t.createElement(i); c = t.getElementsByTagName(i)[0]; a.async = true; a.src = s; c.parentNode.insertBefore(a, c)
             })(window, document, "galite", "script", "https://cdn.jsdelivr.net/npm/ga-lite@2/dist/ga-lite.min.js");
             galite('create', 'UA-46146363-2', 'auto');
             galite('send', 'pageview');
@@ -94,7 +94,9 @@
     <link rel="dns-prefetch" href="https://www.google-analytics.com">
     <link rel="preconnect" href="https://www.google-analytics.com" crossorigin="anonymous">
 
-    <partial name="_TagLibs" model='("TOP", new List<string> { "jquery", "bootstrap", "@fortawesome/fontawesome-free", "site", "modal-action", "modernizr-custom" })' />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" />
+
+    <partial name="_TagLibs" model='("TOP", new List<string> { "jquery", "mdb-ui-kit", "@fortawesome/fontawesome-free", "site", "modal-action", "modernizr-custom" })' />
     @this.WriteBlocks("TOPStyles")
     @this.WriteBlocks("Styles")
     @RenderSection("Styles", required: false)
@@ -107,21 +109,35 @@
         </noscript>*@
     <!-- End Google Tag Manager (noscript) -->
     <header>
-        <div class="fixed-top">
-            <partial name="_Nav" />
-            @RenderSection("NavBar", required: false)
-        </div>
+        @await Component.InvokeAsync("Nav")
+        @RenderSection("NavBar", required: false)
+        @RenderSection("Header", required: false)
     </header>
     <main role="main">
-        <div class="body-content container-fluid" style="min-height:78vh">
+        <div class="body-content container-fluid">
             <partial name="_CookieConsentPartial" />
-            <!-- Load Facebook SDK for JavaScript -->
-            <div id="fb-root"></div>
-            <script>
+            <environment exclude="Development">
+                <!-- Messenger Chat Plugin Code -->
+                <div id="fb-root"></div>
+
+                <!-- Your Chat Plugin code -->
+                <div id="fb-customer-chat" class="fb-customerchat"
+                     attribution=setup_tool
+                     page_id="1350128371792150"
+                     theme_color="#20cef5"
+                     logged_in_greeting="@Localizer["Hi! How can we assist you?"]"
+                     logged_out_greeting="@Localizer["Thank you for chatting with us"]"
+                     greeting_dialog_display="fade"
+                     greeting_dialog_delay="4">
+                </div>
+                <script>
+                var chatbox = document.getElementById('fb-customer-chat');
+                chatbox.setAttribute("page_id", "1350128371792150");
+                chatbox.setAttribute("attribution", "page_inbox");
                 window.fbAsyncInit = function () {
                     FB.init({
                         xfbml: true,
-                        version: 'v8.0'
+                        version: 'v11.0'
                     });
                 };
 
@@ -131,44 +147,24 @@
                     js = d.createElement(s); js.id = id;
                     js.src = 'https://connect.facebook.net/@Localizer["en_GB"]/sdk/xfbml.customerchat.js';
                     fjs.parentNode.insertBefore(js, fjs);
-                }(document, 'script', 'facebook-jssdk'));</script>
-
-            <!-- Your Chat Plugin code -->
-            <div class="fb-customerchat"
-                 attribution=setup_tool
-                 page_id="1350128371792150"
-                 theme_color="#20cef5"
-                 logged_in_greeting="@Localizer["Hi! How can we assist you?"]"
-                 logged_out_greeting="@Localizer["Thank you for chatting with us"]"
-                 greeting_dialog_display="fade"
-                 greeting_dialog_delay="4">
-            </div>
+                }(document, 'script', 'facebook-jssdk'));
+                </script>
+            </environment>
             @RenderBody()
             <partial name="_Modal" model='new BootstrapModel { Id = "modal-action", AreaLabeledId = "modal-action-label", Size = ModalSize.Medium }' />
         </div>
     </main>
-    <footer>
+    <footer class="fixed-bottom">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-12 col-md-6">
-                    <div class="row mb-3">
-                        <div class="col">
-                            <a asp-controller="Home" asp-action="Manual">
-                                <i class="fas fa-info-circle fa-tw"></i> @Localizer["User Manual"]
-                            </a>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col">
-                            <a asp-controller="Home" asp-action="Privacy">
-                                <i class="fas fa-info-circle fa-lock"></i> @Localizer["Privacy Policy"]
-                            </a>
-                        </div>
-                    </div>
+                <div class="col-6 text-center">
+                    <a target="_blank" href="https://www.epicsolutions.cl" rel="noopener" class="text-dark">
+                        <img src="~/epic_hor.svg" alt="epic solutions" class="img-responsive" height="15" asp-append-version="true" /> &copy; @DateTime.Now.Year - BiblioMit
+                    </a>
                 </div>
-                <div class="col-12 col-md-6">
-                    <a target="_blank" href="https://www.epicsolutions.cl" class="float-left-md" rel="noopener">
-                        <img src="~/epic_light_hor.svg" alt="epic solutions" class="img-responsive" height="20" asp-append-version="true" /> &copy; @DateTime.Now.Year - BiblioMit
+                <div class="col-6 text-center">
+                    <a asp-controller="Home" asp-action="Analytics" class="text-dark">
+                        <i class="fas fa-poll fa-fw"></i>&emsp;@Localizer["Total number of visits"]&emsp;<span id="counter"></span>
                     </a>
                 </div>
             </div>

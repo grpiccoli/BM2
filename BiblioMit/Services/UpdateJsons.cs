@@ -1,6 +1,5 @@
 ﻿using BiblioMit.Controllers;
 using BiblioMit.Data;
-using BiblioMit.Models.VM;
 using BiblioMit.Services.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +10,7 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Linq;
 
 namespace BiblioMit.Services
 {
@@ -40,37 +40,37 @@ namespace BiblioMit.Services
         }
         public void SeedUpdate()
         {
-            WriteJson(nameof(AmbientalController.CuencaData));
-            WriteJson(nameof(AmbientalController.ComunaData));
-            WriteJson(nameof(AmbientalController.OceanVarList));
-            WriteJson(nameof(AmbientalController.CuencaList));
-            WriteJson(nameof(AmbientalController.ComunaList));
-            WriteJson(nameof(AmbientalController.TLList));
+            WriteJson(nameof(_ambiental.CuencaData));
+            WriteJson(nameof(_ambiental.ComunaData));
+            WriteJson(nameof(_ambiental.OceanVarList));
+            WriteJson(nameof(_ambiental.CuencaList));
+            WriteJson(nameof(_ambiental.ComunaList));
+            WriteJson(nameof(_ambiental.TLList));
 
-            WriteJson(nameof(AmbientalController.RegionList));
+            WriteJson(nameof(_ambiental.RegionList));
             CenterUpdate();
             PlanktonUpdate();
         }
         public void CenterUpdate()
         {
-            WriteJson(nameof(AmbientalController.ComunaResearchList));
-            WriteJson(nameof(AmbientalController.ComunaFarmList));
-            WriteJson(nameof(AmbientalController.ProvinciaResearchList));
-            WriteJson(nameof(AmbientalController.ProvinciaFarmList));
-            WriteJson(nameof(AmbientalController.InstitutionList));
-            WriteJson(nameof(AmbientalController.CompanyList));
-            WriteJson(nameof(AmbientalController.ResearchList));
-            WriteJson(nameof(AmbientalController.FarmList));
-            WriteJson(nameof(AmbientalController.ResearchData));
-            WriteJson(nameof(AmbientalController.FarmData));
+            WriteJson(nameof(_ambiental.ComunaResearchList));
+            WriteJson(nameof(_ambiental.ComunaFarmList));
+            WriteJson(nameof(_ambiental.ProvinciaResearchList));
+            WriteJson(nameof(_ambiental.ProvinciaFarmList));
+            WriteJson(nameof(_ambiental.InstitutionList));
+            WriteJson(nameof(_ambiental.CompanyList));
+            WriteJson(nameof(_ambiental.ResearchList));
+            WriteJson(nameof(_ambiental.FarmList));
+            WriteJson(nameof(_ambiental.ResearchData));
+            WriteJson(nameof(_ambiental.FarmData));
         }
         public void PlanktonUpdate()
         {
-            WriteJson(nameof(AmbientalController.PsmbData));
-            WriteJson(nameof(AmbientalController.PsmbList));
-            WriteJson(nameof(AmbientalController.GroupVarList));
-            WriteJson(nameof(AmbientalController.GenusVarList));
-            WriteJson(nameof(AmbientalController.SpeciesVarList));
+            WriteJson(nameof(_ambiental.PsmbData));
+            WriteJson(nameof(_ambiental.PsmbList));
+            WriteJson(nameof(_ambiental.GroupVarList));
+            WriteJson(nameof(_ambiental.GenusVarList));
+            WriteJson(nameof(_ambiental.SpeciesVarList));
         }
         private void WriteJson(string function)
         {

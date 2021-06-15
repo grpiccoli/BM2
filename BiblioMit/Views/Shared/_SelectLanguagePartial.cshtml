@@ -1,5 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Builder
-@using Microsoft.AspNetCore.Http.Features
+@*@using Microsoft.AspNetCore.Http.Features*@
 @using Microsoft.AspNetCore.Localization
 @using Microsoft.AspNetCore.Mvc.Localization
 @using Microsoft.Extensions.Options
@@ -15,32 +15,26 @@
     var returnUrl = string.IsNullOrEmpty(Context.Request.Path) ? "~/" : $"~{Context.Request.Path.Value}{Context.Request.QueryString}";
 }
 
-@*<div title="@Localizer["Request culture provider:"] @requestCulture?.Provider?.GetType().Name">
-        <form id="selectLanguage" asp-controller="Home"
-                asp-action="SetLanguage" asp-route-returnUrl="@returnUrl"
-                method="post" class="form-horizontal" role="form">
-            <label asp-for="@requestCulture.RequestCulture.UICulture.Name">@Localizer["Language:"]</label>
-            <select name="culture" onchange="this.form.submit();"
-                asp-for="@requestCulture.RequestCulture.UICulture.Name" asp-items="cultureItems">
-            </select>
-        </form>
-    </div>*@
-
-<li class="nav-item dropdown">
-    <button class="nav-link dropdown-toggle btn btn-dark" id="lang" role="button" data-toggle="dropdown" aria-haspopup="true"
-            aria-expanded="false">
-        <figure class="text-center">
-            <img class="flag-icon" alt="@Localizer["English"]" src="~/images/ico/@(Localizer["gb"].Value).svg" />
-            <figcaption class="light-caption">@Localizer["English"]</figcaption>
-        </figure>
-    </button>
-    <div class="dropdown-menu" aria-labelledby="Index" style="cursor:pointer">
-        <form id="selectLanguage" asp-controller="Home"
-              asp-action="SetLanguage" asp-route-returnUrl="@returnUrl"
-              method="post" role="form" asp-route-culture="@Localizer["es"].Value">
-            <a class="dropdown-item" onclick="$('#selectLanguage').submit();">
-                <img class="flag-icon" alt="@Localizer["Español"]" src="~/images/ico/@(Localizer["cl"].Value).svg" /> @Localizer["Español"]
-            </a>
-        </form>
-    </div>
+<li class="nav-item dropdown text-center m-0">
+    <a class="nav-link dropdown-toggle" id="lang" role="button" data-mdb-toggle="dropdown"
+       aria-expanded="false">
+        <div>
+            <i class="flag flag-@Localizer["gb"] m-0"></i>
+        </div>
+        <span class="small">@Localizer["English"]</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end m-0" aria-labelledby="Index">
+        <li>
+            <form id="selectLanguage" asp-controller="Home"
+                  asp-action="SetLanguage" asp-route-returnUrl="@returnUrl"
+                  method="post" role="form" asp-route-culture="@Localizer["es"].Value">
+                <a class="dropdown-item" onclick="$('#selectLanguage').submit();">
+                    <i class="flag flag-@Localizer["cl"]"></i> 
+                    <span class="small">
+                        @Localizer["Español"]
+                    </span>
+                </a>
+            </form>
+        </li>
+    </ul>
 </li>

@@ -132,6 +132,9 @@
   <data name="Electronic Library and Platform for Digital Management of &lt;i&gt;Mytilus chilensis&lt;/i&gt; Resource." xml:space="preserve">
     <value>Biblioteca Electrónica y Plataforma de Gestión Tecnológica del Recurso &lt;i&gt;Mytilus chilensis&lt;/i&gt;.</value>
   </data>
+  <data name="eng" xml:space="preserve">
+    <value>esp</value>
+  </data>
   <data name="financed by" xml:space="preserve">
     <value>financiada por</value>
   </data>

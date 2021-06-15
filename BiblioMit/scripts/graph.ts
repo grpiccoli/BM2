@@ -460,7 +460,7 @@ var init = async function () {
 init();
 //DATES
 $('.input-daterange').datepicker({
-    inputs: $('.actual_range'),
+    inputs: Array.from($('.actual_range')),
     format: 'yyyy-mm-dd',
     language: lang,
     startDate: $('#start').val().toString(),

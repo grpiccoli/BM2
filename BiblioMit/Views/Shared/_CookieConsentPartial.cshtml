@@ -11,7 +11,7 @@
     <div id="cookieConsent" class="alert alert-info alert-dismissible fade show" role="alert">
         @Localizer["BiblioMit uses cookies and personal information to function correctly. By continuing to use BiblioMit you are giving consent to cookies being used."] 
         <a asp-area="" asp-controller="Home" asp-action="Privacy">@Localizer["Learn More"]</a>.
-        <button type="button" class="accept-policy close" data-dismiss="alert" aria-label="Close" data-cookie-string="@cookieString">
+        <button type="button" class="btn btn-sm btn-success accept-policy close" data-dismiss="alert" aria-label="Close" data-cookie-string="@cookieString">
             <span aria-hidden="true">@Localizer["Accept"]</span>
         </button>
     </div>

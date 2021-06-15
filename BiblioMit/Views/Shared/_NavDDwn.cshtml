@@ -1,35 +1,37 @@
-﻿@model BiblioMit.Models.VM.NavVM.NavDDwnVM
-@{ var first = true; }
-@*asp-controller="@Model.Controller" asp-action="@Model.Action"*@
-@*data-toggle="@item[4]" data-target="@item[5]"*@
-<li class="nav-item dropdown">
-    <button class="nav-link dropdown-toggle btn btn-dark"
-            id="@Model.Action" role="button" data-toggle="dropdown"
-            aria-haspopup="true" aria-expanded="false">
-        <figure class="text-center">
-            <i class="fas fa-@Model.Logo fa-tw logo @Model.Logo"></i>
-            <figcaption class="light-caption">@Model.Title</figcaption>
-        </figure>
-    </button>
-    <div class="dropdown-menu" aria-labelledby="@Model.Action">
-        @foreach (var section in Model.Sections)
+﻿@using BiblioMit.Views.Shared.Components.Nav
+@model NavDDwnVM
+
+<li class="nav-item dropdown text-center m-0">
+    <a class="nav-link dropdown-toggle" href="#" id="@Model.Controller-@Model.Action"
+       role="button" data-mdb-toggle="dropdown" aria-expanded="false">
+        <div>
+            <i class="@Model.Logo m-0"></i>
+            <span class="badge rounded-pill badge-notification bg-primary">@Model.Sections.Sum(s => s.Links.Count)</span>
+        </div>
+        <span class="small">@Model.Title</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-dark m-0" aria-labelledby="@Model.Action">
+        @foreach (var section in Model.Sections.Select((s, i) => new { s, i }))
         {
-            <div class="dropdown-header">@Localizer[section.Key]:</div>
-            @foreach (var item in section.Value)
+            if (section.i > 0)
             {
-                <a class="dropdown-item"
-                   asp-controller="@item[0]" asp-action="@item[1]">
-                    <i class="@item[3] fa-tw"></i>&emsp;@item[2]
-                </a>
+                <li>
+                    <hr class="dropdown-divider" />
+                </li>
             }
-            if (!first)
+            <li>
+                <div class="dropdown-header">@(section.s.Name):</div>
+            </li>
+            @foreach (var item in section.s.Links)
             {
-                <div class="dropdown-divider"></div>
-            }
-            else
-            {
-                first = false;
+                <li>
+                    <a class="dropdown-item"
+                       asp-area=""
+                       asp-controller="@item.Controller" asp-action="@item.Action">
+                        <i class="@item.Icon fa-tw"></i>&emsp;@item.Name
+                    </a>
+                </li>
             }
         }
-    </div>
+    </ul>
 </li>

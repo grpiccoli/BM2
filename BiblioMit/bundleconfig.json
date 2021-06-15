@@ -153,6 +153,14 @@
     "inputFiles": [ "styles/home.css" ]
   },
   {
+    "outputFileName": "wwwroot/js/home.min.js",
+    "inputFiles": [ "wwwroot/js/home.js" ]
+  },
+  {
+    "outputFileName": "wwwroot/js/analytics.min.js",
+    "inputFiles": [ "wwwroot/js/analytics.js" ]
+  },
+  {
     "outputFileName": "wwwroot/css/prueba.min.css",
     "inputFiles": [ "styles/prueba.css" ]
   },

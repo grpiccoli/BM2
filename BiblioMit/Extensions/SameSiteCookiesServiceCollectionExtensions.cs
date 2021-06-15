@@ -125,8 +125,7 @@ namespace Microsoft.Extensions.DependencyInjection
             // We can not validate this assumption, but we trust Microsofts
             // evaluation. And overall not sending a SameSite value equals to the same
             // behavior as SameSite=None for these old versions anyways.
-            if (userAgent.Contains("Chrome/5", StringComparison.InvariantCultureIgnoreCase) 
-                || userAgent.Contains("Chrome/6", StringComparison.InvariantCultureIgnoreCase))
+            if (userAgent.Contains("Chrome/5", StringComparison.InvariantCultureIgnoreCase) || userAgent.Contains("Chrome/6", StringComparison.InvariantCultureIgnoreCase))
             {
                 return true;
             }

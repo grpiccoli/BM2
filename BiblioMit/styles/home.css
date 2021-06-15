@@ -1,49 +1,29 @@
-﻿body {
-  /*padding-top: 0px !important;*/ }
+﻿/* Carousel styling */
+#introCarousel,
+.carousel-inner,
+.carousel-item,
+.carousel-item.active {
+  height: 100vh; }
 
-.jumbotron {
-  background-color: lightblue;
-  margin-top: 0;
-  padding: 1em; }
+footer {
+  background: linear-gradient(transparent, black) !important;
+  opacity: 0.5; }
 
-.logo-diapo {
-  width: 100%;
-  padding-top: 20px; }
-
-.logo-jumbo {
-  max-height: 37px; }
-
-@media screen and (max-width: 62em) {
-  .first {
-    padding: 0;
-    margin: 0; }
-  /* Hide captions */
-  .carousel-caption {
-    display: none; }
-  .jumbotron {
-    margin: 0;
-    padding: 10px; }
-  .logo-diapo {
-    height: auto;
-    max-width: 40vw;
-    padding: 0.5em; } }
-
-.btn-info {
-  color: black;
-  font: bold; }
-
-.carousel-inner, .container-fill, .carousel, .item, .fill {
-  height: 225px;
-  width: 100%;
-  background-position: center center;
+.carousel-item {
   background-repeat: no-repeat;
-  background-size: cover; }
+  background-size: cover;
+  background-position: center center; }
 
-@media only screen and (max-width: 768px) {
-  .carousel-inner, .container-fill, .carousel, .item, .fill {
-    height: 125px; } }
+#introCarousel {
+  margin-top: -66px; }
 
-.btn-info {
-  color: lightblue;
-  background-color: #3276b1;
-  border-color: #285e8e; }
+/* Height for devices larger than 576px */
+@media (min-width: 992px) {
+  .navbar {
+    z-index: 2000;
+    display: none; }
+    .navbar .nav-link {
+      color: #fff !important; } }
+
+body {
+  overflow: hidden; }
