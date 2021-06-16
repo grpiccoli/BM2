@@ -1,15 +1,18 @@
 ﻿async function translate(text: string) {
-    var lang = $("html").attr("lang");
-    var data = {
-        text: text.replace(/[\n\r]+/g, " ").replace(/&nbsp;/g, " "),
-        to: lang,
-        '__RequestVerificationToken': $("input[name='__RequestVerificationToken']").val()
-    };
-    return await fetch('/home/translate', {
-        method: 'post',
-        headers: new Headers({ 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }),
-        body: JSON.stringify(data),
-    }).then(r => r.text());
+    var lang = document.querySelector("html").getAttribute("lang");
+    var token = document.querySelector("input[name='__RequestVerificationToken']");
+    if (lang && token) {
+        var data = {
+            text: text.replace(/[\n\r]+/g, " ").replace(/&nbsp;/g, " "),
+            to: lang,
+            '__RequestVerificationToken': (token as HTMLInputElement).value
+        };
+        return await fetch('/home/translate', {
+            method: 'post',
+            headers: new Headers({ 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }),
+            body: JSON.stringify(data),
+        }).then(r => r.text());
+    }
 }
 $("#search").submit(_ => {
     if ($("#src").val() === "") {

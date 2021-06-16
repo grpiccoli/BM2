@@ -264,7 +264,7 @@
     },
     {
       "library": "mdb-ui-kit@3.6.0",
-      "destination": "wwwroot/mdb-ui-kit",
+      "destination": "wwwroot/lib/mdb-ui-kit",
       "files": [ "js/mdb.min.js", "css/mdb.min.css" ]
     },
     {
