@@ -47,7 +47,7 @@ namespace BiblioMit.Controllers
         }
 
         [TempData]
-        public string StatusMessage { get; set; }
+        internal string StatusMessage { get; set; }
 
         [HttpGet]
         public async Task<IActionResult> Index()
@@ -55,7 +55,7 @@ namespace BiblioMit.Controllers
             var user = await _userManager.GetUserAsync(User).ConfigureAwait(false);
             if (user == null)
             {
-                throw new ApplicationException($"No se puede cargar el usuario con Id '{_userManager.GetUserId(User)}'.");
+                throw new InvalidOperationException($"No se puede cargar el usuario con Id '{_userManager.GetUserId(User)}'.");
             }
 
             var model = new IndexViewModel
@@ -87,7 +87,7 @@ namespace BiblioMit.Controllers
             var user = await _userManager.GetUserAsync(User).ConfigureAwait(false);
             if (user == null)
             {
-                throw new ApplicationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
+                throw new InvalidOperationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
             }
 
             var email = user.Email;
@@ -96,7 +96,7 @@ namespace BiblioMit.Controllers
                 var setEmailResult = await _userManager.SetEmailAsync(user, model.Email).ConfigureAwait(false);
                 if (!setEmailResult.Succeeded)
                 {
-                    throw new ApplicationException($"Unexpected error occurred setting email for user with Id '{user.Id}'.");
+                    throw new InvalidOperationException($"Unexpected error occurred setting email for user with Id '{user.Id}'.");
                 }
             }
 
@@ -106,7 +106,7 @@ namespace BiblioMit.Controllers
                 var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, model.PhoneNumber).ConfigureAwait(false);
                 if (!setPhoneResult.Succeeded)
                 {
-                    throw new ApplicationException($"Unexpected error occurred setting phone number for user with Id '{user.Id}'.");
+                    throw new InvalidOperationException($"Unexpected error occurred setting phone number for user with Id '{user.Id}'.");
                 }
             }
 
@@ -127,7 +127,7 @@ namespace BiblioMit.Controllers
             var user = await _userManager.GetUserAsync(User).ConfigureAwait(false);
             if (user == null)
             {
-                throw new ApplicationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
+                throw new InvalidOperationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
             }
 
             var code = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
@@ -145,7 +145,7 @@ namespace BiblioMit.Controllers
             var user = await _userManager.GetUserAsync(User).ConfigureAwait(false);
             if (user == null)
             {
-                throw new ApplicationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
+                throw new InvalidOperationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
             }
 
             var hasPassword = await _userManager.HasPasswordAsync(user).ConfigureAwait(false);
@@ -172,7 +172,7 @@ namespace BiblioMit.Controllers
             var user = await _userManager.GetUserAsync(User).ConfigureAwait(false);
             if (user == null)
             {
-                throw new ApplicationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
+                throw new InvalidOperationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
             }
 
             var changePasswordResult = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword).ConfigureAwait(false);
@@ -195,7 +195,7 @@ namespace BiblioMit.Controllers
             var user = await _userManager.GetUserAsync(User).ConfigureAwait(false);
             if (user == null)
             {
-                throw new ApplicationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
+                throw new InvalidOperationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
             }
 
             var hasPassword = await _userManager.HasPasswordAsync(user).ConfigureAwait(false);
@@ -223,7 +223,7 @@ namespace BiblioMit.Controllers
             var user = await _userManager.GetUserAsync(User).ConfigureAwait(false);
             if (user == null)
             {
-                throw new ApplicationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
+                throw new InvalidOperationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
             }
 
             var addPasswordResult = await _userManager.AddPasswordAsync(user, model.NewPassword).ConfigureAwait(false);
@@ -245,14 +245,14 @@ namespace BiblioMit.Controllers
             var user = await _userManager.GetUserAsync(User).ConfigureAwait(false);
             if (user == null)
             {
-                throw new ApplicationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
+                throw new InvalidOperationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
             }
 
             var model = new ExternalLoginsViewModel();
-            model.CurrentLogins.AddRange(await _userManager.GetLoginsAsync(user).ConfigureAwait(false));
-            model.OtherLogins.AddRange((await _signInManager.GetExternalAuthenticationSchemesAsync().ConfigureAwait(false))
+            (await _userManager.GetLoginsAsync(user).ConfigureAwait(false)).ToList().ForEach(s => model.CurrentLogins.Add(s));
+            (await _signInManager.GetExternalAuthenticationSchemesAsync().ConfigureAwait(false))
                 .Where(auth => model.CurrentLogins.All(ul => auth.Name != ul.LoginProvider))
-                .ToList());
+                .ToList().ForEach(s => model.OtherLogins.Add(s));
             model.ShowRemoveButton = await _userManager.HasPasswordAsync(user).ConfigureAwait(false) || model.CurrentLogins.Count > 1;
             model.StatusMessage = StatusMessage;
 
@@ -279,19 +279,19 @@ namespace BiblioMit.Controllers
             var user = await _userManager.GetUserAsync(User).ConfigureAwait(false);
             if (user == null)
             {
-                throw new ApplicationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
+                throw new InvalidOperationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
             }
 
             var info = await _signInManager.GetExternalLoginInfoAsync(user.Id).ConfigureAwait(false);
             if (info == null)
             {
-                throw new ApplicationException($"Unexpected error occurred loading external login info for user with Id '{user.Id}'.");
+                throw new InvalidOperationException($"Unexpected error occurred loading external login info for user with Id '{user.Id}'.");
             }
 
             var result = await _userManager.AddLoginAsync(user, info).ConfigureAwait(false);
             if (!result.Succeeded)
             {
-                throw new ApplicationException($"Unexpected error occurred adding external login for user with Id '{user.Id}'.");
+                throw new InvalidOperationException($"Unexpected error occurred adding external login for user with Id '{user.Id}'.");
             }
 
             // Clear the existing external cookie to ensure a clean login process
@@ -310,13 +310,13 @@ namespace BiblioMit.Controllers
             var user = await _userManager.GetUserAsync(User).ConfigureAwait(false);
             if (user == null)
             {
-                throw new ApplicationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
+                throw new InvalidOperationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
             }
 
             var result = await _userManager.RemoveLoginAsync(user, model.LoginProvider, model.ProviderKey).ConfigureAwait(false);
             if (!result.Succeeded)
             {
-                throw new ApplicationException($"Unexpected error occurred removing external login for user with Id '{user.Id}'.");
+                throw new InvalidOperationException($"Unexpected error occurred removing external login for user with Id '{user.Id}'.");
             }
 
             await _signInManager.SignInAsync(user, isPersistent: false).ConfigureAwait(false);
@@ -330,7 +330,7 @@ namespace BiblioMit.Controllers
             var user = await _userManager.GetUserAsync(User).ConfigureAwait(false);
             if (user == null)
             {
-                throw new ApplicationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
+                throw new InvalidOperationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
             }
 
             var model = new TwoFactorAuthenticationViewModel
@@ -349,12 +349,12 @@ namespace BiblioMit.Controllers
             var user = await _userManager.GetUserAsync(User).ConfigureAwait(false);
             if (user == null)
             {
-                throw new ApplicationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
+                throw new InvalidOperationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
             }
 
             if (!user.TwoFactorEnabled)
             {
-                throw new ApplicationException($"Unexpected error occured disabling 2FA for user with Id '{user.Id}'.");
+                throw new InvalidOperationException($"Unexpected error occured disabling 2FA for user with Id '{user.Id}'.");
             }
 
             return View(nameof(Disable2fa));
@@ -368,13 +368,13 @@ namespace BiblioMit.Controllers
             var user = await _userManager.GetUserAsync(User).ConfigureAwait(false);
             if (user == null)
             {
-                throw new ApplicationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
+                throw new InvalidOperationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
             }
 
             var disable2faResult = await _userManager.SetTwoFactorEnabledAsync(user, false).ConfigureAwait(false);
             if (!disable2faResult.Succeeded)
             {
-                throw new ApplicationException($"Unexpected error occured disabling 2FA for user with Id '{user.Id}'.");
+                throw new InvalidOperationException($"Unexpected error occured disabling 2FA for user with Id '{user.Id}'.");
             }
 
             _logger.LogInformation(_localizer["User with Id {UserId} has disabled 2fa."], user.Id);
@@ -387,7 +387,7 @@ namespace BiblioMit.Controllers
             var user = await _userManager.GetUserAsync(User).ConfigureAwait(false);
             if (user == null)
             {
-                throw new ApplicationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
+                throw new InvalidOperationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
             }
 
             var unformattedKey = await _userManager.GetAuthenticatorKeyAsync(user).ConfigureAwait(false);
@@ -420,7 +420,7 @@ namespace BiblioMit.Controllers
             var user = await _userManager.GetUserAsync(User).ConfigureAwait(false);
             if (user == null)
             {
-                throw new ApplicationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
+                throw new InvalidOperationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
             }
 
             // Strip spaces and hypens
@@ -456,7 +456,7 @@ namespace BiblioMit.Controllers
             var user = await _userManager.GetUserAsync(User).ConfigureAwait(false);
             if (user == null)
             {
-                throw new ApplicationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
+                throw new InvalidOperationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
             }
 
             await _userManager.SetTwoFactorEnabledAsync(user, false).ConfigureAwait(false);
@@ -472,17 +472,16 @@ namespace BiblioMit.Controllers
             var user = await _userManager.GetUserAsync(User).ConfigureAwait(false);
             if (user == null)
             {
-                throw new ApplicationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
+                throw new InvalidOperationException($"Unable to load user with Id '{_userManager.GetUserId(User)}'.");
             }
 
             if (!user.TwoFactorEnabled)
             {
-                throw new ApplicationException($"Cannot generate recovery codes for user with Id '{user.Id}' as they do not have 2FA enabled.");
+                throw new InvalidOperationException($"Cannot generate recovery codes for user with Id '{user.Id}' as they do not have 2FA enabled.");
             }
 
             var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10).ConfigureAwait(false);
-            var model = new GenerateRecoveryCodesViewModel();
-            model.RecoveryCodes.AddRange(recoveryCodes);
+            var model = new GenerateRecoveryCodesViewModel(recoveryCodes);
 
             _logger.LogInformation(_localizer["User with Id {UserId} has generated new 2FA recovery codes."], user.Id);
 

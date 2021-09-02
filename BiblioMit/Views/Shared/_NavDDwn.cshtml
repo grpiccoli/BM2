@@ -1,16 +1,16 @@
-﻿@using BiblioMit.Views.Shared.Components.Nav
+﻿@using BiblioMit.Views.Components.Nav
 @model NavDDwnVM
 
-<li class="nav-item dropdown text-center m-0">
-    <a class="nav-link dropdown-toggle" href="#" id="@Model.Controller-@Model.Action"
-       role="button" data-mdb-toggle="dropdown" aria-expanded="false">
+<li class="nav-item dropdown text-lg-center m-0">
+    <a class="nav-link dropdown-toggle" href="#" id="@Model.Title"
+       role="button" data-bs-toggle="dropdown" aria-expanded="false">
         <div>
             <i class="@Model.Logo m-0"></i>
             <span class="badge rounded-pill badge-notification bg-primary">@Model.Sections.Sum(s => s.Links.Count)</span>
         </div>
         <span class="small">@Model.Title</span>
     </a>
-    <ul class="dropdown-menu dropdown-menu-dark m-0" aria-labelledby="@Model.Action">
+    <ul class="dropdown-menu dropdown-menu-dark m-0 p-0" aria-labelledby="@Model.Title">
         @foreach (var section in Model.Sections.Select((s, i) => new { s, i }))
         {
             if (section.i > 0)

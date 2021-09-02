@@ -86,6 +86,9 @@ declare namespace AmCharts {
      */
     function makeChart(selector: string, params: any, delay?: number): AmChart;
 
+    function loadFile(url: string, params: any, callback: any): void;
+
+    function parseJSON(data: any): any;
     /**
      * Set a method to be called before initializing the chart.
      * When the method is called, the chart instance is passed as an attribute.

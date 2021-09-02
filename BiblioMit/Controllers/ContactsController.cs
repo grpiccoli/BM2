@@ -33,6 +33,7 @@ namespace BiblioMit.Controllers
         }
 
         // GET: Contacts
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             ViewData["comunas"] = _context.Communes
@@ -72,6 +73,7 @@ namespace BiblioMit.Controllers
         }
 
         // GET: Contacts/Details/5
+        [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -106,6 +108,7 @@ namespace BiblioMit.Controllers
 
         // GET: Contacts/Create
         [Authorize(Roles = "Administrador",Policy = "Contactos")]
+        [HttpGet]
         public IActionResult Create()
         {
             //return View();
@@ -157,6 +160,7 @@ namespace BiblioMit.Controllers
 
         // GET: Contacts/Edit/5
         [Authorize(Roles = "Administrador,Editor",Policy = "Contactos")]
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -231,6 +235,7 @@ namespace BiblioMit.Controllers
 
         // GET: Contacts/Delete/5
         [Authorize(Roles = "Administrador",Policy = "Contactos")]
+        [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)

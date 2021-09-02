@@ -25,7 +25,7 @@ namespace BiblioMit.Controllers
             _userManager = userManager;
             _userService = userService;
         }
-
+        [HttpGet]
         public async Task<IActionResult> Create(int id)
         {
             var post = _postService.GetById(id);

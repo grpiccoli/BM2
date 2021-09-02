@@ -1,74 +1,90 @@
 ﻿[
   {
-    "outputFile": "styles/site.css",
-    "inputFile": "styles/site.scss"
+    "outputFile": "wwwroot/css/publicationsIndex.css",
+    "inputFile": "styles/publicationsIndex.scss"
   },
   {
-    "outputFile": "styles/samplings.css",
+    "outputFile": "wwwroot/css/homeSimac.css",
+    "inputFile": "styles/homeSimac.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/layout.css",
+    "inputFile": "styles/layout.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/samplings.css",
     "inputFile": "styles/samplings.scss"
   },
   {
-    "outputFile": "styles/graph.css",
-    "inputFile": "styles/graph.scss"
+    "outputFile": "wwwroot/css/ambientalGraph.css",
+    "inputFile": "styles/ambientalGraph.scss"
   },
   {
-    "outputFile": "styles/chart.css",
+    "outputFile": "wwwroot/css/chart.css",
     "inputFile": "styles/chart.scss"
   },
   {
-    "outputFile": "styles/chat.css",
+    "outputFile": "wwwroot/css/chat.css",
     "inputFile": "styles/chat.scss"
   },
   {
-    "outputFile": "styles/background.css",
+    "outputFile": "wwwroot/css/background.css",
     "inputFile": "styles/background.scss"
   },
   {
-    "outputFile": "styles/boletin1.css",
-    "inputFile": "styles/boletin1.scss"
+    "outputFile": "wwwroot/css/boletinBoletin.css",
+    "inputFile": "styles/boletinBoletin.scss"
   },
   {
-    "outputFile": "styles/dinamicTableBoletin.css",
-    "inputFile": "styles/dinamicTableBoletin.scss"
-  },
-  {
-    "outputFile": "styles/dinamicTable.css",
+    "outputFile": "wwwroot/css/dinamicTable.css",
     "inputFile": "styles/dinamicTable.scss"
   },
   {
-    "outputFile": "styles/dragndrop.css",
+    "outputFile": "wwwroot/css/dragndrop.css",
     "inputFile": "styles/dragndrop.scss"
   },
   {
-    "outputFile": "styles/dropzone.css",
+    "outputFile": "wwwroot/css/dropzone.css",
     "inputFile": "styles/dropzone.scss"
   },
   {
-    "outputFile": "styles/fonts.css",
+    "outputFile": "wwwroot/css/fonts.css",
     "inputFile": "styles/fonts.scss"
   },
   {
-    "outputFile": "styles/gridPlanilla.css",
+    "outputFile": "wwwroot/css/gridPlanilla.css",
     "inputFile": "styles/gridPlanilla.scss"
   },
   {
-    "outputFile": "styles/home.css",
+    "outputFile": "wwwroot/css/home.css",
     "inputFile": "styles/home.scss"
   },
   {
-    "outputFile": "styles/prueba.css",
+    "outputFile": "wwwroot/css/prueba.css",
     "inputFile": "styles/prueba.scss"
   },
   {
-    "outputFile": "styles/bibliomit.css",
+    "outputFile": "wwwroot/css/bibliomit.css",
     "inputFile": "styles/bibliomit.scss"
   },
   {
-    "outputFile": "styles/loader.css",
+    "outputFile": "wwwroot/css/loader.css",
     "inputFile": "styles/loader.scss"
   },
   {
-    "outputFile": "styles/centres.css",
-    "inputFile": "styles/centres.scss"
+    "outputFile": "wwwroot/css/psmbs.css",
+    "inputFile": "styles/psmbs.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/banners.css",
+    "inputFile": "styles/banners.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/homeAbout.css",
+    "inputFile": "styles/homeAbout.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/flowpaper.css",
+    "inputFile": "styles/flowpaper.scss"
   }
 ]

@@ -2,8 +2,8 @@
 
 <partial name="_SelectLanguagePartial" />
 @*<vc:culture-switcher />*@
-<li class="nav-item dropdown text-center m-0">
-    <a class="nav-link dropdown-toggle" href="#" role="button" id="login" data-mdb-toggle="dropdown"
+<li class="nav-item dropdown text-lg-center m-0">
+    <a class="nav-link dropdown-toggle" href="#" role="button" id="login" data-bs-toggle="dropdown"
        aria-expanded="false">
         @if (SignInManager.IsSignedIn(User))
         {
@@ -30,12 +30,12 @@
                       method="post" id="logoutForm">
                     <a class="dropdown-item" asp-controller="Manage"
                        asp-action="Index" title="Manage">
-                            <i class="fas fa-cog fa-tw"></i>
-                            <span class="small">@Localizer["Manage"]</span>
+                        <i class="fas fa-cog fa-tw"></i>
+                        <span class="small">@Localizer["Manage"]</span>
                     </a>
                     <button type="submit" class="dropdown-item">
-                            <i class="fas fa-times fa-tw"></i>
-                            <span class="small">@Localizer["Logout"]</span>
+                        <i class="fas fa-times fa-tw"></i>
+                        <span class="small">@Localizer["Logout"]</span>
                     </button>
                 </form>
             }
@@ -45,16 +45,16 @@
                       asp-action="Login" asp-route-returnUrl="@Context.Request.Path"
                       method="post" autocomplete="on">
                     <div class="form-group">
-                        <label asp-for="Email">@Localizer["Email"]</label>
-                        <input asp-for="Email" class="form-control" autocomplete="email">
+                        <label asp-for="EmailLogin">@Localizer["Email"]</label>
+                        <input asp-for="EmailLogin" class="form-control" autocomplete="email">
                     </div>
                     <div class="form-group">
-                        <label asp-for="Password">@Localizer["Password"]</label>
-                        <input asp-for="Password" class="form-control" autocomplete="current-password">
+                        <label asp-for="PasswordLogin">@Localizer["Password"]</label>
+                        <input asp-for="PasswordLogin" class="form-control" autocomplete="current-password">
                     </div>
                     <div class="form-check">
-                        <input asp-for="RememberMe" class="form-check-input">
-                        <label class="form-check-label" asp-for="RememberMe">
+                        <input asp-for="RememberMeLogin" class="form-check-input">
+                        <label class="form-check-label" asp-for="RememberMeLogin">
                             @Localizer["Remember me"]
                         </label>
                     </div>

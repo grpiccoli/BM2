@@ -1,5 +1,4 @@
-﻿using BiblioMit.Data;
-using Microsoft.AspNetCore.Http.Features;
+﻿using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
 
@@ -21,7 +20,7 @@ namespace BiblioMit.Services
 
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            if (context == null) throw new Exception();
+            if (context == null) throw new ArgumentNullException(nameof(context));
             var features = context.HttpContext.Features;
             var formFeature = features.Get<IFormFeature>();
 
@@ -31,5 +30,6 @@ namespace BiblioMit.Services
                 features.Set<IFormFeature>(new FormFeature(context.HttpContext.Request, _formOptions));
             }
         }
+        public int ValueCountLimit { get; }
     }
 }

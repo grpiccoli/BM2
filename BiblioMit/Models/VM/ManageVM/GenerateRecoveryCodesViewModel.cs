@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace BiblioMit.Models.ManageViewModels
 {
     public class GenerateRecoveryCodesViewModel
     {
-        public List<string> RecoveryCodes { get; } = new List<string>();
+        public GenerateRecoveryCodesViewModel(IEnumerable<string> recoveryCodes)
+        {
+            RecoveryCodes = recoveryCodes;
+        }
+        public IEnumerable<string> RecoveryCodes { get; internal set; }
     }
 }

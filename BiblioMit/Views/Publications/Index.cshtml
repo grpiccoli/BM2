@@ -9,9 +9,10 @@
     var asc = (bool)ViewData["asc"];
     var trpp = (int)ViewData["trpp"];
     var srt = (string)ViewData["srt"];
+    BiblioMit.Models.VM.CSPTag.StyleSrcElem.Add("'sha256-Ucye6igbBXX1kfOSQeZ4ymqY8ogge1RacRAkgcaiVxc='");
 }
 
-<partial name="_Libs" model='new List<string> { "bibico", "bibliomit", "bootstrap-select", "bootstrap-select-localize", "@popperjs/core", "tippy.js", "tippyTranslate", "statsGraph" }' />
+<partial name="_LibsPg" model='new List<string> { "bibico", "bibliomit", "bootstrap-select", "bootstrap-select-localize", "@popperjs/core", "tippy.js", "tippyTranslate", "statsGraph" }' />
 
 <input id="title" class="d-none"/>
 <div class="row">
@@ -193,7 +194,7 @@
                     <tr>
                         <td class="d-none d-sm-table-cell">
                             @*@{ var acr = string.IsNullOrWhiteSpace(item.Company.Acronym) ? "bibliomit" : item.Company.Acronym; }
-                                <img src="~/images/ico/@(acr).svg" style="height:50px;"/>*@
+                                <img src="~/images/ico/@(acr).svg"/>*@
                             <span class="display-4 bib-@item.Company.Acronym">
                                 <span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span><span class="path6"></span>
                             </span>
@@ -201,7 +202,9 @@
                         <td class="d-none d-sm-table-cell">
                             <strong>@Html.DisplayFor(modelItem => item.Company.BusinessName)</strong>
                             <p>
-                                <a style="font-size:small" asp-controller="Companies" asp-action="Details" asp-route-id="@item.Company.Id">@Localizer["Details"]</a>
+                                <a asp-controller="Companies" asp-action="Details" asp-route-id="@item.Company.Id">
+                                    <small>@Localizer["Details"]</small>
+                                </a>
                             </p>
                         </td>
                         <td class="d-none d-sm-table-cell">
@@ -211,12 +214,19 @@
                             <div class="d-block d-sm-none">
                                 <div>
                                     <div class="img-with-text">
-                                        <a style="font-size:small" asp-controller="Companies" asp-action="Details" asp-route-id="@item.Company.Id">
-                                            <span style="font-size:48px;" class="bib-@item.Company.Acronym">
-                                                <span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span><span class="path6"></span>
+                                        <a asp-controller="Companies" asp-action="Details" asp-route-id="@item.Company.Id">
+                                            <span class="bib-@item.Company.Acronym">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                                <span class="path3"></span>
+                                                <span class="path4"></span>
+                                                <span class="path5"></span>
+                                                <span class="path6"></span>
                                             </span>
-                                            <p style="font-size:smaller">
-                                                @item.Company.Acronym
+                                            <p>
+                                                <small>
+                                                    @item.Company.Acronym
+                                                </small>
                                             </p>
                                         </a>
                                     </div>

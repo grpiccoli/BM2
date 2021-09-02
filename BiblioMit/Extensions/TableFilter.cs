@@ -6,10 +6,10 @@ using System.Globalization;
 using System.Linq;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Collections.ObjectModel;
 
 namespace BiblioMit.Extensions
 {
-    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Extensions")]
     public static class TableFilter
     {
         public static IQueryable<TSource> Pre<TSource>(this IEnumerable<TSource> contexto)
@@ -19,6 +19,11 @@ namespace BiblioMit.Extensions
         }
         public static PropertyDescriptor FilterSort<TSource>(this IEnumerable<TSource> contexto, string srt = "Id")
         {
+            if (contexto is null)
+            {
+                throw new ArgumentNullException(nameof(contexto));
+            }
+
             if (string.IsNullOrWhiteSpace(srt)) srt = "Id";
             PropertyDescriptor sort = TypeDescriptor.GetProperties(typeof(TSource)).Find(srt, false);
             return sort;
@@ -27,7 +32,7 @@ namespace BiblioMit.Extensions
             IQueryable<TSource> pre, int? pg = 1, int? rpp = 20, string srt = "Id",
             bool? asc = true, string[] val = null)
         {
-            Dictionary<string, List<string>> Filters = new Dictionary<string, List<string>> { };
+            Dictionary<string, List<string>> Filters = new() { };
 
             if (val != null && val.Length > 0)
             {
@@ -65,7 +70,12 @@ namespace BiblioMit.Extensions
 
         public static IDictionary<string, List<string>> Filters<TSource>(this IEnumerable<TSource> contexto, IQueryable<TSource> pre, string val = null)
         {
-            Dictionary<string, List<string>> Filters = new Dictionary<string, List<string>> { };
+            if (contexto is null)
+            {
+                throw new ArgumentNullException(nameof(contexto));
+            }
+
+            Dictionary<string, List<string>> Filters = new() { };
 
             if (!string.IsNullOrEmpty(val))
             {
@@ -90,7 +100,7 @@ namespace BiblioMit.Extensions
             return Filters;
         }
 
-        public static List<object> Variables(
+        public static Collection<object> Variables(
             int? pg = 1, int? rpp = 20, string srt = "Id",
             bool? asc = true)
         {
@@ -101,7 +111,7 @@ namespace BiblioMit.Extensions
 
             bool _asc = asc.Value;
 
-            return new List<object> { pg, rpp, srt, _asc };
+            return new Collection<object> { pg, rpp, srt, _asc };
         }
     }
 }

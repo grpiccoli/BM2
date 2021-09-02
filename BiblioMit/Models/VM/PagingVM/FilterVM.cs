@@ -4,6 +4,10 @@ namespace BiblioMit.Models.ViewModels
 {
     public class FilterVM
     {
+        public FilterVM(ICollection<string> input)
+        {
+            Val = input;
+        }
         public int Rpp { get; set; }
 
         public bool Asc { get; set; }
@@ -14,6 +18,6 @@ namespace BiblioMit.Models.ViewModels
 
         public string Srt { get; set; }
 
-        public List<string> Val { get; } = new List<string>();
+        public ICollection<string> Val { get; internal set;  }
     }
 }

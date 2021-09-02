@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace BiblioMit.Models.SamplingViewModels
@@ -27,6 +28,6 @@ namespace BiblioMit.Models.SamplingViewModels
         [Display(Name = "Dissolved Oxigen (mg/L)")] //oxigen level in mg/L
         public decimal O2 { get; set; }
 
-        public List<Individual> Individuals { get; } = new List<Individual>();
+        public Collection<Individual> Individuals { get; } = new Collection<Individual>();
     }
 }

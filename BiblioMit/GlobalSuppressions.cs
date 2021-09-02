@@ -5,4 +5,4 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "migration runs internally only", Scope = "namespaceanddescendants", Target = "BiblioMit.Migrations")]
+[assembly: SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "migration runs internally only", Scope = "namespaceanddescendants", Target = "~N:BiblioMit.Migrations")]

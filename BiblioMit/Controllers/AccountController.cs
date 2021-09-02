@@ -51,7 +51,7 @@ namespace BiblioMit.Controllers
         }
 
         [TempData]
-        public string ErrorMessage { get; set; }
+        private string ErrorMessage { get; set; }
 
         [HttpGet]
         [AllowAnonymous]
@@ -74,7 +74,7 @@ namespace BiblioMit.Controllers
             if (ModelState.IsValid)
             {
                 // Require the user to have a confirmed email before they can log on.
-                var user = await _userManager.FindByEmailAsync(model.Email).ConfigureAwait(false);
+                var user = await _userManager.FindByEmailAsync(model.EmailLogin).ConfigureAwait(false);
                 if (user != null)
                 {
                     if (!await _userManager.IsEmailConfirmedAsync(user).ConfigureAwait(false))
@@ -84,10 +84,15 @@ namespace BiblioMit.Controllers
                         return View(model);
                     }
                 }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    return View(model);
+                }
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var result = await _signInManager
-                    .PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, lockoutOnFailure: false)
+                    .PasswordSignInAsync(user.UserName, model.PasswordLogin, model.RememberMeLogin, lockoutOnFailure: false)
                     .ConfigureAwait(false);
                 if (result.Succeeded)
                 {
@@ -96,7 +101,7 @@ namespace BiblioMit.Controllers
                 }
                 if (result.RequiresTwoFactor)
                 {
-                    return RedirectToAction(nameof(LoginWith2fa), new { returnUrl = returnUrl.AbsoluteUri, model.RememberMe });
+                    return RedirectToAction(nameof(LoginWith2fa), new { returnUrl = returnUrl.AbsoluteUri, model.RememberMeLogin });
                 }
                 if (result.IsLockedOut)
                 {
@@ -122,7 +127,7 @@ namespace BiblioMit.Controllers
 
             if (user == null)
             {
-                throw new ApplicationException(_localizer[$"Unable to load two-factor authentication user."]);
+                throw new InvalidOperationException(_localizer[$"Unable to load two-factor authentication {nameof(user)}."]);
             }
 
             var model = new LoginWith2faViewModel { RememberMe = rememberMe };
@@ -146,7 +151,7 @@ namespace BiblioMit.Controllers
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync().ConfigureAwait(false);
             if (user == null)
             {
-                throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                throw new InvalidOperationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
             var authenticatorCode = model.TwoFactorCode.Replace(" ", string.Empty, StringComparison.InvariantCultureIgnoreCase)
@@ -180,7 +185,7 @@ namespace BiblioMit.Controllers
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync().ConfigureAwait(false);
             if (user == null)
             {
-                throw new ApplicationException(_localizer[$"Unable to load two-factor authentication user."]);
+                throw new InvalidOperationException(_localizer[$"Unable to load two-factor authentication user."]);
             }
 
             ViewData["ReturnUrl"] = returnUrl?.AbsoluteUri;
@@ -203,7 +208,7 @@ namespace BiblioMit.Controllers
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync().ConfigureAwait(false);
             if (user == null)
             {
-                throw new ApplicationException(_localizer[$"Unable to load two-factor authentication user."]);
+                throw new InvalidOperationException(_localizer[$"Unable to load two-factor authentication user."]);
             }
 
             var recoveryCode = model.RecoveryCode.Replace(" ", string.Empty, StringComparison.InvariantCultureIgnoreCase);
@@ -453,7 +458,7 @@ namespace BiblioMit.Controllers
                 var info = await _signInManager.GetExternalLoginInfoAsync().ConfigureAwait(false);
                 if (info == null)
                 {
-                    throw new ApplicationException(_localizer["Error loading external login information during confirmation."]);
+                    throw new InvalidOperationException(_localizer["Error loading external login information during confirmation."]);
                 }
                 var user = new ApplicationUser { UserName = model.Email, Name = model.Name, Last = model.Last, Email = model.Email, ProfileImageUrl = model.ProfileImageUrl };
                 var result = await _userManager.CreateAsync(user).ConfigureAwait(false);
@@ -485,7 +490,7 @@ namespace BiblioMit.Controllers
             var user = await _userManager.FindByIdAsync(userId).ConfigureAwait(false);
             if (user == null)
             {
-                throw new ApplicationException($"Unable to load user with ID '{userId}'.");
+                throw new InvalidOperationException($"Unable to load user with ID '{userId}'.");
             }
             var result = await _userManager.ConfirmEmailAsync(user, code).ConfigureAwait(false);
             return View(result.Succeeded ? "ConfirmEmail" : "Error");
@@ -540,7 +545,7 @@ namespace BiblioMit.Controllers
         {
             if (code == null)
             {
-                throw new ApplicationException(_localizer["A code must be supplied for password reset."]);
+                throw new InvalidOperationException(_localizer["A code must be supplied for password reset."]);
             }
             var model = new ResetPasswordViewModel { Code = code };
             return View(model);

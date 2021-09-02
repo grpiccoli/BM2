@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace BiblioMit.Models.VM
 {
@@ -6,6 +7,6 @@ namespace BiblioMit.Models.VM
     {
         public double Version { get; set; }
         public string DefaultProvider { get; set; }
-        public List<LibManLibrary> Libraries { get; } = new List<LibManLibrary>();
+        public Collection<LibManLibrary> Libraries { get; } = new Collection<LibManLibrary>();
     }
 }

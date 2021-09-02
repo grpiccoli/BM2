@@ -8,7 +8,7 @@
       "files": [ "dist/browser/signalr.min.js" ]
     },
     {
-      "library": "@fortawesome/fontawesome-free@5.15.3",
+      "library": "@fortawesome/fontawesome-free@5.15.4",
       "destination": "wwwroot/lib/@fortawesome/fontawesome-free",
       "files": [
         "css/all.min.css",
@@ -17,7 +17,10 @@
         "webfonts/fa-solid-900.ttf",
         "webfonts/fa-regular-400.woff2",
         "webfonts/fa-regular-400.woff",
-        "webfonts/fa-regular-400.ttf"
+        "webfonts/fa-regular-400.ttf",
+        "webfonts/fa-brands-400.woff2",
+        "webfonts/fa-brands-400.woff",
+        "webfonts/fa-brands-400.ttf"
       ]
     },
     {
@@ -27,12 +30,12 @@
       "files": [ "moment.min.js", "locale/es.js" ]
     },
     {
-      "library": "ckeditor5@28.0.0",
+      "library": "ckeditor5@29.1.0",
       "destination": "wwwroot/lib/ckeditor5",
       "files": [ "package.json" ]
     },
     {
-      "library": "@amcharts/amcharts4@4.10.19",
+      "library": "@amcharts/amcharts4@4.10.22",
       "destination": "wwwroot/lib/@amcharts/amcharts4",
       "files": [
         "core.js",
@@ -57,12 +60,12 @@
       ]
     },
     {
-      "library": "fabric@4.5.0",
+      "library": "fabric@4.6.0",
       "destination": "wwwroot/lib/fabric",
       "files": [ "dist/fabric.min.js" ]
     },
     {
-      "library": "alasql@1.7.2",
+      "library": "alasql@1.7.3",
       "destination": "wwwroot/lib/alasql",
       "files": [ "dist/alasql.min.js" ]
     },
@@ -88,7 +91,7 @@
       ]
     },
     {
-      "library": "bootstrap@5.0.1",
+      "library": "bootstrap@5.1.0",
       "destination": "wwwroot/lib/bootstrap",
       "files": [
         "dist/css/bootstrap.min.css",
@@ -166,7 +169,7 @@
       "files": [ "dist/flatpickr.min.css", "dist/flatpickr.min.js", "dist/l10n/es.js" ]
     },
     {
-      "library": "globalize@1.6.0",
+      "library": "globalize@1.7.0",
       "destination": "wwwroot/lib/globalize",
       "files": [
         "dist/globalize.js",
@@ -185,7 +188,7 @@
       "files": [ "dist/jspdf.umd.min.js", "dist/jspdf.es.min.js" ]
     },
     {
-      "library": "pdfmake@0.1.71",
+      "library": "pdfmake@0.2.2",
       "destination": "wwwroot/lib/pdfmake",
       "files": [ "build/pdfmake.min.js", "build/vfs_fonts.js" ]
     },
@@ -231,11 +234,13 @@
       "destination": "wwwroot/lib/nanogallery2",
       "files": [
         "dist/css/nanogallery2.min.css",
-        "dist/jquery.nanogallery2.min.js"
+        "dist/jquery.nanogallery2.min.js",
+        "dist/css/font/ngy2_icon_font.woff2",
+        "dist/css/font/ngy2_icon_font.woff"
       ]
     },
     {
-      "library": "@popperjs/core@2.9.2",
+      "library": "@popperjs/core@2.9.3",
       "destination": "wwwroot/lib/@popperjs/core",
       "files": [ "dist/umd/popper.min.js" ]
     },
@@ -263,12 +268,12 @@
       "files": [ "dist/umd/tooltip.min.js" ]
     },
     {
-      "library": "mdb-ui-kit@3.6.0",
+      "library": "mdb-ui-kit@3.9.0",
       "destination": "wwwroot/lib/mdb-ui-kit",
       "files": [ "js/mdb.min.js", "css/mdb.min.css" ]
     },
     {
-      "library": "xlsx@0.17.0",
+      "library": "xlsx@0.17.1",
       "destination": "wwwroot/lib/xlsx",
       "files": [ "dist/xlsx.core.min.js" ]
     }

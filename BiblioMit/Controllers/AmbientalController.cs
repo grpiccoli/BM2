@@ -29,6 +29,7 @@ namespace BiblioMit.Controllers
             _context = context;
             _dateFormat = "yyyy-MM-dd";
         }
+        [HttpGet]
         public IActionResult PullPlankton()
         {
             return View();
@@ -59,9 +60,12 @@ namespace BiblioMit.Controllers
         private IQueryable<ChoicesItem> PublicAreaChoices() => CuencaChoices().Union(CommuneChoices());
         private IQueryable<ChoicesItem> PrivateAreaChoices() => PublicAreaChoices().Union(PsmbChoices());
         [AllowAnonymous]
+        [HttpGet]
         public IActionResult PublicAreasList() => Json(PublicAreaChoices());
+        [HttpGet]
         public IActionResult PrivateAreasList() => Json(PrivateAreaChoices());
         [AllowAnonymous]
+        [HttpGet]
         public IActionResult CuencaList()
         {
             var singlabel = _localizer["Catchment Area"] + " ";
@@ -76,6 +80,7 @@ namespace BiblioMit.Controllers
                 });
         }
         [AllowAnonymous]
+        [HttpGet]
         public IActionResult RegionList() => Json(new ChoicesGroup
             {
                 Label = _localizer["Regions"],
@@ -87,6 +92,7 @@ namespace BiblioMit.Controllers
                     })
             });
         [AllowAnonymous]
+        [HttpGet]
         public IActionResult ProvinciaList() => Json(Provincia());
         private IQueryable<ChoicesGroup> Provincia() =>
             _context.Regions.Select(c => new ChoicesGroup
@@ -100,6 +106,7 @@ namespace BiblioMit.Controllers
                     })
             });
         [AllowAnonymous]
+        [HttpGet]
         public IActionResult ComunaList()
         {
             var singlabel = _localizer["Catchment Area"] + " ";
@@ -116,6 +123,7 @@ namespace BiblioMit.Controllers
                         Label = com.Name + " " + c.Name
                     })
             });
+        [HttpGet]
         public IActionResult PsmbList() => Json(_context.Communes
                 .Where(c => c.CatchmentAreaId.HasValue)
                 .Select(c => new ChoicesGroup
@@ -129,12 +137,15 @@ namespace BiblioMit.Controllers
                         Label = p.Code + " " + p.Name + " " + c.Name
                     })
                 }));
+        [HttpGet]
         public IActionResult ProvinciaFarmList() => Json(Provincia());
+        [HttpGet]
         public IActionResult ComunaFarmList()
         {
             var singlabel = _localizer["Catchment Area"] + " ";
             return Json(Comuna(singlabel));
         }
+        [HttpGet]
         public IActionResult ProvinciaResearchList() => Json(_context.Regions
             .Select(c => new ChoicesGroup
             {
@@ -147,6 +158,7 @@ namespace BiblioMit.Controllers
                             Label = com.Name + ", " + c.Name
                         })
             }));
+        [HttpGet]
         public IActionResult ComunaResearchList() => Json(_context.Provinces
             .Select(c => new ChoicesGroup
             {
@@ -159,6 +171,7 @@ namespace BiblioMit.Controllers
                             Label = com.Name + ", " + c.Name
                         })
             }));
+        [HttpGet]
         public IActionResult FarmData() => Json(_context.PsmbAreas
             .Where(c => c.PolygonId.HasValue && c.CommuneId.HasValue && c.CompanyId.HasValue)
             .Select(c => new GMapPolygonCentre
@@ -198,6 +211,7 @@ namespace BiblioMit.Controllers
                             Lng = o.Longitude
                         })
                     }));
+        [HttpGet]
         public IActionResult FarmList() => Json(_context.Farms
                     .Where(p => p.PolygonId.HasValue)
                     .Select(p => new ChoicesItem
@@ -205,6 +219,7 @@ namespace BiblioMit.Controllers
                         Value = p.Id,
                         Label = p.Code + " " + p.Name
                     }));
+        [HttpGet]
         public IActionResult CompanyList() => Json(_context.Companies
                     .Where(p => p.Id > 900_000 && p.Psmbs.Any(f => f.Discriminator == Models.Entities.Centres.PsmbType.Farm && f.PolygonId.HasValue))
                     .Select(p => new ChoicesItem
@@ -212,6 +227,7 @@ namespace BiblioMit.Controllers
                         Value = p.Id,
                         Label = p.BusinessName + " (" + p.GetRUT() + ")"
                     }));
+        [HttpGet]
         public IActionResult ResearchList() => Json(_context.ResearchCentres
                     .Where(p => p.PolygonId.HasValue)
                     .Select(p => new ChoicesItem
@@ -219,6 +235,7 @@ namespace BiblioMit.Controllers
                         Value = p.CompanyId,
                         Label =  p.Name + " (" + p.Acronym + ")"
                     }));
+        [HttpGet]
         public IActionResult InstitutionList() => Json(_context.Companies
                     .Where(p => p.Psmbs.Any(p => p.Discriminator == Models.Entities.Centres.PsmbType.ResearchCentre))
                     .Select(p => new ChoicesItem
@@ -226,7 +243,9 @@ namespace BiblioMit.Controllers
                         Value = p.Id,
                         Label = p.BusinessName + " (" + p.Acronym + ")"
                     }));
+        [HttpGet]
         public JsonResult OceanVarList() => Json(Variable.t.Enum2ChoicesGroup("v").FirstOrDefault());
+        [HttpGet]
         public JsonResult GroupVarList()
         {
             var group = " (" + _localizer["Group"] + ")";
@@ -240,6 +259,7 @@ namespace BiblioMit.Controllers
                 })
             });
         }
+        [HttpGet]
         public JsonResult GenusVarList()
         {
             var genus = " (" + _localizer["Genus"] + ")";
@@ -253,6 +273,7 @@ namespace BiblioMit.Controllers
                 })
             });
         }
+        [HttpGet]
         public JsonResult SpeciesVarList()
         {
             var sp = " (" + _localizer["Species"] + ")";
@@ -269,6 +290,7 @@ namespace BiblioMit.Controllers
             return Json(species);
         }
         [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" })]
+        [HttpGet]
         public JsonResult TLData(int a, int psmb, int sp, int? v
             //, DateTime start, DateTime end
             )
@@ -420,6 +442,7 @@ namespace BiblioMit.Controllers
             }
             return Json(selection);
         }
+        [HttpGet]
         public JsonResult TLList() =>
             Json(new List<object>
             {
@@ -602,6 +625,7 @@ namespace BiblioMit.Controllers
                     }
                 }
             });
+        [HttpGet]
         public JsonResult CuencaData()
         {
             var title = _localizer["Catchment Area"] + " ";
@@ -617,6 +641,7 @@ namespace BiblioMit.Controllers
                    })
                }));
         }
+        [HttpGet]
         public JsonResult ComunaData()
         {
             var title = _localizer["Commune"] + " ";
@@ -650,8 +675,10 @@ namespace BiblioMit.Controllers
                             Lng = o.Longitude
                         })
                                  });
+        [HttpGet]
         public JsonResult PsmbData() => Json(SelectPsmbs(_context.PsmbAreas
                     .Where(c => c.Commune.CatchmentAreaId.HasValue && c.PolygonId.HasValue && c.PlanktonAssays.Any())));
+        [HttpGet]
         public IActionResult BuscarInformes(int id, string start, string end)
         {
             int order = id / 99_996 + 24_998 / 24_999;
@@ -668,6 +695,7 @@ namespace BiblioMit.Controllers
         }
         [AllowAnonymous]
         [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" })]
+        [HttpGet]
         public IActionResult Data(int area, char type, int id, DateTime start, DateTime end)
         {
             int order = 0;
@@ -743,6 +771,7 @@ namespace BiblioMit.Controllers
             }
         }
         [AllowAnonymous]
+        [HttpGet]
         public IActionResult Graph()
         {
             ViewData["start"] = _context.PlanktonAssays.Min(e => e.SamplingDate)

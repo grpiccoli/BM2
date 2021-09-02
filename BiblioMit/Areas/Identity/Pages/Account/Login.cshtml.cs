@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using BiblioMit.Models;
@@ -51,7 +49,7 @@ namespace BiblioMit.Areas.Identity.Pages.Account
                 ModelState.AddModelError(string.Empty, ErrorMessage);
             }
 
-            if (returnUrl == null) returnUrl = new Uri("~/");
+            returnUrl ??= new Uri(HttpContext.Request.Host.ToUriComponent());
 
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme)
@@ -68,7 +66,7 @@ namespace BiblioMit.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync(Uri returnUrl = null)
         {
-            returnUrl ??= new Uri("~/");
+            returnUrl ??= new Uri(HttpContext.Request.Host.ToUriComponent());
             ViewData["ReturnUrl"] = returnUrl?.ToString();
             if (ModelState.IsValid)
             {
@@ -82,6 +80,11 @@ namespace BiblioMit.Areas.Identity.Pages.Account
                                       "Debes confirmar tu correo electrónico para poder iniciar sesión.");
                         return Page();
                     }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    return Page();
                 }
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true

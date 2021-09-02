@@ -13,7 +13,7 @@ namespace BiblioMit.Services
         private static Libs Libs { get; set; } = new Libs();
         public static Libs LoadJson()
         {
-            using StreamReader r = new StreamReader("libman.json");
+            using StreamReader r = new("libman.json");
             string json = r.ReadToEnd();
             Libs = JsonConvert.DeserializeObject<Libs>(json);
             var os = Environment.OSVersion.Platform.ToString();

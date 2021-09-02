@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace BiblioMit.Models
@@ -13,7 +14,7 @@ namespace BiblioMit.Models
         public string Email { get; set; }
 
         [Display(Name = "Permisos de usuario")]
-        public List<SelectListItem> UserClaims { get; } = new List<SelectListItem>();
+        public Collection<SelectListItem> UserClaims { get; } = new Collection<SelectListItem>();
 
         [Display(Name = "Rol de usuario")]
         public string RoleName { get; set; }

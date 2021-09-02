@@ -123,7 +123,7 @@
   <data name="es" xml:space="preserve">
     <value>en</value>
   </data>
-  <data name="gb" xml:space="preserve">
+  <data name="uk" xml:space="preserve">
     <value>cl</value>
   </data>
   <data name="Hello" xml:space="preserve">
@@ -160,7 +160,7 @@
     <value>Ingresar</value>
   </data>
   <data name="cl" xml:space="preserve">
-    <value>gb</value>
+    <value>uk</value>
   </data>
   <data name="Español" xml:space="preserve">
     <value>English</value>

@@ -1,0 +1,42 @@
+﻿@using BiblioMit.Controllers
+@model Carousel
+
+@{
+    ViewData["Title"] = "Banners";
+    ViewData["footer-text"] = "text-light";
+    ViewData["navbar-bg"] = "";
+    ViewData["footer-logo"] = "~/epic_light_hor.svg";
+}
+
+<partial name="_Libs" model='new List<string> { "banners" }' />
+
+@section Styles{
+    <style>@Html.Raw(string.Join(string.Empty, Model.Styles))</style>
+}
+
+@section Headers{
+    <!-- Carousel wrapper -->
+    <div id="introCarousel" class="carousel slide carousel-fade shadow-2-strong" data-bs-ride="carousel" data-interval="false">
+        <!-- Indicators -->
+        <div class="carousel-indicators">
+            @Html.Raw(string.Join(string.Empty, Model.Indicators))
+        </div>
+
+        <!-- Inner -->
+        <div class="carousel-inner">
+            <!-- Single item -->
+            @Html.Raw(string.Join(string.Empty, Model.Items))
+        </div>
+        <!-- Inner -->
+        <!-- Controls -->
+        <button class="carousel-control-prev" type="button" href="#introCarousel" role="button" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" href="#introCarousel" role="button" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+    <!-- Carousel wrapper -->
+}

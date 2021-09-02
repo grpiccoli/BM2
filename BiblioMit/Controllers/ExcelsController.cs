@@ -19,12 +19,14 @@ namespace BiblioMit.Controllers
         }
 
         // GET: Excels
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             return View(await _context.InputFiles.Include(e => e.Registries).ToListAsync().ConfigureAwait(false));
         }
 
         // GET: Excels/Details/5
+        [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -43,6 +45,7 @@ namespace BiblioMit.Controllers
         }
 
         // GET: Excels/Create
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
@@ -66,6 +69,7 @@ namespace BiblioMit.Controllers
         }
 
         // GET: Excels/Edit/5
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -118,6 +122,7 @@ namespace BiblioMit.Controllers
         }
 
         // GET: Excels/Delete/5
+        [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)

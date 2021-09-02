@@ -1,7 +1,9 @@
-function setStyles() {
-    $("nav").removeClass("bg-dark");
-    $("footer a").removeClass("text-dark").addClass("text-light");
-    $("img[alt='epic solutions']").attr("src", "epic_light_hor.svg");
+function setStyles(lightPage) {
+    document.querySelector("nav").classList.toggle("bg-dark", lightPage);
+    var foot = document.querySelector("footer a").classList;
+    foot.toggle("text-dark", lightPage);
+    foot.toggle("text-light", !lightPage);
+    document.querySelector("img[alt='epic solutions']").src = lightPage ? "epic_hor.svg" : "epic_light_hor.svg";
 }
 function getAverageColourAsRGB(img) {
     var canvas = document.createElement('canvas'), context = canvas.getContext && canvas.getContext('2d'), rgb = { r: 102, g: 102, b: 102 }, pixelInterval = 5, count = 0, i = -4, data, length;
@@ -47,5 +49,4 @@ function setContrast() {
     var isLight = brightness > 250;
     $("nav").toggleClass("navbar-dark", !isLight).toggleClass("navbar-light", isLight);
 }
-document.addEventListener("DOMContentLoaded", setStyles);
 //# sourceMappingURL=home.js.map

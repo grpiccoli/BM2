@@ -5,28 +5,27 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using BiblioMit.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using BiblioMit.Data;
 using Microsoft.Extensions.Localization;
+using BiblioMit.Extensions;
+using System;
 
 namespace BiblioMit.Controllers
 {
-    [Authorize(Policy = "Usuarios")]
+    [Authorize(Policy = nameof(UserClaims.Users))]
     public class UserController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly ILogger _logger;
         private readonly IStringLocalizer<UserController> _localizer;
 
         public UserController(
             ApplicationDbContext context,
             UserManager<ApplicationUser> userManager,
-            RoleManager<ApplicationRole> roleManager,
             ILogger<AccountController> logger,
             IStringLocalizer<UserController> localizer
             )
@@ -35,13 +34,12 @@ namespace BiblioMit.Controllers
             _context = context;
             _logger = logger;
             _userManager = userManager;
-            _roleManager = roleManager;
         }
 
         [HttpGet]
         public IActionResult Index()
         {
-            List<UserListViewModel> model = new List<UserListViewModel>();
+            List<UserListViewModel> model = new();
             model = _userManager.Users.Select(u => new UserListViewModel
             {
                 Id = u.Id,
@@ -56,54 +54,39 @@ namespace BiblioMit.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Administrador")]
+        [Authorize(Roles = nameof(RoleData.Administrator))]
         public IActionResult AddUser()
         {
-            UserViewModel model = new UserViewModel();
-            model.UserClaims.AddRange(ClaimData.UserClaims.Select(c => new SelectListItem
-            {
-                Text = c,
-                Value = c
-            }).ToList());
-            model.AppRoles.AddRange(_roleManager.Roles.Select(r => new SelectListItem
-            {
-                Text = r.Name,
-                Value = r.Id
-            }).ToList());
+            UserViewModel model = new(UserClaims.Banners.Enum2MultiSelect(),
+                RoleData.Administrator.Enum2MultiSelect());
             return PartialView("_AddUser", model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
-        [Authorize(Roles = "Administrador")]
+        [Authorize(Roles = nameof(RoleData.Administrator))]
         public async Task<IActionResult> AddUser(UserViewModel model)
         {
             if (ModelState.IsValid && model != null)
             {
-                ApplicationUser user = new ApplicationUser
+                ApplicationUser user = new()
                 {
                     UserName = model.Email,
                     Email = model.Email
                 };
                 IdentityResult result = await _userManager.CreateAsync(user, model.Password).ConfigureAwait(false);
-                ApplicationUser applicationUser = await _userManager.FindByEmailAsync(user.Email).ConfigureAwait(false);
-                List<SelectListItem> userClaims = model.UserClaims.Where(c => c.Selected).ToList();
-                foreach (var claim in userClaims)
-                {
-                    applicationUser.Claims.Add(new IdentityUserClaim<string>
-                    {
-                        ClaimType = claim.Value,
-                        ClaimValue = claim.Value
-                    });
-                }
                 if (result.Succeeded)
                 {
-                    ApplicationRole applicationRole = await _roleManager.FindByIdAsync(model.AppRoleId).ConfigureAwait(false);
-                    if(applicationRole != null)
+                    ApplicationUser applicationUser = await _userManager.FindByEmailAsync(user.Email).ConfigureAwait(false);
+                    IdentityResult claimsIdentityResult = await _userManager
+                        .AddClaimsAsync(applicationUser, model.UserClaims.Where(c => c.Selected)
+                        .Select(claim => new Claim(claim.Value, claim.Value))).ConfigureAwait(false);
+                    if (claimsIdentityResult.Succeeded)
                     {
-                        IdentityResult identityResult = await _userManager.AddToRoleAsync(user, applicationRole.Name).ConfigureAwait(false);
-                        if(identityResult.Succeeded)
+                        IdentityResult identityResult = await _userManager
+                            .AddToRolesAsync(user, model.AppRoles.SelectedValues.Cast<string>()).ConfigureAwait(false);
+                        if (identityResult.Succeeded)
                         {
                             _logger.LogInformation(_localizer["Se ha añadido un nuevo usuario exitosamente."]);
                             return RedirectToAction("Index");
@@ -125,139 +108,97 @@ namespace BiblioMit.Controllers
         }
 //        [Authorize(Policy = "Usuarios")]
         [HttpGet]
-        [Authorize(Roles = "Administrador,Editor")]
+        [Authorize(Roles = nameof(RoleData.Administrator))]
+        [Authorize(Roles = nameof(RoleData.Editor))]
         public async Task<IActionResult> EditUser(string id)
         {
-            EditUserViewModel model = new EditUserViewModel();
-            model.AppRoles.AddRange(_roleManager.Roles.Select(r => new SelectListItem
-            {
-                Text = r.Name,
-                Value = r.Id
-            }).ToList());
             if (!string.IsNullOrEmpty(id))
             {
                 ApplicationUser applicationUser = await _userManager.FindByIdAsync(id).ConfigureAwait(false);
                 if (applicationUser != null)
                 {
-                    model.Email = applicationUser.Email;
                     var claims = await _userManager.GetClaimsAsync(applicationUser).ConfigureAwait(false);
-                    model.UserClaims.AddRange(ClaimData.UserClaims.Select(c => new SelectListItem
-                    {
-                        Text = c,
-                        Value = c,
-                        Selected = claims.Any(x => x.Value == c)
-                    }).ToList());
                     var roles = await _userManager.GetRolesAsync(applicationUser).ConfigureAwait(false);
-                    var role = roles.Single();
-                    if (!string.IsNullOrEmpty(role))
+                    EditUserViewModel model = new(
+                        RoleData.Administrator.Enum2MultiSelect(
+                            claims.Select(c => c.Value)
+                            ),
+                        UserClaims.Banners.Enum2MultiSelect(
+                            roles
+                            )
+                        )
                     {
-                        string roleId = _roleManager.Roles.SingleOrDefault(r => r.Name == role)?.Id;
-                        if (!string.IsNullOrEmpty(roleId))
-                        {
-                            model.AppRoleId = roleId;
-                        }
-                    }
-                }
-                else
-                {
-                    model.UserClaims.AddRange(ClaimData.UserClaims.Select(c => new SelectListItem
-                    {
-                        Text = c,
-                        Value = c
-                    }).ToList());
+                        Email = applicationUser.Email
+                    };
+                    return PartialView("_EditUser", model);
                 }
             }
-            return PartialView("_EditUser", model);
+            return PartialView("_EditUser");
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
-        [Authorize(Roles = "Administrador,Editor")]
+        [Authorize(Roles = nameof(RoleData.Administrator))]
+        [Authorize(Roles = nameof(RoleData.Editor))]
         public async Task<IActionResult> EditUser(string id, EditUserViewModel model)
         {
             if (model == null) return NotFound();
             if (ModelState.IsValid)
             {
                 ApplicationUser applicationUser = await _userManager.FindByIdAsync(id).ConfigureAwait(false);
-                if (applicationUser != null && applicationUser.Email != "adminmit@bibliomit.cl")
+                if (applicationUser != null && applicationUser.Email != "contacto@epicsolutions.cl")
                 {
-                    applicationUser.Email = model.Email;
-                    List<SelectListItem> userClaims = new List<SelectListItem>();
-                    //try
-                    //{
-                        IList<Claim> claims = await _userManager.GetClaimsAsync(applicationUser).ConfigureAwait(false);
-                        userClaims = model.UserClaims
-                                        .Where(c => c.Selected && !claims
-                                            .Any(u => u.Value == c.Value))
-                                            .ToList();
-                        List<Claim> userRemoveClaims = claims
-                            .Where(c => model
-                                        .UserClaims
-                                        .Any(u => u.Value == c.Value && !u.Selected))
-                            .ToList();
-                        foreach (Claim claim in userRemoveClaims)
-                        {
-                            var idResult = await _userManager.RemoveClaimAsync(applicationUser, claim)
-                                .ConfigureAwait(false);
-                        if (idResult.Succeeded) continue;
-                        }
-                    //}
-                    //catch
-                    //{
-                    //    userClaims = model.UserClaims.Where(u => u.Selected).ToList();
-                    //}
-                    foreach (var claim in userClaims)
-                    {
-                        applicationUser.Claims.Add(new IdentityUserClaim<string>
-                        {
-                            ClaimType = claim.Value,
-                            ClaimValue = claim.Value
-                        });
-                    }
-                    IdentityResult result = await _userManager.UpdateAsync(applicationUser).ConfigureAwait(false);
-                    if (result.Succeeded)
-                    {
-                        //try
-                        //{
-                            string existingRole = _userManager.GetRolesAsync(applicationUser).Result.Single();
-                            string existingRoleId = _roleManager.Roles.Single(r => r.Name == existingRole).Id;
-                            if (existingRoleId != model.AppRoleId)
-                            {
-                                IdentityResult roleResult = await _userManager.RemoveFromRoleAsync(applicationUser, existingRole).ConfigureAwait(false);
-                                if (roleResult.Succeeded)
-                                {
-                                ApplicationRole applicationRole = await _roleManager.FindByIdAsync(model.AppRoleId).ConfigureAwait(false);
-                                    if (applicationRole != null)
-                                    {
-                                        IdentityResult newRoleResult = await _userManager.AddToRoleAsync(applicationUser, applicationRole.Name).ConfigureAwait(false);
-                                        if (newRoleResult.Succeeded)
-                                        {
-                                            return RedirectToAction("Index");
-                                        }
-                                    }
-                                }
-                            }
-                        //}
-                        //catch
-                        //{
-                        //    AppRole applicationRole = await _roleManager.FindByIdAsync(model.AppRoleId).ConfigureAwait(false);
-                        //    if (applicationRole != null)
-                        //    {
-                        //        IdentityResult newRoleResult = await _userManager.AddToRoleAsync(applicationUser, applicationRole.Name).ConfigureAwait(false);
-                        //        if (newRoleResult.Succeeded)
-                        //        {
-                        //            return RedirectToAction("Index");
-                        //        }
-                        //    }
-                        //}
-                    }
+                    var claims = (await _userManager.GetClaimsAsync(applicationUser).ConfigureAwait(false))
+                        .Select(c => c.Value).ToHashSet();
+                    var roles = (await _userManager.GetRolesAsync(applicationUser).ConfigureAwait(false))
+                        .ToHashSet();
+
+                    var claimChanges = model.UserClaims.Where(c => (claims.Contains(c.Value) && !c.Selected) 
+                    || (!claims.Contains(c.Value) && c.Selected))
+                        .ToDictionary(c => c.Value, c => c.Selected);
+
+                    var removeClaims = await _userManager
+                        .AddClaimsAsync(applicationUser, claimChanges.Where(c => c.Value)
+                        .Select(c => new Claim(c.Key, c.Key)))
+                        .ConfigureAwait(false);
+
+                    if (removeClaims.Succeeded)
+                        throw new InvalidOperationException($"{applicationUser.Name} claims could not be removed");
+
+                    var addClaims = await _userManager
+                        .RemoveClaimsAsync(applicationUser, claimChanges.Where(c => !c.Value)
+                        .Select(c => new Claim(c.Key, c.Key)))
+                        .ConfigureAwait(false);
+
+                    if (addClaims.Succeeded)
+                        throw new InvalidOperationException($"{applicationUser.Name} claims could not be added");
+
+                    var roleChanges = model.AppRoles.Where(c => (roles.Contains(c.Value) && !c.Selected)
+                    || (!claims.Contains(c.Value) && c.Selected))
+                        .ToDictionary(c => c.Value, c => c.Selected);
+
+                    var removeRoles = await _userManager
+                        .AddToRolesAsync(applicationUser, roleChanges.Where(c => c.Value)
+                        .Select(c => c.Key))
+                        .ConfigureAwait(false);
+
+                    if (removeRoles.Succeeded)
+                        throw new InvalidOperationException($"{applicationUser.Name} roles could not be removed");
+
+                    var addRoles = await _userManager
+                        .RemoveFromRolesAsync(applicationUser, roleChanges.Where(c => !c.Value)
+                        .Select(c => c.Key))
+                        .ConfigureAwait(false);
+
+                    if (addRoles.Succeeded)
+                        throw new InvalidOperationException($"{applicationUser.Name} roles could not be added");
                 }
             }
             return RedirectToAction("Index");
         }
         [HttpGet]
-        [Authorize(Roles = "Administrador")]
+        [Authorize(Roles = nameof(RoleData.Administrator))]
         public async Task<IActionResult> DeleteUser(string id)
         {            
             string name = string.Empty;
@@ -273,7 +214,7 @@ namespace BiblioMit.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Administrador")]
+        [Authorize(Roles = nameof(RoleData.Administrator))]
         [ValidateAntiForgeryToken]
         [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> DeleteUser(string id, IFormCollection form)
@@ -281,7 +222,7 @@ namespace BiblioMit.Controllers
             if (!string.IsNullOrEmpty(id) && form != null)
             {
                 ApplicationUser applicationUser = await _userManager.FindByIdAsync(id).ConfigureAwait(false);
-                if (applicationUser != null && applicationUser.Email != "adminmit@bibliomit.cl")
+                if (applicationUser != null && applicationUser.Email != "contacto@epicsolutions.cl")
                 {
                     IdentityResult result = await _userManager.DeleteAsync(applicationUser).ConfigureAwait(false);
                     if (result.Succeeded)

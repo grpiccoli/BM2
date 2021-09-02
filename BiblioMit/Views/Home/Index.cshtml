@@ -1,39 +1,44 @@
-﻿@using BiblioMit.Controllers 
-@inject UserManager<ApplicationUser> UserManager
-@model Carousel
+﻿@model Carousel
 @{
-    ViewData["Title"] = "BiblioMit";
+    ViewData["Title"] = "Home";
+    ViewData["footer-text"] = "text-light";
+    ViewData["navbar-bg"] = "";
+    ViewData["footer-logo"] = "~/epic_light_hor.svg";
+
+    //carousel dynamic style
+    var styleNonce = Hash.Nonce();
+    BiblioMit.Models.VM.CSPTag.StyleSrcElem.Add($"'nonce-{styleNonce}'");
 }
 @* "signalr", "/chat.min"*@
 <partial name="_Libs" model='new List<string> { "home" }' />
 
 @section Styles{
-    <style>@Html.Raw(Model.Styles)</style>
+    <style nonce="@styleNonce">@Html.Raw(string.Join(string.Empty, Model.Styles))</style>
 }
 
-@section Header{
+@section Headers{
     <!-- Carousel wrapper -->
-    <div id="introCarousel" class="carousel slide carousel-fade shadow-2-strong" data-mdb-ride="carousel">
+    <div id="introCarousel" class="carousel slide carousel-fade shadow-2-strong" data-bs-ride="carousel">
         <!-- Indicators -->
-        <ol class="carousel-indicators">
-            @Html.Raw(Model.Indicators)
-        </ol>
+        <div class="carousel-indicators">
+            @Html.Raw(string.Join(string.Empty,Model.Indicators))
+        </div>
 
         <!-- Inner -->
         <div class="carousel-inner">
             <!-- Single item -->
-            @Html.Raw(Model.Items)
+            @Html.Raw(string.Join(string.Empty, Model.Items))
         </div>
         <!-- Inner -->
         <!-- Controls -->
-        <a class="carousel-control-prev" href="#introCarousel" role="button" data-mdb-slide="prev">
+        <button class="carousel-control-prev" type="button" href="#introCarousel" role="button" data-bs-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="sr-only">Previous</span>
-        </a>
-        <a class="carousel-control-next" href="#introCarousel" role="button" data-mdb-slide="next">
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" href="#introCarousel" role="button" data-bs-slide="next">
             <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="sr-only">Next</span>
-        </a>
+            <span class="visually-hidden">Next</span>
+        </button>
     </div>
     <!-- Carousel wrapper -->
 }

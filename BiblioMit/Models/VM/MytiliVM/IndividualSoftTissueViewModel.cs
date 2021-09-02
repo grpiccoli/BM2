@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace BiblioMit.Models.ViewModels
@@ -15,7 +16,7 @@ namespace BiblioMit.Models.ViewModels
         public SoftType SoftType { get; set; }
 
         [Display(Name = "Tissues")]
-        public List<TissueView> Tissues { get; } = new List<TissueView>();
+        public Collection<TissueView> Tissues { get; } = new Collection<TissueView>();
 
         [Display(Name = "Count")]
         [Range(1, 1000, ErrorMessage = "This value must be between {0} and {1}")]

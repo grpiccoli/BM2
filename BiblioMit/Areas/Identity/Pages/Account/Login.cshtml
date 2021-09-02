@@ -3,6 +3,8 @@
 
 @{
     ViewData["Title"] = Localizer["Log in"].Value;
+    BiblioMit.Models.VM.CSPTag.StyleSrc.Add("'unsafe-hashes'");
+    BiblioMit.Models.VM.CSPTag.StyleSrc.Add("'sha256-aqNNdDLnnrDOnTNdkJpYlAxKVJtLt9CtFLklmInuUAE='");
 }
 
 <h1>@ViewData["Title"]</h1>

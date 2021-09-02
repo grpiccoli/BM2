@@ -26,7 +26,7 @@ namespace BiblioMit.Extensions
         public static KeyValuePair<(int, int), string> GetFromHeader(
             this Dictionary<(int, int), string> dic, string q) =>
             dic.FirstOrDefault(y => y.Value.Equals(q, StringComparison.Ordinal));
-        public static (int, int) SearchHeaders(this Dictionary<(int, int), string> dic, List<string> headers)
+        public static (int, int) SearchHeaders(this Dictionary<(int, int), string> dic, IEnumerable<string> headers)
         {
             if (headers != null)
                 foreach (var reg in headers)

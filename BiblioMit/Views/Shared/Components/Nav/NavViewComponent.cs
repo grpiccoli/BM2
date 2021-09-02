@@ -1,81 +1,81 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BiblioMit.Data;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Security.Claims;
 
-namespace BiblioMit.Views.Shared.Components.Nav
+namespace BiblioMit.Views.Components.Nav
 {
     public class NavViewComponent : ViewComponent
     {
-        private readonly IStringLocalizer<NavViewComponent> Localizer;
+        private readonly IStringLocalizer<NavViewComponent> _localizer;
         public NavViewComponent(IStringLocalizer<NavViewComponent> localizer)
         {
-            Localizer = localizer;
+            _localizer = localizer;
         }
         public IViewComponentResult Invoke()
         {
             var links = new NavDDwnVM
             {
-                Controller = "Home",
-                Action = "Index",
                 Logo = "fas fa-link",
-                Title = Localizer["Links"].Value,
+                Title = _localizer["Links"],
                 Sections = new Collection<Section>
                 {
                     new Section
                     {
-                        Name = Localizer["Main"].Value,
+                        Name = _localizer["Main"],
                         Links = new Collection<Link>
                         {
                             new Link
                             {
                                 Controller = "Home",
                                 Action = "Index",
-                                Name = Localizer["Home"].Value,
+                                Name = _localizer["Home"],
                                 Icon = "fas fa-home"
                             },
                             new Link
                             {
                                 Controller = "Home",
                                 Action = "About",
-                                Name = Localizer["About us"].Value,
+                                Name = _localizer["About us"],
                                 Icon = "fas fa-question"
                             },
                             new Link
                             {
                                 Controller = "Home",
                                 Action = "Contact",
-                                Name = Localizer["Contact"].Value,
+                                Name = _localizer["Contact"],
                                 Icon = "fas fa-address-book"
                             }
                         }
                     },
                     new Section
                     {
-                        Name = Localizer["Information"].Value,
+                        Name = _localizer["Information"],
                         Links = new Collection<Link>
                         {
                             new Link
                             {
                                 Controller = "Home",
                                 Action = "Manual",
-                                Name = Localizer["User Manual"].Value,
+                                Name = _localizer["User Manual"],
                                 Icon = "far fa-question-circle"
                             },
                             new Link
                             {
                                 Controller = "Home",
                                 Action = "Privacy",
-                                Name = Localizer["Privacy Policy"].Value,
+                                Name = _localizer["Privacy Policy"],
                                 Icon = "fas fa-shield-alt"
                             },
                             new Link
                             {
                                 Controller = "Home",
                                 Action = "Terms",
-                                Name = Localizer["Terms & Conditions"].Value,
+                                Name = _localizer["Terms & Conditions"],
                                 Icon = "fas fa-balance-scale"
                             }
                         }
@@ -84,36 +84,34 @@ namespace BiblioMit.Views.Shared.Components.Nav
             };
             var producers = new NavDDwnVM
             {
-                Controller = "Centres",
-                Action = "Producers",
                 Logo = "fas fa-map-marker-alt",
-                Title = Localizer["Maps"].Value,
+                Title = _localizer["Maps"],
                 Sections = new Collection<Section>
                 {
                     new Section
                     {
-                        Name = Localizer["Maps"].Value,
+                        Name = _localizer["Maps"],
                         Links = new Collection<Link>
                         {
                             new Link
                             {
                                 Controller = "Ambiental",
                                 Action = "Graph",
-                                Name = Localizer["PSMBs"].Value,
+                                Name = _localizer["PSMBs"],
                                 Icon = "fas fa-water"
                             },
                             new Link
                             {
                                 Controller = "Centres",
                                 Action = "Producers",
-                                Name = Localizer["Aquaculture Farms"].Value,
+                                Name = _localizer["Aquaculture Farms"],
                                 Icon = "fas fa-industry"
                             },
                             new Link
                             {
                                 Controller = "Centres",
                                 Action = "Research",
-                                Name = Localizer["Research Centres"].Value,
+                                Name = _localizer["Research Centres"],
                                 Icon = "fas fa-microscope"
                             }
                         }
@@ -122,43 +120,41 @@ namespace BiblioMit.Views.Shared.Components.Nav
             };
             var boletin = new NavDDwnVM
             {
-                Controller = "Boletin",
-                Action = "Index",
                 Logo = "fas fa-chart-line",
-                Title = Localizer["Reports"].Value,
+                Title = _localizer["Reports"],
                 Sections = new Collection<Section>
                 {
                     new Section
                     {
-                        Name = Localizer["Publications"].Value,
+                        Name = _localizer["Publications"],
                         Links = new Collection<Link>
                         {
                             new Link
                             {
                                 Controller = "Boletin",
                                 Action = "Index",
-                                Name = Localizer["Production / Environmental"].Value,
+                                Name = _localizer["Production / Environmental"],
                                 Icon = "fas fa-newspaper"
                             }
                         }
                     },
                     new Section
                     {
-                        Name = Localizer["Website Analytics"],
+                        Name = _localizer["Website Analytics"],
                         Links = new Collection<Link>
                         {
                             new Link
                             {
                                 Controller = "Home",
                                 Action = "Analytics",
-                                Name = Localizer["Web Analytics"].Value,
+                                Name = _localizer["Web Analytics"],
                                 Icon = "fas fa-poll"
                             }
                         }
                     },
                     new Section
                     {
-                        Name = Localizer["Sistemas"].Value,
+                        Name = _localizer["Sistemas"],
                         Links = new Collection<Link>
                         {
                             new Link
@@ -174,36 +170,34 @@ namespace BiblioMit.Views.Shared.Components.Nav
             };
             var publications = new NavDDwnVM
             {
-                Controller = "Publications",
-                Action = "Index",
                 Logo = "fas fa-search",
-                Title = Localizer["Search"].Value,
+                Title = _localizer["Search"],
                 Sections = new Collection<Section>
                 {
                     new Section
                     {
-                        Name = Localizer["Engines"].Value,
+                        Name = _localizer["Engines"],
                         Links = new Collection<Link>
                         {
                             new Link
                             {
                                 Controller = "Publications",
                                 Action = "Index",
-                                Name = Localizer["Library"].Value,
+                                Name = _localizer["Library"],
                                 Icon = "fas fa-book-reader"
                             },
                             new Link
                             {
                                 Controller = "Contacts",
                                 Action = "Index",
-                                Name = Localizer["Contacts"].Value,
+                                Name = _localizer["Contacts"],
                                 Icon = "far fa-address-book"
                             },
                             new Link
                             {
                                 Controller = "Publications",
                                 Action = "Agenda",
-                                Name = Localizer["Funding"].Value,
+                                Name = _localizer["Funding"],
                                 Icon = "fas fa-hand-holding-usd"
                             },
                             //, "modal", "#modal-action"
@@ -211,7 +205,7 @@ namespace BiblioMit.Views.Shared.Components.Nav
                             {
                                 Controller = "Home",
                                 Action = "Search",
-                                Name = Localizer["Website search"].Value,
+                                Name = _localizer["Website search"],
                                 Icon = "fas fa-search"
                             }
                         }
@@ -220,22 +214,20 @@ namespace BiblioMit.Views.Shared.Components.Nav
             };
             var gallery = new NavDDwnVM
             {
-                Controller = "Photos",
-                Action = "Gallery",
                 Logo = "fas fa-images",
-                Title = Localizer["Images"].Value,
+                Title = _localizer["Images"],
                 Sections = new Collection<Section>
                 {
                     new Section
                     {
-                        Name = Localizer["Catalogue"].Value,
+                        Name = _localizer["Catalogue"],
                         Links = new Collection<Link>
                         {
                             new Link
                             {
                                 Controller = "Photos",
                                 Action = "Gallery",
-                                Name = Localizer["Histopathology Gallery"].Value,
+                                Name = _localizer["Histopathology Gallery"],
                                 Icon = "fas fa-disease"
                             }
                         }
@@ -244,271 +236,192 @@ namespace BiblioMit.Views.Shared.Components.Nav
             };
             var forum = new NavDDwnVM
             {
-                Controller = "Home",
-                Action = "Forum",
                 Logo = "far fa-comment-dots",
-                Title = Localizer["Networking"].Value,
+                Title = _localizer["Networking"],
                 Sections = new Collection<Section>
                 {
                     new Section
                     {
-                        Name = Localizer["Forums"].Value,
+                        Name = _localizer["Forums"],
                         Links = new Collection<Link>
                         {
                             new Link
                             {
                                 Controller = "Manage",
                                 Action = "Index",
-                                Name = Localizer["Profile"].Value,
+                                Name = _localizer["Profile"],
                                 Icon = "fas fa-user-edit"
                             },
                             new Link()
                             {
                                 Controller = "Home",
                                 Action = "Forum",
-                                Name = Localizer["Forums"].Value,
+                                Name = _localizer["Forums"],
                                 Icon = "fas fa-comments"
                             }
                         }
                     },
                     new Section
                     {
-                        Name = Localizer["Survey"].Value,
+                        Name = _localizer["Survey"],
                         Links = new Collection<Link>
                         {
                             new Link
                             {
                                 Controller = "Home",
                                 Action = "Survey",
-                                Name = Localizer["Tell us what you think"].Value,
+                                Name = _localizer["Tell us what you think"],
                                 Icon = "fas fa-user-edit"
                             },
                             new Link()
                             {
                                 Controller = "Home",
                                 Action = "Responses",
-                                Name = Localizer["Responses"].Value,
+                                Name = _localizer["Responses"],
                                 Icon = "fas fa-comments"
                             }
                         }
                     }
                 }
             };
-            var tools = new Collection<Section>();
-            var claims = ((ClaimsIdentity)User.Identity).Claims;
-            var admin = claims.Any(c => c.Value == "webmaster");
+            HashSet<UserClaims> claims = ((ClaimsIdentity)User.Identity).Claims
+                .Where(c => Enum.IsDefined(typeof(UserClaims), c.Value))
+                .Select(c => (UserClaims)Enum.Parse(typeof(UserClaims), c.Value))
+                .ToHashSet();
 
-            if (User.Identity.IsAuthenticated)
+            var authenticated = User.Identity.IsAuthenticated;
+            var admin = authenticated && User.IsInRole(RoleData.Administrator.ToString());
+            var editor = admin || (authenticated && User.IsInRole(RoleData.Editor.ToString()));
+            var webmaster = admin && claims.Contains(UserClaims.Webmaster);
+            var client = authenticated && User.IsInRole(RoleData.Client.ToString());
+
+            if (admin && claims.Contains(UserClaims.Digest))
             {
-                var access = admin || User.IsInRole("Editor");
-
-                if (admin || claims.Any(c => c.Value == "per" || c.Value == "sernapesca" || c.Value == "intemit"))
+                boletin.Sections.Add(new Section
                 {
-                    var adminstrings = new Collection<Link>
+                    Name = _localizer["Administration"],
+                    Links = new Collection<Link>
                     {
                         new Link
                         {
-                            Controller = "Columnas", 
-                            Action = "Index", 
-                            Name = Localizer["Input Format"].Value
-                        }
-                    };
-                    if (admin || claims.Any(c => c.Value == "per" || c.Value == "sernapesca"))
-                    {
-                        adminstrings.Add(
-                        new Link 
-                        { 
-                            Controller = "Entries", 
-                            Action = "Index", 
-                            Name = Localizer["Uploaded Files"].Value
-                        }
-                        );
-                        if (User.IsInRole("Administrador"))
+                            Controller = "Entries",
+                            Action = "Create",
+                            Name = _localizer["Production"],
+                            Icon = "fas fa-unlock-alt"
+                        },
+                        new Link
                         {
-                            boletin.Sections.Add(
-                                new Section
-                                {
-                                    Name = Localizer["Prod Uploads"].Value,
-                                    Links = new Collection<Link>
-                                    {
-                                        new Link
-                                        {
-                                            Controller = "Entries",
-                                            Action = "Create",
-                                            Name = Localizer["Production"].Value
-                                        }
-                                    }
-                                });
+                            Controller = "Columnas",
+                            Action = "Index",
+                            Name = _localizer["Input Format"],
+                            Icon = "fas fa-unlock-alt"
+                        },
+                        new Link
+                        {
+                            Controller = "Entries",
+                            Action = "Index",
+                            Name = _localizer["Uploaded Files"],
+                            Icon = "fas fa-unlock-alt"
                         }
                     }
-                    boletin.Sections.Add(new Section
-                    {
-                        Name = Localizer["Administration"].Value,
-                        Links = adminstrings
-                    });
-                }
+                });
+            }
 
-                if (admin || claims.Any(c => c.Value == "intemit"))
+            if (admin && claims.Contains(UserClaims.PSMB))
+            {
+                boletin.Sections.Add(new Section
                 {
-                    boletin.Sections.Add(new Section
+                    Name = _localizer["Administration"],
+                    Links = new Collection<Link>
                     {
-                        Name = Localizer["Env Uploads"].Value,
-                        Links = new Collection<Link>
+                        new Link
                         {
-                            new Link
-                            {
-                                Controller = "Entries",
-                                Action = "CreateFito",
-                                Name = Localizer["Environmental"].Value
-                            }
+                            Controller = "Entries",
+                            Action = "CreateFito",
+                            Name = _localizer["Environmental"],
+                            Icon = "fas fa-globe-americas"
+                        },
+                        new Link
+                        {
+                            Controller = "Ambiental",
+                            Action = "Graph",
+                            Name = _localizer["PSMB statistics"],
+                            Icon = "fas fa-chart-line"
+                        },
+                        new Link
+                        {
+                            Controller = "Ambiental",
+                            Action = "PullPlankton",
+                            Name = _localizer["Upload Errors"],
+                            Icon = "fas fa-exclamation-triangle"
                         }
-                    });
-                    boletin.Sections.Add(new Section
-                    {
-                        Name = Localizer["Graphs"].Value,
-                        Links = new Collection<Link>
-                        {
-                            new Link
-                            {
-                                Controller = "Ambiental",
-                                Action = "Graph",
-                                Name = Localizer["PSMB statistics"].Value
-                            }
-                            }
-                    });
-                    producers.Sections.Add(new Section
-                    {
-                        Name = Localizer["Reports"].Value,
-                        Links = new Collection<Link>
-                        {
-                            new Link
-                            {
-                                Controller = "Ambiental",
-                                Action = "PullPlankton",
-                                Name = Localizer["Upload Errors"].Value,
-                                Icon = "fas fa-exclamation-triangle"
-                            }
-                        }
-                    });
-                }
+                    }
+                });
+            }
 
-                if (admin)
+            if (admin && claims.Contains(UserClaims.Forums))
+            {
+                forum.Sections.Add(new Section
                 {
-                    forum.Sections.Add(new Section
-                    {
-                        Name = Localizer["Administration"].Value,
-                        Links = new Collection<Link>
+                    Name = _localizer["Administration"],
+                    Links = new Collection<Link>
                         {
                             new Link
                             {
                                 Controller = "Fora",
                                 Action = "Create",
-                                Name = Localizer["Create Forum"].Value
+                                Name = _localizer["Create Forum"],
+                                Icon = "fas fa-comment-dots"
                             }
                         }
-                    });
+                });
+            }
 
-                    tools.Add(new Section
-                    {
-                        Name = Localizer["Databases"].Value,
-                        Links = new Collection<Link>
-                        {
-                            new Link
-                            {
-                                Controller = "Companies",
-                                Action = "Index",
-                                Name = Localizer["Companies and Institutions"].Value
-                            },
-                            new Link
-                            {
-                                Controller = "Centres",
-                                Action = "Index",
-                                Name = Localizer["Centres"].Value
-                            },
-                            new Link
-                            {
-                                Controller = "Coordinates",
-                                Action = "Index",
-                                Name = Localizer["Coordinates"].Value
-                            },
-                            new Link
-                            {
-                                Controller = "Productions",
-                                Action = "Index",
-                                Name = Localizer["Productions"].Value
-                            },
-                            new Link
-                            {
-                                Controller = "Contacts",
-                                Action = "Index",
-                                Name = Localizer["Contacts"].Value
-                            }
-                        }
-                    });
-
-                    tools.Add(new Section
-                    {
-                        Name = Localizer["Users"].Value,
-                        Links = new Collection<Link>
-                        {
-                            new Link
-                            {
-                                Controller = "User",
-                                Action = "Index",
-                                Name = Localizer["Users and claims"].Value
-                            },
-                            new Link
-                            {
-                                Controller = "AppRole",
-                                Action = "Index",
-                                Name = Localizer["Roles"].Value
-                            }
-                        }
-                    });
-                }
-
-                if (admin || claims.Any(c => c.Value == "mitilidb"))
+            if (admin && claims.Contains(UserClaims.Mitilidb))
+            {
+                gallery.Sections.Add(new Section
                 {
-                    gallery.Sections.Add(new Section
-                    {
-                        Name = Localizer["Administration"].Value, 
-                        Links = new Collection<Link>
+                    Name = _localizer["Administration"],
+                    Links = new Collection<Link>
                         {
                             new Link
                             {
-                                Controller = "Samplings", 
-                                Action = "Index", 
-                                Name = Localizer["Samplings"].Value
+                                Controller = "Samplings",
+                                Action = "Index",
+                                Name = _localizer["Samplings"],
+                                Icon = "fas fa-microscope"
                             },
                             new Link
                             {
-                                Controller = "Individuals", 
-                                Action = "Index", 
-                                Name = Localizer["Subjects"].Value
+                                Controller = "Individuals",
+                                Action = "Index",
+                                Name = _localizer["Subjects"],
+                                Icon = "fas fa-info"
                             },
                             new Link
                             {
-                                Controller = "Softs", 
-                                Action = "Index", 
-                                Name = Localizer["Softs"].Value
+                                Controller = "Softs",
+                                Action = "Index",
+                                Name = _localizer["Softs"],
+                                Icon = "fas fa-vial"
                             }
                         }
-                    });
+                });
 
-                    gallery.Sections.Add(new Section
-                    {
-                        Name = Localizer["Images"].Value, 
-                        Links = new Collection<Link>
+                gallery.Sections.Add(new Section
+                {
+                    Name = _localizer["Images"],
+                    Links = new Collection<Link>
                         {
                             new Link
                             {
                                 Controller = "Photos",
                                 Action = "Index",
-                                Name = Localizer["Image gallery"].Value
+                                Name = _localizer["Image gallery"],
+                                Icon = "fas fa-images"
                             }
                         }
-                    });
-                }
+                });
             }
 
             var model = new List<NavDDwnVM>
@@ -516,26 +429,123 @@ namespace BiblioMit.Views.Shared.Components.Nav
                 links, producers, boletin, publications, gallery, forum
             };
 
-            if (admin)
+            if (claims.Contains(UserClaims.Banners))
             {
-                var adminTools = new NavDDwnVM
+                var services = new NavDDwnVM
                 {
-                    Controller = "User",
-                    Action = "Index",
-                    Logo = "fas fa-tools",
-                    Title = Localizer["Administration"].Value,
-                    Sections = tools
+                    Logo = "fas fa-concierge-bell",
+                    Title = _localizer["Services"],
+                    Sections = new Collection<Section>()
                 };
-                model.Add(adminTools);
+                if (client || webmaster)
+                {
+                    services.Sections.Add(new Section
+                    {
+                        Name = _localizer["Clients"],
+                        Links = new Collection<Link>
+                            {
+                                new Link
+                                {
+                                    Controller = "Payment",
+                                    Action = "Index",
+                                    Name = _localizer["Pay"],
+                                    Icon = "fas fa-shopping-cart"
+                                }
+                            }
+                    });
+                }
+                if (admin)
+                {
+                    services.Sections.Add(new Section
+                    {
+                        Name = _localizer["Advertisement"],
+                        Links = new Collection<Link>
+                            {
+                                new Link
+                                {
+                                    Controller = "Banners",
+                                    Action = "Index",
+                                    Name = _localizer["Banners"],
+                                    Icon = "fas fa-ad"
+                                }
+                            }
+                    });
+                }
+                model.Add(services);
             }
 
+            if (webmaster)
+            {
+                model.Add(new NavDDwnVM
+                {
+                    Logo = "fas fa-tools",
+                    Title = _localizer["Administration"],
+                    Sections = new Collection<Section>
+                    {
+                        new Section
+                        {
+                            Name = _localizer["Databases"],
+                            Links = new Collection<Link>
+                                {
+                                    new Link
+                                    {
+                                        Controller = "Companies",
+                                        Action = "Index",
+                                        Name = _localizer["Companies and Institutions"]
+                                    },
+                                    new Link
+                                    {
+                                        Controller = "Centres",
+                                        Action = "Index",
+                                        Name = _localizer["Centres"]
+                                    },
+                                    new Link
+                                    {
+                                        Controller = "Coordinates",
+                                        Action = "Index",
+                                        Name = _localizer["Coordinates"]
+                                    },
+                                    new Link
+                                    {
+                                        Controller = "Productions",
+                                        Action = "Index",
+                                        Name = _localizer["Productions"]
+                                    },
+                                    new Link
+                                    {
+                                        Controller = "Contacts",
+                                        Action = "Index",
+                                        Name = _localizer["Contacts"]
+                                    }
+                                }
+                        },
+                        new Section
+                        {
+                            Name = _localizer["Users"],
+                            Links = new Collection<Link>
+                                {
+                                    new Link
+                                    {
+                                        Controller = "User",
+                                        Action = "Index",
+                                        Name = _localizer["Users and claims"]
+                                    },
+                                    new Link
+                                    {
+                                        Controller = "AppRole",
+                                        Action = "Index",
+                                        Name = _localizer["Roles"]
+                                    }
+                                }
+                        }
+                    }
+                });
+            }
             return View(model);
         }
     }
     public class NavDDwnVM
     {
-        public string Controller { get; set; }
-        public string Action { get; set; }
         public string Logo { get; set; }
         public string Title { get; set; }
         public Collection<Section> Sections { get; internal set; } = new Collection<Section>();

@@ -1,35 +1,10 @@
 ﻿@{
     ViewData["Title"] = Localizer["Gallery"];
+    BiblioMit.Models.VM.CSPTag.ScriptSrcElem.Add("'sha256-ePgBExBZYOBJk8AkpBMo3BHnbgJxzof66UQID1FFsO4='");
 }
 
-@section Styles{
-    <style>
-        header {
-            height: calc(100vh - 66px);
-        }
+<partial name="_Libs" model='new List<string> { "flowpaper" }' />
 
-        iframe {
-            width: 100vw;
-            height: calc(100vh - 66px);
-        }
-
-        footer {
-            background: linear-gradient(transparent,black) !important;
-            opacity: 0.5;
-        }
-    </style>
-}
-
-@section Scripts{ 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        $("footer a").removeClass("text-dark").addClass("text-light");
-        $("img[alt='epic solutions']").attr("src", "epic_light_hor.svg");
-    });
-</script>
-}
-
-@section Header{
-    <iframe src="~/colecci-n-virtual/index.html"
-            title="@Localizer["Virtual Collection"]"></iframe>
+@section Headers{
+    <iframe src="~/flowpaper/Gallery.html" title="@Localizer["Virtual Collection"]"></iframe>
 }

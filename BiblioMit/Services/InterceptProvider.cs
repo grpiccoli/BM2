@@ -14,25 +14,25 @@ namespace BiblioMit.Services
                 return null;
         }
 
-        public string Format(string format, object obj, IFormatProvider provider)
+        public string Format(string format, object arg, IFormatProvider formatProvider)
         {
             // Display information about method call.
-            if (!Equals(provider))
+            if (!Equals(formatProvider))
                 return null;
             // Set default format specifier             
             if (string.IsNullOrEmpty(format))
                 format = "N";
             //string numericString = obj.ToString();
-            if (obj is int && format.Equals("U", StringComparison.OrdinalIgnoreCase))
-                return obj.ToString().RUTFormat();
+            if (arg is int && format.Equals("U", StringComparison.OrdinalIgnoreCase))
+                return arg.ToString().RUTFormat();
             // If this is a byte and the "R" format string, format it with Roman numerals.
-            if (obj is int && format.Equals("R", StringComparison.OrdinalIgnoreCase))
-                return ((int)obj).ToRomanNumeral();
+            if (arg is int @int && format.Equals("R", StringComparison.OrdinalIgnoreCase))
+                return @int.ToRomanNumeral();
             // Use default for all other formatting.
-            if (obj is IFormattable)
-                return ((IFormattable)obj).ToString(format, CultureInfo.CurrentCulture);
+            if (arg is IFormattable @formattable)
+                return @formattable.ToString(format, CultureInfo.CurrentCulture);
             else
-                return obj?.ToString();
+                return arg?.ToString();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace BiblioMit.Models.ViewModels
 {
@@ -9,7 +10,7 @@ namespace BiblioMit.Models.ViewModels
 
         public int Version { get; set; }
 
-        public List<string> Reportes { get; } = new List<string>();
+        public Collection<string> Reportes { get; } = new Collection<string>();
 
         public int Year { get; set; }
 

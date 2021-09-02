@@ -9,7 +9,7 @@ namespace BiblioMit.Extensions
 {
     public static class CustomCollectionExtensions
     {
-        public static void Shuffle<T>(this IList<T> list)
+        public static IList<T> Shuffle<T>(this IList<T> list)
         {
             if (list is null) throw new ArgumentNullException(nameof(list));
             using RNGCryptoServiceProvider provider = new();
@@ -25,6 +25,7 @@ namespace BiblioMit.Extensions
                 list[k] = list[n];
                 list[n] = value;
             }
+            return list;
         }
         public static void AddRangeOverride<TKey, TValue>(this IDictionary<TKey, TValue> dic, IDictionary<TKey, TValue> dicToAdd) =>
             dicToAdd.ForEach(x => dic[x.Key] = x.Value);

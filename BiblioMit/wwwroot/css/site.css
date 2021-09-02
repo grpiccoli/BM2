@@ -1,0 +1,113 @@
+﻿.h-1-5em {
+  height: 1.5em; }
+
+.h-4rem {
+  height: 4rem; }
+
+.h-3-5rem {
+  height: 3.5rem; }
+
+.b-0 {
+  border: 0; }
+
+footer {
+  background: linear-gradient(transparent, white); }
+
+.h-80vh {
+  height: 80vh; }
+
+/*mdb*/
+/*badges fix*/
+.badge-notification {
+  position: absolute;
+  font-size: .6rem;
+  margin-top: -.1rem;
+  margin-left: -.5rem;
+  padding: .2em .45em; }
+
+/*font*/
+body {
+  font-family: Roboto;
+  line-height: 1.6;
+  color: #4f4f4f;
+  margin-top: 61.4px;
+  font-size: 0.9rem; }
+
+/*masks*/
+.mask {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-attachment: fixed; }
+
+[class^="path"]::before {
+  margin-left: 0 !important;
+  position: absolute;
+  margin-top: 0.5rem;
+  font-size: 0.6rem; }
+
+.flag {
+  margin-right: 1.5rem;
+  height: 1rem; }
+
+/*mdb navbar styles*/
+.navbar {
+  -webkit-box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.05);
+  background-color: rgba(0, 0, 0, 0.5);
+  /*icomoon fix for overlaying fonts*/ }
+  .navbar #lang > div {
+    height: 23px;
+    width: 50%; }
+  .navbar .navbar-brand {
+    height: 61.4px; }
+  .navbar .dropdown-menu {
+    font-size: 0.9rem; }
+    .navbar .dropdown-menu[aria-labelledby="SignIn"] {
+      min-width: 17rem; }
+    .navbar .dropdown-menu.dropdown-menu-dark {
+      background-color: #4f4f4f; }
+      .navbar .dropdown-menu.dropdown-menu-dark hr {
+        color: #212529; }
+      .navbar .dropdown-menu.dropdown-menu-dark .dropdown-item {
+        color: #e0e0e0;
+        padding: .5rem 1rem; }
+      .navbar .dropdown-menu.dropdown-menu-dark .dropdown-header {
+        color: #9e9e9e; }
+  .navbar .fa, .navbar .fas, .navbar .far {
+    width: 1rem; }
+
+.carousel-caption.top {
+  top: calc(1.25rem + 61.4px); }
+
+/*mdb*/
+@media (max-width: 992px) {
+  .sidebar,
+  .overlay {
+    top: 0;
+    bottom: 0; }
+  .sidebar {
+    height: calc(100vh - 61.4px);
+    max-width: 300px;
+    transition: all ease 0.25s;
+    overflow-y: scroll;
+    z-index: 1032;
+    background-color: #212529 !important; }
+    .sidebar .nav-link div {
+      display: inline;
+      padding: 0 1rem 0 1rem; }
+      .sidebar .nav-link div .flag {
+        padding: 0 1.2rem 0 0; }
+  .overlay {
+    left: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.75);
+    visibility: hidden;
+    z-index: 1031; } }

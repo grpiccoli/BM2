@@ -1,5 +1,10 @@
 ﻿@{
     ViewData["Title"] = Localizer["Environmental Platform"].Value;
+
+    BiblioMit.Models.VM.CSPTag.ConnectSrc.Add("https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/");
+    BiblioMit.Models.VM.CSPTag.ConnectSrc.Add("https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/");
+    BiblioMit.Models.VM.CSPTag.ConnectSrc.Add("https://cdn.jsdelivr.net/npm/choices.js@9.0.1/");
+    BiblioMit.Models.VM.CSPTag.ConnectSrc.Add("https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/");
 }
 
 @*tested with:
@@ -56,7 +61,7 @@
         </div>
         <div class="col-12 col-md-8">
             <h2>@Localizer["Map"]</h2>
-            <div class="w-100" id="map" style="height:275px;"></div>
+            <div class="w-100" id="map"></div>
         </div>
     </div>
     <div class="row">
@@ -69,20 +74,23 @@
             <div id="legenddiv"></div>
         </div>
     </div>
+    <br />
     @if (User.Identity.IsAuthenticated)
     {
         <div class="row">
             <div class="col-11">
-                <button class="form-control btn btn-sm" onclick="fetchPlankton()">@Localizer["Search Plankton Assays"]</button>
+                <button class="form-control btn btn-sm" id="fetchPlankton">@Localizer["Search Plankton Assays"]</button>
             </div>
             <div class="col-1">
-                <button class="form-control btn btn-sm" onclick="tableToExcel('newTable', 'Ensayos')"><i class="fa fa-arrow-down" aria-hidden="true"></i></button>
+                <button class="form-control btn btn-sm collapse" id="table2excel"><i class="fa fa-arrow-down" aria-hidden="true"></i></button>
             </div>
         </div>
+        <br />
+        <br />
         <div class="row">
             <div id="results" class="col-12"></div>
         </div>
-        <div id="infotable" class="d-none" style="float:right">
+        <div id="infotable" class="d-none float-right">
             <table class="small table-striped text-center w-100">
                 <tr>
                     <th>@Localizer["Analysis"]</th>

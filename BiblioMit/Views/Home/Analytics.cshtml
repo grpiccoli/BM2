@@ -2,10 +2,10 @@
     ViewData["Title"] = "Analytics";
 }
 
-<partial name="_Libs" model='new List<string> { "chart", "analytics" }' />
+<partial name="_LibsPg" model='new List<string> { "chart" }' />
 
 <h1>@Localizer["Total visits per month"]</h1>
 
-<div class="chartdiv w-100" style="height:500px;"></div>
+<div class="chartdiv w-100 h-80vh"></div>
 
 <partial name="_AmCharts" />

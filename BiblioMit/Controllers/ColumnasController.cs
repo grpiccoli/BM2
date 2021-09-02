@@ -25,10 +25,11 @@ namespace BiblioMit.Controllers
             _context = context;
             _localizer = localizer;
         }
-
+        [HttpGet]
         public IActionResult Index(int? pg, int? rpp, string srt, bool? asc, string[] val) =>
             RedirectToAction(nameof(Columnas), new { pg, rpp, srt, asc, val });
         // GET: Columnas
+        [HttpGet]
         public async Task<IActionResult> Columnas(int? pg, int? rpp, string srt,
             bool? asc, string[] val)
         {

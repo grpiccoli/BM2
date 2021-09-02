@@ -18,28 +18,35 @@ using BiblioMit.Services;
 using Microsoft.Extensions.Localization;
 using System.Collections.Generic;
 using BiblioMit.Models.VM;
-using System.Net.Http;
 using System.Threading.Tasks;
-using System.Collections.ObjectModel;
 using BiblioMit.Extensions;
+using BiblioMit.Data;
+using Microsoft.EntityFrameworkCore;
+using BiblioMit.Services.Interfaces;
 
 namespace BiblioMit.Controllers
 {
     [AllowAnonymous]
     public class HomeController : Controller
     {
+        private readonly ApplicationDbContext _context;
         private readonly IPuppet _puppet;
+        private readonly IBannerService _banner;
         private readonly IStringLocalizer<HomeController> _localizer;
         private readonly IPost _postService;
         private readonly INodeService _nodeService;
 
         public HomeController(
             IPuppet puppet,
+            IBannerService banner,
             IStringLocalizer<HomeController> localizer,
             IPost postService,
-            INodeService nodeService
+            INodeService nodeService,
+            ApplicationDbContext context
             )
         {
+            _banner = banner;
+            _context = context;
             _puppet = puppet;
             _localizer = localizer;
             _postService = postService;
@@ -255,140 +262,12 @@ namespace BiblioMit.Controllers
             return View();
         }
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var model = new Collection<Banner>
-            {
-                new Banner
-                {
-                    Imgs = new Collection<Img>
-                    {
-                        new Img
-                        {
-                            FileName = "../images/backgrounds/87a36c4e7ac349ad932a71428ddb07a4_th.jpg",
-                            Size = Size.xxl
-                        }
-                    },
-                    Texts = new Collection<Text>
-                    {
-                        new Text
-                        {
-                            Title = "Place your ad here",
-                            Subtitle = "Contact us",
-                            Lang = Lang.eng,
-                            Btns = new Collection<Btn>
-                            {
-                                new Btn
-                                {
-                                    Title = "jefedeproyectos@intemit.cl",
-                                    Uri = new Uri("mail:jefedeproyectos@intemit.cl")
-                                },
-                                new Btn
-                                {
-                                    Title = "+56 65 253 1609",
-                                    Uri = new Uri("tel:+56652531609")
-                                }
-                            }
-                        },
-                        new Text
-                        {
-                            Title = "Publicita tu empresa aquí",
-                            Subtitle = "Contactanos",
-                            Lang = Lang.esp,
-                            Btns = new Collection<Btn>
-                            {
-                                new Btn
-                                {
-                                    Title = "jefedeproyectos@intemit.cl",
-                                    Uri = new Uri("mail:jefedeproyectos@intemit.cl")
-                                },
-                                new Btn
-                                {
-                                    Title = "+56 65 253 1609",
-                                    Uri = new Uri("tel:+56652531609")
-                                }
-                            }
-                        }
-                    }
-                },
-                new Banner
-                {
-                    Imgs = new Collection<Img>
-                    {
-                        new Img
-                        {
-                            FileName = "../images/backgrounds/mussels-shells-mytilus-watt-area-53131.min.jpg",
-                            Size = Size.xxl
-                        }
-                    },
-                    Texts = new Collection<Text>
-                    {
-                        new Text
-                        {
-                            Title = "Bibliomit",
-                            Subtitle = "Electronic Library and Platform for Digital Management of Mytilus chilensis Resource.",
-                            Lang = Lang.eng
-                        },
-                        new Text
-                        {
-                            Title = "Bibliomit",
-                            Subtitle = "Plataforma y biblioteca electrónica para el manejo digital del recurso Mytilus chilensis",
-                            Lang = Lang.esp
-                        }
-                    }
-                }
-            };
-            model.Shuffle();
-
-            var modelo = new Carousel();
-
-            foreach(var item in model.Select((value, i) => new { i, value }))
-            {
-                var mask = "background-color: rgba(0, 0, 0, 0.6)";
-                var active = item.i == 0 ? "active" : "";
-                var lang = _localizer["eng"].Value;
-                var text = item.value.Texts.First(t => t.Lang.ToString() == lang);
-                modelo.Indicators += @$"<li data-mdb-target=""#introCarousel"" data-mdb-slide-to=""{item.i}"" class=""{active}""></li>";
-                var btns = "";
-                if (item.value.Rgbs != null && item.value.Rgbs.Any())
-                {
-                    if (item.value.Rgbs.Count > 1 && string.IsNullOrWhiteSpace(item.value.MaskAngle))
-                    {
-                        var rgbas = string.Join(",", item.value.Rgbs.Select(r => $"rgba({r.R}, {r.G}, {r.B}, 0.6)"));
-                        mask = $"background: linear-gradient({item.value.MaskAngle}, {rgbas})";
-                    }
-                    else
-                    {
-                        var first = item.value.Rgbs.First();
-                        mask = $"background-color: rgba({first.R}, {first.G}, {first.B}, 0.6)";
-                    }
-                }
-                if(text.Btns != null && text.Btns.Any())
-                {
-                    btns = string.Join("", text.Btns.Select(b => @$"<a class=""btn btn-outline-light btn-lg m-2"" href=""{b.Uri}"";
-role=""button"" rel=""nofollow"" target=""_blank"">{b.Title}</a>"));
-                }
-                mask = $@".banner-{item.i} .mask{{{mask};}}";
-                modelo.Styles += string.Join(" ",item.value.Imgs.Select(i => $@"@media (max-width: {(int)i.Size}px){{ 
-.banner-{item.i}{{
-background-image: url('{i.FileName}') 
-}}
-}}"));
-                modelo.Styles += mask;
-                modelo.Items += @$"<div class=""carousel-item banner-{item.i} {active}"">
-                     <div class=""mask"">
-                           <div class=""d-flex justify-content-center align-items-center h-100"">
-                                <div class=""text-white text-center"">
-                                     <h1 class=""mb-3"">{text.Title}</h1>
-                                     <h5 class=""mb-4"">{text.Subtitle}</h5>
-                                        {btns}
-                                </div>
-                           </div>
-                      </div>
-                   </div>";
-            }
-            return View(modelo);
+            var model = await _banner.GetCarouselAsync().ConfigureAwait(false);
+            return View(model);
         }
+
         [HttpGet]
         public IActionResult Forum()
         {
@@ -434,6 +313,7 @@ background-image: url('{i.FileName}')
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Search(string searchQuery)
         {
             return RedirectToAction("Results", new { searchQuery });
@@ -505,7 +385,13 @@ background-image: url('{i.FileName}')
                 Response.Cookies.Append(
                     CookieRequestCultureProvider.DefaultCookieName,
                     CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
-                    new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) }
+                    new CookieOptions { 
+                        Expires = DateTimeOffset.UtcNow.AddYears(1),
+                        IsEssential = true,
+                        HttpOnly = true,
+                        Path = "/",
+                        Secure = true
+                    }
                 );
             }
 
@@ -521,57 +407,5 @@ background-image: url('{i.FileName}')
     {
         public string Date { get; set; }
         public int Views { get; set; }
-    }
-    public class Banner
-    {
-        public Collection<Img> Imgs { get; internal set; }
-        public string MaskAngle { get; set; }
-        public Collection<Text> Texts { get; internal set; }
-        public Collection<Rgb> Rgbs { get; internal set; }
-    }
-    public class Text
-    {
-        public string Title { get; set; }
-        public string Subtitle { get; set; }
-        public Collection<Btn> Btns { get; internal set; }
-        public Lang Lang { get; set; }
-    }
-    public class Btn
-    {
-        public string Title { get; set; }
-        public Uri Uri { get; set; }
-    }
-    public class Rgb
-    {
-        public int R { get; set; }
-        public int G { get; set; }
-        public int B { get; set; }
-    }
-    public class Img
-    {
-        public Size Size { get; set; }
-        public string FileName { get; set; }
-    }
-    public enum Lang
-    {
-        None,
-        eng,
-        esp
-    }
-    public enum Size
-    {
-        None,
-        xs = 576,
-        sm = 768,
-        md = 992,
-        lg = 1200,
-        xl = 1400,
-        xxl = 3800
-    }
-    public class Carousel
-    {
-        public string Indicators { get; set; }
-        public string Items { get; set; }
-        public string Styles { get; set; }
     }
 }

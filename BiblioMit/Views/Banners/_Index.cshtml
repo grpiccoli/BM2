@@ -1,0 +1,93 @@
+﻿@using BiblioMit.Models.Entities.Ads
+@using BiblioMit.Extensions
+@model (List<Banner>, string)
+
+@{
+    ViewData["Title"] = "Banners";
+    var sizeSelect = Size.xxl.Enum2Select();
+}
+
+<div class="sticky-top text-right" style="margin-top: -66px !important;">
+    <h1>@ViewData["Title"]</h1>
+    <button class="btn btn-sm btn-success" asp-action="Save">@Localizer["Save all changes"]</button>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Item1.FirstOrDefault().Id)
+            </th>
+            <th>
+                @Localizer["Ad Campaign"].Value
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Item1)
+        {
+            <tr>
+                <td>
+                    @item.Id
+                </td>
+                <td>
+                    @foreach (var img in item.Imgs)
+                    {
+                        <div class="row">
+                            <div class="col" style="background: url('@img.FileName'); width:100%; height: auto">
+                                <img src="@img.FileName" style="width:100%;height:auto;visibility:hidden;" />
+                                @foreach (var text in item.Texts)
+                                {
+                                    var hidden = Model.Item2 == text.Lang.ToString() ? "" : "collapse";
+                            <div class="row @hidden">
+                                <h5>@Html.EditorFor(model => text.Title, new { htmlAttributes = new { @class = "form-control" } })</h5>
+                                <h6>@Html.EditorFor(model => text.Subtitle, new { htmlAttributes = new { @class = "form-control" } })</h6>
+                                <div class="row">
+                                    @foreach (var btn in text.Btns)
+                                    {
+                                    <div class="col">
+                                        @Html.EditorFor(model => btn.Title, new { htmlAttributes = new { @class = "form-control" } })
+                                        @Html.EditorFor(model => btn.Uri, new { htmlAttributes = new { @class = "form-control" } })
+                                    </div>
+                                    }
+                                </div>
+                            </div>
+                                }
+                            </div>
+                            <div class="col">
+                                Size:
+                                @Html.DropDownListFor(model => img.Size, (IEnumerable<SelectListItem>)sizeSelect, new { @class = "form-control" })
+                                URI:
+                                @Html.EditorFor(model => img.FileName, new { htmlAttributes = new { @class = "form-control" } })
+                                Language:
+                            </div>
+                        </div>
+                        <hr />
+                    }
+                    <div class="row">
+                        Angle:
+                        @Html.EditorFor(model => item.MaskAngle)
+                    </div>
+                    @if (item.Rgbs.Any())
+                    {
+                        <div class="row">
+                            RGBs:
+                            @foreach (var rgb in item.Rgbs)
+                            {
+                                <div class="col"
+                                     style="background-color:rgb(@rgb.R, @rgb.G, @rgb.B);
+                            height:1rem;">
+
+                                </div>
+                            }
+                        </div>
+                    }
+                </td>
+                @*<td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>*@
+            </tr>
+        }
+    </tbody>
+</table>

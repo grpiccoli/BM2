@@ -31,6 +31,7 @@ namespace BiblioMit.Controllers
         }
 
         [AllowAnonymous]
+        [HttpGet]
         public IActionResult Index()
         {
             var forums = _forumService.GetAll()
@@ -51,7 +52,7 @@ namespace BiblioMit.Controllers
 
             return View(model);
         }
-
+        [HttpGet]
         public IActionResult Topic(int id, string searchQuery)
         {
             var forum = _forumService.GetbyId(id);
@@ -88,6 +89,7 @@ namespace BiblioMit.Controllers
         }
 
         [Authorize(Roles = "Administrador",Policy ="Foros")]
+        [HttpGet]
         public IActionResult Create()
         {
             var model = new AddForumModel();

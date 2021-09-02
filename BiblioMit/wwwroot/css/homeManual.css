@@ -1,0 +1,10 @@
+﻿header {
+  height: calc(100vh - 66px); }
+
+iframe {
+  width: 100vw;
+  height: calc(100vh - 66px); }
+
+footer {
+  background: linear-gradient(transparent, black) !important;
+  opacity: 0.5; }

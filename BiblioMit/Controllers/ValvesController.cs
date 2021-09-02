@@ -20,6 +20,7 @@ namespace BiblioMit.Controllers
         }
 
         // GET: Samplings
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             var ApplicationDbContext = _context.Valves.Include(s => s.Individual);
@@ -27,6 +28,7 @@ namespace BiblioMit.Controllers
         }
 
         // GET: Samplings/Details/5
+        [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -46,6 +48,7 @@ namespace BiblioMit.Controllers
         }
 
         // GET: Samplings/Create
+        [HttpGet]
         public IActionResult Create()
         {
             ViewData["IndividualId"] = new SelectList(_context.Individuals, "Id", "Id");
@@ -75,6 +78,7 @@ namespace BiblioMit.Controllers
         }
 
         // GET: Samplings/Edit/5
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -129,6 +133,7 @@ namespace BiblioMit.Controllers
         }
 
         // GET: Samplings/Delete/5
+        [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)

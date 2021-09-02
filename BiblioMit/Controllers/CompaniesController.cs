@@ -24,6 +24,7 @@ namespace BiblioMit.Controllers
 
         // GET: Companies
         [Authorize(Roles = "Administrador,Editor,Invitado")]
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Companies
@@ -34,6 +35,7 @@ namespace BiblioMit.Controllers
         }
 
         // GET: Companies/Details/5
+        [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -59,6 +61,7 @@ namespace BiblioMit.Controllers
 
         // GET: Companies/Create
         [Authorize(Roles = "Administrador")]
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
@@ -79,7 +82,7 @@ namespace BiblioMit.Controllers
                 var rut = company.RUT.RUTUnformat();
                 if (rut.HasValue)
                 {
-                    Company corp = new Company
+                    Company corp = new()
                     {
                         Id = rut.Value.rut
                     };
@@ -95,6 +98,7 @@ namespace BiblioMit.Controllers
 
         // GET: Companies/Edit/5
         [Authorize(Roles = "Administrador,Editor")]
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -154,6 +158,7 @@ namespace BiblioMit.Controllers
 
         // GET: Companies/Delete/5
         [Authorize(Roles = "Administrador")]
+        [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)

@@ -4,7 +4,10 @@
     "lib": [
       "ES2015",
       "ES5",
-      "DOM"
+      "DOM",
+      "ES6",
+      "ESNext",
+      "ES2016"
     ],
     "module": "commonjs",
     "noEmitOnError": true,
@@ -20,9 +23,13 @@
     "rootDir": "scripts/",
     "sourceMap": true,
     "sourceRoot": "scripts/",
-    "target": "ESNext",
+    "target": "ES6",
+    //"allowJs": true,
+    //"checkJs": true,
     "typeRoots": [ "node_modules/@types", "scripts/types" ]
   },
+  "files": [ "node_modules/typescript/lib/lib.es6.d.ts" ],
+  "include": [ "scripts/*" ],
   "exclude": [
     "node_modules",
     "wwwroot"

@@ -1,6 +1,7 @@
 ﻿using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace BiblioMit.Extensions
@@ -12,7 +13,7 @@ namespace BiblioMit.Extensions
             if (ws is null) throw new ArgumentNullException(nameof(ws));
             return ws.Cells["1:1"].FirstOrDefault(c => c.Value.ToString().Equals(columnName, StringComparison.OrdinalIgnoreCase)).Start.Column;
         }
-        public static int GetColumnByNames(this ExcelWorksheet ws, List<string> columnNames)
+        public static int GetColumnByNames(this ExcelWorksheet ws, IEnumerable<string> columnNames)
         {
             if (ws is null)
                 throw new ArgumentNullException(nameof(ws));
@@ -23,7 +24,7 @@ namespace BiblioMit.Extensions
                 .FirstOrDefault(c => columnNames
                 .Contains(c.Value.ToString().CleanCell())).Start.Column;
         }
-        public static int GetColumnByNames(this List<string> headers, List<string> columnNames)
+        public static int GetColumnByNames(this IList<string> headers, IEnumerable<string> columnNames)
         {
             if (headers is null) throw new ArgumentNullException(nameof(headers));
             if (columnNames is null) throw new ArgumentNullException(nameof(columnNames));

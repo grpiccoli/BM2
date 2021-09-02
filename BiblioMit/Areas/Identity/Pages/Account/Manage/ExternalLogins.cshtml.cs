@@ -23,7 +23,7 @@ namespace BiblioMit.Areas.Identity.Pages.Account.Manage
             _userManager = userManager;
             _signInManager = signInManager;
         }
-        public List<UserLoginInfo> CurrentLogins { get; } = new List<UserLoginInfo>();
+        public Collection<UserLoginInfo> CurrentLogins { get; } = new Collection<UserLoginInfo>();
 
         public Collection<AuthenticationScheme> OtherLogins { get; } = new Collection<AuthenticationScheme>();
 
@@ -39,8 +39,7 @@ namespace BiblioMit.Areas.Identity.Pages.Account.Manage
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
-
-            CurrentLogins.AddRange(await _userManager.GetLoginsAsync(user).ConfigureAwait(false));
+            (await _userManager.GetLoginsAsync(user).ConfigureAwait(false)).ToList().ForEach(s => CurrentLogins.Add(s));
             foreach(var logging in (await _signInManager.GetExternalAuthenticationSchemesAsync().ConfigureAwait(false))
                 .Where(auth => CurrentLogins.All(ul => auth.Name != ul.LoginProvider)) )
             {

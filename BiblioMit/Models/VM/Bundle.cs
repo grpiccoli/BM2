@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.ObjectModel;
 
 namespace BiblioMit.Models.VM
 {
     public class BundleConfig
     {
         public string OutputFileName { get; set; }
-        public List<string> InputFiles { get; } = new List<string>();
+        public Collection<string> InputFiles { get; } = new Collection<string>();
     }
 }

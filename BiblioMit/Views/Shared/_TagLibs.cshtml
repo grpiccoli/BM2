@@ -3,22 +3,22 @@
 @using BiblioMit.Services
 
 @{
-string style = $"{Model.Item1}Styles";
-string script = $"{Model.Item1}Scripts";
-foreach (string lib in Model.Item2)
-{
-    var bundles = Bundler.GetBundles(lib);
-    var continuar = false;
-    if (bundles != null && bundles.Any())
+    string style = $"{Model.Item1}Styles";
+    string script = $"{Model.Item1}Scripts";
+    foreach (string lib in Model.Item2)
     {
-        foreach (var bundle in bundles)
+        var bundles = Bundler.GetBundles(lib);
+        var continuar = false;
+        if (bundles != null && bundles.Any())
         {
-            string file = bundle.OutputFileName.Replace("wwwroot", "~");
-            string ext = System.IO.Path.GetExtension(file);
-            switch (ext)
+            foreach (var bundle in bundles)
             {
-                case ".css":
-                    this.Block(style, @<link href="@file" rel="stylesheet" asp-append-version="true" />);
+                string file = bundle.OutputFileName.Replace("wwwroot", "~");
+                string ext = System.IO.Path.GetExtension(file);
+                switch (ext)
+                {
+                    case ".css":
+                        this.Block(style, @<link href="@file" rel="stylesheet" asp-append-version="true" />);
                     break;
                 case ".js":
                     this.Block(script, @<script src="@file" asp-append-version="true"></script>);
@@ -27,52 +27,75 @@ foreach (string lib in Model.Item2)
                 case ".woff":
                 case ".ttf":
                     this.Block(style, @<link href="@file" rel="preload" as="font" type="font/@ext.TrimStart('.')" asp-append-version="true" />);
-                    break;
+                        break;
             }
             continuar = true;
         }
     }
-    if (continuar) { continue; }
-    var l = Libman.GetLibs(lib);
-    if (l != null && l.Files.Any())
+    var compiles = WebCompiler.GetBundles(lib);
+    if (compiles != null && compiles.Any())
     {
-        foreach (var file in l.Files)
+        foreach (var compile in compiles)
         {
-            var url = string.Empty;
-            var provider = l.Provider ?? "jsdelivr";
-            switch (provider)
-            {
-                case "cdnjs":
-                    l.Library = l.Library.Replace("@", "/");
-                    url = "cdnjs.cloudflare.com/ajax/libs";
-                    break;
-                case "unpkg":
-                    url = "unpkg.com";
-                    break;
-                case "jsdelivr":
-                    url = "cdn.jsdelivr.net/npm";
-                    break;
-                default:
-                    break;
+            string file = compile.OutputFile.Replace("wwwroot", "~").Replace(".css",".min.css");
+            this.Block(style, @<link href="@file" rel="stylesheet" asp-append-version="true" />);
+                continuar = true;
             }
-            var f = $"{l.Destination}/{file}";
-            var href = $"{Context.Request.Scheme}://{url}/{l.Library}/{file}";
-            var ext = System.IO.Path.GetExtension(file);
-            switch (ext)
+        }
+        if (continuar) { continue; }
+        var l = Libman.GetLibs(lib);
+        if (l != null && l.Files.Any())
+        {
+            foreach (var file in l.Files)
             {
-                case ".css":
-                    this.Block(style, @<link href="@href" rel="stylesheet" asp-subresource-integrity-href="@f" asp-fallback-href="@f"/>);
-                    break;
-                case ".js":
-                    this.Block(script, @<script src="@href" asp-subresource-integrity-src="@f" asp-fallback-src="@f" ></script>);
-                    break;
-                case ".woff2":
-                case ".woff":
-                case ".ttf":
-                    this.Block(style, @<link href="@href" rel="preload" as="font" type="font/@ext.TrimStart('.')" crossorigin="anonymous" />);
-                    break;
+                var url = string.Empty;
+                var provider = l.Provider ?? "jsdelivr";
+                switch (provider)
+                {
+                    case "cdnjs":
+                        l.Library = l.Library.Replace("@", "/");
+                        url = "cdnjs.cloudflare.com/ajax/libs";
+                        break;
+                    case "unpkg":
+                        url = "unpkg.com";
+                        break;
+                    case "jsdelivr":
+                        url = "cdn.jsdelivr.net/npm";
+                        break;
+                    default:
+                        break;
+                }
+                var f = $"{l.Destination}/{file}";
+                var href = $"{Context.Request.Scheme}://{url}/{l.Library}/{file}";
+                var ext = System.IO.Path.GetExtension(file);
+                string hash;
+                if (!BiblioMit.Models.VM.CSPTag.Files.ContainsKey(f))
+                {
+                    hash = Hash.Get512(f);
+                    BiblioMit.Models.VM.CSPTag.Files.Add(f,hash);
+                }
+                else
+                {
+                    hash = BiblioMit.Models.VM.CSPTag.Files[f];
+                }
+                switch (ext)
+                {
+                    case ".css":
+                        this.Block(style, @<link href="@href" rel="stylesheet" crossorigin="anonymous" integrity="@hash" asp-fallback-href="@f"/>);
+                        BiblioMit.Models.VM.CSPTag.StyleSrcElem.Add(href);
+                        break;
+                    case ".js":
+                        this.Block(script, @<script src="@href" crossorigin="anonymous" integrity="@hash" asp-fallback-src="@f" ></script>);
+                        BiblioMit.Models.VM.CSPTag.ScriptSrcElem.Add($"'{hash}'");
+                        break;
+                    case ".woff2":
+                    case ".woff":
+                    case ".ttf":
+                        this.Block(style, @<link href="@href" rel="preload" as="font" type="font/@ext.TrimStart('.')" crossorigin="anonymous" />);
+                        BiblioMit.Models.VM.CSPTag.FontSrc.Add(href);
+                        break;
+                }
             }
         }
     }
-}
 }

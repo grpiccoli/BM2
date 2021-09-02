@@ -21,6 +21,8 @@ using BiblioMit.Models.Entities.Environmental;
 using BiblioMit.Services.Interfaces;
 using System.Globalization;
 using BiblioMit.Models.Entities.Environmental.Plancton;
+using System.Security.Claims;
+using BiblioMit.Models.Entities.Ads;
 
 namespace BiblioMit.Services
 {
@@ -30,6 +32,7 @@ namespace BiblioMit.Services
         private readonly IUpdateJsons _update;
         private readonly ILogger _logger;
         private readonly IStringLocalizer _localizer;
+        private readonly UserManager<ApplicationUser> _userManager;
         public IConfiguration Configuration { get; }
         private readonly IWebHostEnvironment _environment;
         private readonly string _os;
@@ -43,6 +46,7 @@ namespace BiblioMit.Services
             IConfiguration configuration,
             IWebHostEnvironment environment,
             ApplicationDbContext context,
+            UserManager<ApplicationUser> userManager,
             ILookupNormalizer normalizer,
             IUpdateJsons update
             )
@@ -50,6 +54,7 @@ namespace BiblioMit.Services
             _update = update;
             _import = import;
             _logger = logger;
+            _userManager = userManager;
             _localizer = localizer;
             Configuration = configuration;
             _environment = environment;
@@ -65,7 +70,7 @@ namespace BiblioMit.Services
                 await Users().ConfigureAwait(false);
                 await AddProcedures().ConfigureAwait(false);
                 var adminId = _context.ApplicationUsers
-                    .Where(u => u.Email == "adminmit@bibliomit.cl")
+                    .Where(u => u.Email == "contacto@epicsolutions.cl")
                     .SingleOrDefault().Id;
 
                 var tsvPath = Path
@@ -176,6 +181,19 @@ namespace BiblioMit.Services
                     await Insert<PlanktonUser>(tsvPath).ConfigureAwait(false);
 
                 tsvPath = Path
+                    .Combine(_environment.ContentRootPath, "Data", "Ads");
+                if (!_context.Banners.Any())
+                    await Insert<Banner>(tsvPath).ConfigureAwait(false);
+                if (!_context.Btns.Any())
+                    await Insert<Btn>(tsvPath).ConfigureAwait(false);
+                if (!_context.Captions.Any())
+                    await Insert<Caption>(tsvPath).ConfigureAwait(false);
+                if (!_context.Imgs.Any())
+                    await Insert<Img>(tsvPath).ConfigureAwait(false);
+                if (!_context.Rgbs.Any())
+                    await Insert<Rgb>(tsvPath).ConfigureAwait(false);
+
+                tsvPath = Path
                     .Combine(_environment.ContentRootPath, "Data", "Semaforo");
                 if (!_context.Spawnings.Any())
                     await Insert<Spawning>(tsvPath).ConfigureAwait(false);
@@ -231,8 +249,8 @@ IF @HasIdentity = 1
 	END
 END";
             bool spExists = false;
-            using SqlConnection connection = new SqlConnection(_conn);
-            using SqlCommand command = new SqlCommand
+            using SqlConnection connection = new(_conn);
+            using SqlCommand command = new()
             {
                 Connection = connection,
                 CommandText = query
@@ -281,7 +299,7 @@ END";
             {
                 if (!_context.ApplicationRoles.Any())
                 {
-                    var aprolls = RoleData.AppRoles.Select(r => new ApplicationRole
+                    var aprolls = RoleData.Administrator.Enum2ListNames().Select(r => new ApplicationRole
                     {
                         CreatedDate = DateTime.Now,
                         Name = r,
@@ -296,61 +314,93 @@ END";
                     await _context.SaveChangesAsync().ConfigureAwait(false);
                 }
                 var users = new List<UserInitializerVM>();
-                var userPer = new UserInitializerVM
+                var userPer = new UserInitializerVM(
+                    //roles
+                    new List<string> 
+                    {
+                        RoleData.Administrator.ToString()
+                    }, 
+                    //claims
+                    new List<string> 
+                    {
+                        UserClaims.Digest.ToString()
+                    })
                 {
                     Name = "PER",
                     Email = "javier.aros@mejillondechile.cl",
-                    Key = "per2018",
+                    Key = "Per@2018",
                     ImageUri = new Uri("~/images/ico/mejillondechile.svg", UriKind.Relative)
                 };
-                userPer.Roles.Add(RoleData.AppRoles.ElementAt(0));
-                //userPer.Plataforma.Add(Plataforma.mytilidb);
-                userPer.Claims.Add("per");
                 users.Add(userPer);
-                var userMitilidb = new UserInitializerVM
+                var userMitilidb = new UserInitializerVM(
+                    //roles
+                    new List<string>
+                    {
+                        RoleData.Administrator.ToString()
+                    },
+                    //claims
+                    new List<string>
+                    {
+                        UserClaims.Mitilidb.ToString()
+                    })
                 {
                     Name = "MytiliDB",
                     Email = "mytilidb@bibliomit.cl",
-                    Key = "sivisam2016",
+                    Key = "Sivisam@2016",
                     ImageUri = new Uri("~/images/ico/bibliomit.svg", UriKind.Relative)
                 };
-                userMitilidb.Roles.Add(RoleData.AppRoles.ElementAt(0));
-                //userMitilidb.Plataforma.Add(Plataforma.mytilidb);
-                userMitilidb.Claims.Add("mitilidb");
                 users.Add(userMitilidb);
-                var userWebmaster = new UserInitializerVM
+                var userWebmaster = new UserInitializerVM(
+                    //roles
+                    RoleData.Administrator.Enum2ListNames(),
+                    //claims
+                    UserClaims.Banners.Enum2ListNames())
                 {
                     Name = "WebMaster",
-                    Email = "adminmit@bibliomit.cl",
+                    Email = "contacto@epicsolutions.cl",
                     Key = "34#$erERdfDFcvCV",
                     ImageUri = new Uri("~/images/ico/bibliomit.svg", UriKind.Relative),
                     Rating = 10
                 };
-                userWebmaster.Roles.AddRange(RoleData.AppRoles);
-                //userWebmaster.Plataforma.AddRange(Plataforma.bibliomit.Enum2List());
-                userWebmaster.Claims.AddRange(ClaimData.UserClaims);
                 users.Add(userWebmaster);
-                var userSernapesca = new UserInitializerVM
+                var userSernapesca = new UserInitializerVM(
+                    //roles
+                    new List<string>
+                    {
+                        RoleData.Administrator.ToString()
+                    },
+                    //claims
+                    new List<string>
+                    {
+                        UserClaims.Digest.ToString()
+                    })
                 {
                     Name = "Sernapesca",
                     Email = "sernapesca@bibliomit.cl",
-                    Key = "sernapesca2018",
+                    Key = "Sernapesca@2018",
                     ImageUri = new Uri("~/images/ico/bibliomit.svg", UriKind.Relative)
                 };
-                userSernapesca.Roles.Add(RoleData.AppRoles.ElementAt(0));
-                //userSernapesca.Plataforma.Add(Plataforma.boletin);
-                userSernapesca.Claims.Add("sernapesca");
                 users.Add(userSernapesca);
-                var userIntemit = new UserInitializerVM
+                var userIntemit = new UserInitializerVM(
+                    //roles
+                    new List<string>
+                    {
+                        RoleData.Administrator.ToString()
+                    },
+                    //claims
+                    new List<string>
+                    {
+                        UserClaims.PSMB.ToString(),
+                        UserClaims.Contacts.ToString(),
+                        UserClaims.Forums.ToString(),
+                        UserClaims.Banners.ToString()
+                    })
                 {
                     Name = "Intemit",
-                    Email = "intemit@bibliomit.cl",
-                    Key = "intemit2018",
+                    Email = "jefedeproyectos@intemit.cl",
+                    Key = "Intemit@2018",
                     ImageUri = new Uri("~/images/ico/bibliomit.svg", UriKind.Relative)
                 };
-                userIntemit.Roles.Add(RoleData.AppRoles.ElementAt(0));
-                //userIntemit.Plataforma.Add(Plataforma.psmb);
-                userIntemit.Claims.Add("intemit");
                 users.Add(userIntemit);
                 var hasher = new PasswordHasher<ApplicationUser>();
                 foreach (var item in users)
@@ -366,27 +416,18 @@ END";
                         SecurityStamp = Guid.NewGuid().ToString(),
                         ProfileImageUrl = item.ImageUri
                     };
-                    user.PasswordHash = hasher.HashPassword(user, item.Key);
+                    IdentityResult userResult = await _userManager.CreateAsync(user, item.Key).ConfigureAwait(false);
+                    if (!userResult.Succeeded) throw new InvalidOperationException($"user could not be added {user.Name}");
 
-                    user.Claims.AddRangeOverride(item.Claims.Select(c => new IdentityUserClaim<string>
-                    {
-                        ClaimType = c,
-                        ClaimValue = c
-                    }).ToList());
-
-                    foreach (var role in item.Roles)
-                    {
-                        var roller = await _context.Roles
-                            .SingleOrDefaultAsync(r => r.Name == role)
-                            .ConfigureAwait(false);
-                        user.UserRoles.Add(new IdentityUserRole<string>
-                        {
-                            UserId = user.Id,
-                            RoleId = roller.Id
-                        });
-                    }
-                    await _context.Users.AddAsync(user)
+                    IdentityResult claimIdentityResult = await _userManager
+                        .AddClaimsAsync(user, item.Claims.Select(c =>
+                    new Claim(c, c)))
                         .ConfigureAwait(false);
+                    if (!claimIdentityResult.Succeeded) throw new InvalidOperationException($"claims could not be added to user {user.Name}");
+
+                    IdentityResult rolesIdentityResult = await _userManager
+                        .AddToRolesAsync(user, item.Roles).ConfigureAwait(false);
+                    if (!rolesIdentityResult.Succeeded) throw new InvalidOperationException($"roles could not be added to user {user.Name}");
                 }
                 await _context.SaveChangesAsync()
                     .ConfigureAwait(false);

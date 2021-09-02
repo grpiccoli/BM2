@@ -147,7 +147,7 @@ namespace BiblioMit.Blazor
         }
         public async Task<ICollection<ChartData>> GetDatas(
             DateTimeOffset? start,
-            DateTimeOffset? end,
+            DateTimeOffset? endDt,
             IList<Variable> variables,
             IList<SelectListItem> orders,
             IList<SelectListItem> genus,
@@ -157,13 +157,13 @@ namespace BiblioMit.Blazor
             IList<SelectListItem> psmbs)
         {
             var resp = new List<ChartData>();
-            if (!start.HasValue || !end.HasValue) return null;
+            if (!start.HasValue || !endDt.HasValue) return null;
             if(variables != null && variables.Any())
                 foreach (var v  in variables)
                 {
                     resp.Add(await GetData(
                         start.Value,
-                        end.Value,
+                        endDt.Value,
                         LocationType.Cuenca,
                         1,
                         "Cuenca Norte",

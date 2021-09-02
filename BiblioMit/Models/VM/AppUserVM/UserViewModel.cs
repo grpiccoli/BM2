@@ -1,11 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace BiblioMit.Models
 {
     public class UserViewModel
     {
+        public UserViewModel(MultiSelectList appRoles, MultiSelectList userClaims)
+        {
+            AppRoles = appRoles;
+            UserClaims = userClaims;
+        }
         public string Id { get; set; }
 
         [Required(ErrorMessage = "Se requiere una contraseña")]
@@ -27,9 +31,9 @@ namespace BiblioMit.Models
         public string Email { get; set; }
 
         [Display(Name = "Permisos de usuario")]
-        public List<SelectListItem> UserClaims { get; } = new List<SelectListItem>();
-
-        public List<SelectListItem> AppRoles { get; } = new List<SelectListItem>();
+        public MultiSelectList UserClaims { get; internal set; }
+        [Display(Name = "Roles de usuario")]
+        public MultiSelectList AppRoles { get; internal set; }
 
         [Display(Name = "Rol")]
         public string AppRoleId { get; set; }

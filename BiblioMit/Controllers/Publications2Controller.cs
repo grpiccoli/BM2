@@ -20,6 +20,7 @@ using System.Drawing;
 using Newtonsoft.Json;
 using BiblioMit.Services;
 using BiblioMit.Extensions;
+using System.Collections.ObjectModel;
 //using PaulMiami.AspNetCore.Mvc.Recaptcha;
 
 namespace BiblioMit.Controllers
@@ -41,6 +42,7 @@ namespace BiblioMit.Controllers
         }
 
         [AllowAnonymous]
+        [HttpGet]
         public async Task<IActionResult> Index(
             int? pg, //page
             int? trpp, //results per page
@@ -52,7 +54,7 @@ namespace BiblioMit.Controllers
             //[FromServices] INodeServices nodeServices
             )
         {
-            Stopwatch stopWatch = new Stopwatch();
+            Stopwatch stopWatch = new();
             stopWatch.Start();
 
             #region Variables
@@ -173,11 +175,11 @@ namespace BiblioMit.Controllers
                     var articulosGradient = GetGradients(Color.DarkBlue, Color.LightBlue, noa);
                     var patentesGradient = GetGradients(Color.Brown, Color.Yellow, nopat);
 
-                    List<object> tesisData = new List<object> { },
-                        projData = new List<object> { },
-                        globalData = new List<object> { },
-                        artsData = new List<object> { },
-                        patsData = new List<object> { };
+                    List<object> tesisData = new(),
+                        projData = new(),
+                        globalData = new(),
+                        artsData = new(),
+                        patsData = new();
                     var l = new List<int>() { nor, nop, noa, nopat };
 
                     var repos = new List<Dictionary<string, string>> { ues, proj, gs, gp }.SelectMany(d => d).ToDictionary(d => d.Key, d => d.Value);
@@ -303,6 +305,7 @@ namespace BiblioMit.Controllers
         }
 
         [Authorize(Roles = "Administrador")]
+        [HttpGet]
         public IActionResult Translate(string text, string lang)
         {
             var result = _node.Run("./wwwroot/js/translate.js", new string[] { text, lang });
@@ -310,6 +313,7 @@ namespace BiblioMit.Controllers
         }
 
         [AllowAnonymous]
+        [HttpGet]
         public async Task<IActionResult> Agenda(
             int? pg, //page
             int? trpp, //results per page
@@ -319,7 +323,7 @@ namespace BiblioMit.Controllers
             //[FromServices] INodeServices nodeServices
             )
         {
-            Stopwatch stopWatch = new Stopwatch();
+            Stopwatch stopWatch = new();
             stopWatch.Start();
 
             #region Variables
@@ -394,9 +398,9 @@ namespace BiblioMit.Controllers
                                 { "blogid", "20" }
                             };
                     using var content = new FormUrlEncodedContent(values);
-                    using HttpClient bc = new HttpClient();
+                    using HttpClient bc = new();
                     using HttpResponseMessage response = await bc.PostAsync(new Uri($"{conicyt2[fondo]}wp-content/themes/fondef/ajax/getpostconcursos.php"), content).ConfigureAwait(false);
-                    HtmlDocument bc_doc = new HtmlDocument();
+                    HtmlDocument bc_doc = new();
                     bc_doc.Load(await response.Content.ReadAsStreamAsync().ConfigureAwait(false));
                     HtmlNodeCollection bc_entrys = bc_doc.DocumentNode.SelectNodes(".//div/a");
                     //        }
@@ -421,7 +425,7 @@ namespace BiblioMit.Controllers
                     //string Acrn = name.SelectSingleNode(".//span").InnerHtml.Trim();
                     string Fund = "";
                     string Acrn = fondo.ToUpperInvariant();
-                    Regex ress1 = new Regex(@"[\d-]+");
+                    Regex ress1 = new(@"[\d-]+");
                     string[] formats = { "yyyy", "yyyy-MM", "d-MM-yyyy" };
                     foreach (HtmlNode entry in bc_entrys)
                     {
@@ -444,7 +448,7 @@ namespace BiblioMit.Controllers
             }
 
             //CORFO DIVIdIR POR REGION Y ACTOR?
-            Regex ress = new Regex(@"corfo\d+");
+            Regex ress = new(@"corfo\d+");
             var corfo_funds = fund.Where(item => ress.IsMatch(item));
             if (corfo_funds.Any())
             {
@@ -452,9 +456,9 @@ namespace BiblioMit.Controllers
                 {
                     var corfo = "https://www.corfo.cl/sites/cpp/programas-y-convocatorias?p=1456407859853-1456408533016-1456408024098-1456408533181&at=&et=&e=&o=&buscar_resultado=&bus=&r=";
                     var num = fondo.Replace("corfo", "", StringComparison.InvariantCulture);
-                    using HttpClient bc = new HttpClient();
+                    using HttpClient bc = new();
                     using HttpResponseMessage bc_result = await bc.GetAsync(new Uri(corfo + num)).ConfigureAwait(false);
-                    HtmlDocument bc_doc = new HtmlDocument();
+                    HtmlDocument bc_doc = new();
                     bc_doc.Load(await bc_result.Content.ReadAsStreamAsync().ConfigureAwait(false));
                     HtmlNodeCollection bc_entrys = bc_doc.DocumentNode.SelectNodes("//div[contains(@class, 'col-sm-12') and contains(@class, 'areas')]/a");
                     foreach (HtmlNode entry in bc_entrys)
@@ -482,7 +486,7 @@ namespace BiblioMit.Controllers
                             Description = entry.SelectSingleNode(".//div[@class='col-md-9 col-sm-8']")?.InnerHtml.HtmlToPlainText(),
                         };
 
-                        Regex ress2 = new Regex(@"[\d\/]+");
+                        Regex ress2 = new(@"[\d\/]+");
                         string[] formats = { "dd/MM/yyyy" };
                         var parsed = DateTime.TryParseExact(ress2.Match(entry.SelectNodes(".//li")?[2].InnerHtml).ToString(),
                                                 formats,
@@ -508,7 +512,7 @@ namespace BiblioMit.Controllers
             ViewData["interval"] = Convert.ToInt32(stopWatch.ElapsedMilliseconds / 500);
             return View(Agendas);
         }
-        public Task<(IEnumerable<PublicationVM>, string, int)[]> GetPubsAsync(
+        private Task<(IEnumerable<PublicationVM>, string, int)[]> GetPubsAsync(
             string[] src, string q, int rpp, int? pg, string sortBy, string order, string srtUach, int ggl)
         {
             if (sortBy == null || order == null) return null;
@@ -693,9 +697,9 @@ string dateSelect, int rpp, string acronym)
             {
                 //try
                 //{
-                    Regex resss = new Regex(@"([0-9]+,)*[0-9]+");
-                    Regex yr = new Regex(@"[0-9]{4}");
-                    Regex aut = new Regex(@"\A(?:(?![0-9]{4}).)*");
+                    Regex resss = new(@"([0-9]+,)*[0-9]+");
+                    Regex yr = new(@"[0-9]{4}");
+                    Regex aut = new(@"\A(?:(?![0-9]{4}).)*");
                     var co = new Company
                     {
                         Id = 55555555,
@@ -711,7 +715,8 @@ string dateSelect, int rpp, string acronym)
                         {
                             Source = acronym,
                             Uri = GetUri(n.QuerySelector(quriSelect)),
-                            Title = t?.Substring(t.LastIndexOf(']') + 1),
+                            Title = t?[(t.LastIndexOf(']')
+                            + 1)..],
                             Typep = Typep.Article,
                             Company = co,
                             Date = GetDateGS(n, dateSelect),
@@ -726,7 +731,7 @@ string dateSelect, int rpp, string acronym)
             return (new List<PublicationVM>(), acronym, 0);
         }
 
-        public async Task<(IEnumerable<PublicationVM>, string, int)> GetCorfoAsync(string[] src,
+        private async Task<(IEnumerable<PublicationVM>, string, int)> GetCorfoAsync(string[] src,
 Uri url, string NoResultsSelect, int NoResultsPos, string nodeSelect, string quriSelect,
 string authorSelect, string dateSelect, string abstractSelect)
         {
@@ -759,7 +764,7 @@ string authorSelect, string dateSelect, string abstractSelect)
             return (new List<PublicationVM>(), acronym, 0);
         }
 
-        public async Task<(IEnumerable<PublicationVM>, string, int)> GetFipaAsync(string[] src,
+        private async Task<(IEnumerable<PublicationVM>, string, int)> GetFipaAsync(string[] src,
 Uri url, string NoResultsSelect, int NoResultsPos, string nodeSelect)
         {
             var acronym = "FIPA";
@@ -787,14 +792,14 @@ Uri url, string NoResultsSelect, int NoResultsPos, string nodeSelect)
             return (new List<PublicationVM>(), acronym, 0);
         }
 
-        public static string ColorToHex(Color color)
+        private static string ColorToHex(Color color)
         {
             return "#" + color.R.ToString("X2", CultureInfo.InvariantCulture) +
                          color.G.ToString("X2", CultureInfo.InvariantCulture) +
                          color.B.ToString("X2", CultureInfo.InvariantCulture);
         }
 
-        public static IEnumerable<Color> GetGradients(Color start, Color end, int steps)
+        private static IEnumerable<Color> GetGradients(Color start, Color end, int steps)
         {
             if(steps > 2)
             {
@@ -819,7 +824,7 @@ Uri url, string NoResultsSelect, int NoResultsPos, string nodeSelect)
             }
         }
 
-        public async Task<(IEnumerable<PublicationVM>, string, int)> GetConicyt(string[] src,
+        private async Task<(IEnumerable<PublicationVM>, string, int)> GetConicyt(string[] src,
 string acronym, string parameter, int rpp, string sortBy, string order, int? pg, string q)
         {
             if (src.Contains(acronym))
@@ -850,7 +855,7 @@ Journal = GetJournalConicyt(n)
             return (new List<PublicationVM>(), acronym, 0);
         }
 
-        public async Task<(IEnumerable<PublicationVM>, string, int)> GetPucAsync(string[] src,
+        private async Task<(IEnumerable<PublicationVM>, string, int)> GetPucAsync(string[] src,
 Uri url, string NoResultsSelect, int NoResultsPos, string nodeSelect, string quriSelect,
 string dateSelect, string authorSelect)
         {
@@ -882,7 +887,7 @@ string dateSelect, string authorSelect)
             return (new List<PublicationVM>(), acronym, 0);
         }
 
-        public async Task<(IEnumerable<PublicationVM>, string, int)> GetPucvAsync(string[] src,
+        private async Task<(IEnumerable<PublicationVM>, string, int)> GetPucvAsync(string[] src,
 Uri url, string NoResultsSelect, int NoResultsPos, string nodeSelect, string dateSelect,
 string quriSelect, string quriSelectAlt, string titleSelect, string authorSelect, int rpp)
         {
@@ -914,7 +919,7 @@ string quriSelect, string quriSelectAlt, string titleSelect, string authorSelect
             return (new List<PublicationVM>(), acronym, 0);
         }
 
-        public async Task<(IEnumerable<PublicationVM>, string, int)> GetUdecAsync(string[] src,
+        private async Task<(IEnumerable<PublicationVM>, string, int)> GetUdecAsync(string[] src,
 Uri url, string NoResultsSelect, int NoResultsPos, string nodeSelect, string quriSelect, string authorSelect, string dateSelect)
         {
             var acronym = "udec";
@@ -946,7 +951,7 @@ Date = GetDate(n, dateSelect)
             return (new List<PublicationVM>(), acronym, 0);
         }
 
-        public async Task<(IEnumerable<PublicationVM>, string, int)> GetUachAsync(string[] src,
+        private async Task<(IEnumerable<PublicationVM>, string, int)> GetUachAsync(string[] src,
     Uri url, string NoResultsSelect, int NoResultsPos, string nodeSelect, string titleSelect, 
     string quriSelect, string authorSelect, string dateSelect)
         {
@@ -976,7 +981,7 @@ Date = GetDate(n, dateSelect)
             return (new List<PublicationVM>(), acronym, 0);
         }
 
-        public async Task<(IEnumerable<PublicationVM>, string, int)> GetUctAsync(string[] src,
+        private async Task<(IEnumerable<PublicationVM>, string, int)> GetUctAsync(string[] src,
 Uri url, string NoResultsSelect, int NoResultsPos, string nodeSelect, string quriSelect, string journalSelect, string authorSelect, string dateSelect)
         {
             var acronym = "uct";
@@ -985,7 +990,7 @@ Uri url, string NoResultsSelect, int NoResultsPos, string nodeSelect, string qur
                 try
                 {
                     var co = GetCo(acronym);
-                    Regex regex = new Regex("[a-zA-Z]");
+                    Regex regex = new("[a-zA-Z]");
                 using var doc = await GetDoc(url).ConfigureAwait(false);
 
                 return (
@@ -1018,7 +1023,7 @@ Date = GetDate(d, j.LastIndexOf(",", StringComparison.InvariantCultureIgnoreCase
             return (new List<PublicationVM>(), acronym, 0);
         }
 
-        public async Task<(IEnumerable<PublicationVM>, string, int)> GetUcscAsync(string[] src,
+        private async Task<(IEnumerable<PublicationVM>, string, int)> GetUcscAsync(string[] src,
 Uri url, string NoResultsSelect, int NoResultsPos, string nodeSelect, string quriSelect, string authorSelect, string dateSelect)
         {
             var acronym = "ucsc";
@@ -1050,7 +1055,7 @@ Date = GetDate(n, dateSelect)
             return (new List<PublicationVM>(), acronym, 0);
         }
 
-        public async Task<(IEnumerable<PublicationVM>, string, int)> GetUmagAsync(string[] src,
+        private async Task<(IEnumerable<PublicationVM>, string, int)> GetUmagAsync(string[] src,
     Uri url, string NoResultsSelect, int NoResultsPos, string nodeSelect, string quriSelect, string authorSelect, string dateSelect)
         {
             var acronym = "umag";
@@ -1081,7 +1086,7 @@ Date = GetDate(n, dateSelect)
             return (new List<PublicationVM>(), acronym, 0);
         }
 
-        public async Task<(IEnumerable<PublicationVM>, string, int)> GetUchileAsync(string[] src, 
+        private async Task<(IEnumerable<PublicationVM>, string, int)> GetUchileAsync(string[] src, 
             Uri url, string NoResultsSelect, int NoResultsPos, string nodeSelect, string quriSelect, string authorSelect, string dateSelect)
         {
             var acronym = "uchile";
@@ -1111,7 +1116,7 @@ Date = GetDate(n, dateSelect)
             return (new List<PublicationVM>(), acronym, 0);
         }
 
-        public async Task<(IEnumerable<PublicationVM>, string, int)> GetUlaAsync(string[] src,
+        private async Task<(IEnumerable<PublicationVM>, string, int)> GetUlaAsync(string[] src,
     Uri url, string nodeSelect, string quriSelect, string authorSelect, int? pg, int rpp)
         {
             var acronym = "ula";
@@ -1134,20 +1139,20 @@ Date = GetDate(n, dateSelect)
                 }
                 catch
                 {
-                    throw new Exception("");
+                    throw;
                 }
             }
             return (new List<PublicationVM>(), acronym, 0);
         }
 
-        public static (string, string) GetJournalDoi(IElement node, string acronym)
+        private static (string, string) GetJournalDoi(IElement node, string acronym)
         {
             string doi = "https://dx.doi.org/";
             switch (acronym)
             {
                 case "uchile":
                     var titls = node?.QuerySelector("h4.discoUch span").Attributes["title"].Value;
-                    List<int> indexes = titls.AllIndexesOf("rft_id");
+                    Collection<int> indexes = titls.AllIndexesOf("rft_id");
                     if (indexes.Count == 3)
                     {
                         return (QueryHelpers.ParseQuery(titls[indexes[0]..indexes[1]])["rft_id"],
@@ -1224,7 +1229,7 @@ Date = GetDate(n, dateSelect)
             try
             {
                 var parser = new HtmlParser();
-                using HttpClient hc = new HttpClient();
+                using HttpClient hc = new();
                 return await parser.ParseDocumentAsync(await hc.GetStringAsync(rep).ConfigureAwait(false)).ConfigureAwait(false);
             }
             catch (HttpRequestException ex)
@@ -1242,60 +1247,60 @@ Date = GetDate(n, dateSelect)
         public static async Task<IHtmlDocument> GetDocStream(Uri rep)
         {
             var parser = new HtmlParser();
-            using HttpClient hc = new HttpClient();
+            using HttpClient hc = new();
             return await parser.ParseDocumentAsync(await hc.GetStreamAsync(rep).ConfigureAwait(false)).ConfigureAwait(false);
         }
 
         public static async Task<HtmlDocument> GetDocXPath(Uri rep)
         {
             var doc = new HtmlDocument();
-            using (HttpClient hc = new HttpClient())
+            using (HttpClient hc = new())
                 doc.Load(await hc.GetStreamAsync(rep).ConfigureAwait(false));
             return doc;
         }
 
-        public Company GetCo(string u)
+        private Company GetCo(string u)
         {
             return _context.Companies.SingleOrDefault(c => c.Acronym == u);
         }
 
-        public Company GetCo(int rut)
+        private Company GetCo(int rut)
         {
             return _context.Companies.SingleOrDefault(c => c.Id == rut);
         }
 
-        public static int GetNoResultsGS(IHtmlDocument doc, string selector)
+        private static int GetNoResultsGS(IHtmlDocument doc, string selector)
         {
             if(doc != null)
             {
-                Regex res = new Regex(@"([0-9]+,)*[0-9]+");
+                Regex res = new(@"([0-9]+,)*[0-9]+");
                 var parsed = int.TryParse(res.Match(doc.QuerySelector(selector).TextContent).Value.Replace(",", "", StringComparison.InvariantCultureIgnoreCase), out int result);
                 if (parsed) return result;
             }
             return 0;
         }
 
-        public static int GetNoResults(IHtmlDocument doc, string selector, int pos)
+        private static int GetNoResults(IHtmlDocument doc, string selector, int pos)
         {
             if (doc != null)
             {
-                Regex res = new Regex(@"[\d\.,]+");
+                Regex res = new(@"[\d\.,]+");
                 var parsed = int.TryParse(res.Matches(doc.QuerySelector(selector).TextContent)[pos].Value, out int result);
                 if (parsed) return result;
             }
             return 0;
         }
 
-        public static int GetNoResults(HtmlDocument doc, string selector, int pos)
+        private static int GetNoResults(HtmlDocument doc, string selector, int pos)
         {
-            Regex res = new Regex(@"[\d\.,]+");
+            Regex res = new(@"[\d\.,]+");
             var parsed = int.TryParse(res.Matches(doc?.DocumentNode.SelectSingleNode(selector).InnerText)[pos].Value, out int result);
             return parsed ? result : 0;
         }
 
-        public static DateTime GetDate(HtmlNode node, string selector)
+        private static DateTime GetDate(HtmlNode node, string selector)
         {
-            Regex res = new Regex(@"[\d\-]+");
+            Regex res = new(@"[\d\-]+");
             string[] formats = { "yyyy", "yyyy-MM" };
             var parsed = DateTime.TryParseExact(res.Match(node?.SelectSingleNode(selector).InnerText).Value,
                                     formats,
@@ -1305,9 +1310,9 @@ Date = GetDate(n, dateSelect)
             return parsed ? Date : new DateTime();
         }
 
-        public static DateTime GetDateGS(IElement node, string selector)
+        private static DateTime GetDateGS(IElement node, string selector)
         {
-                Regex res = new Regex(@"[\d]+");
+                Regex res = new(@"[\d]+");
                 string[] formats = { "yyyy" };
                 var parsed = DateTime.TryParseExact(res.Match(node?.QuerySelector(selector).TextContent).Value,
                                         formats,
@@ -1317,9 +1322,9 @@ Date = GetDate(n, dateSelect)
                 return parsed ? Date : new DateTime();
         }
 
-        public static DateTime GetDate(IElement node, string selector)
+        private static DateTime GetDate(IElement node, string selector)
         {
-                Regex res = new Regex(@"[\d\-]+");
+                Regex res = new(@"[\d\-]+");
                 string[] formats = { "yyyy", "yyyy-MM", "yyyy-MM-dd" };
                 var parsed = DateTime.TryParseExact(res.Match(node?.QuerySelector(selector).TextContent).Value,
                                         formats,
@@ -1329,10 +1334,10 @@ Date = GetDate(n, dateSelect)
                 return parsed ? Date : new DateTime();
         }
 
-        public static DateTime GetDateAgenda(IElement node)
+        private static DateTime GetDateAgenda(IElement node)
         {
             string[] formats = { "dd 'de' MMMM 'de'  yyyy" };
-            Regex ress1 = new Regex(@"\d[\dA-Za-z\s]+\d");
+            Regex ress1 = new(@"\d[\dA-Za-z\s]+\d");
             var parsed = DateTime.TryParseExact(ress1.Match(node?.TextContent).Value,
                 formats,
                 CultureInfo.GetCultureInfo("es-CL"),
@@ -1341,7 +1346,7 @@ Date = GetDate(n, dateSelect)
             return parsed ? Date : new DateTime();
         }
 
-        public static DateTime GetDate(string journal, int start)
+        private static DateTime GetDate(string journal, int start)
         {
             if(journal != null)
             {
@@ -1356,16 +1361,16 @@ Date = GetDate(n, dateSelect)
             return new DateTime();
         }
 
-        public static string GetAbstract(IElement node, string selector)
+        private static string GetAbstract(IElement node, string selector)
         {
             return node?.QuerySelector(selector).TextContent;
         }
 
-        public static IEnumerable<AuthorVM> GetAuthorsGS(IElement node, string selector)
+        private static IEnumerable<AuthorVM> GetAuthorsGS(IElement node, string selector)
         {
             if(node != null)
             {
-                Regex aut = new Regex(@"\A(?:(?![0-9]{4}).)*");
+                Regex aut = new(@"\A(?:(?![0-9]{4}).)*");
                 return aut.Match(node.QuerySelector(selector).TextContent).Value.Trim().Trim('-').Split(',')
                     .Select(a => a.Split(' '))
                     .Select(nn =>
@@ -1378,7 +1383,7 @@ Date = GetDate(n, dateSelect)
             return new List<AuthorVM>();
         }
 
-        public static IEnumerable<AuthorVM> GetAuthorsCorfo(IElement node, string selector)
+        private static IEnumerable<AuthorVM> GetAuthorsCorfo(IElement node, string selector)
         {
             return node?.QuerySelector(selector).TextContent.Split(';')
                 .Select(nn =>

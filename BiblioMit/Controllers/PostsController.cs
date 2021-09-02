@@ -31,7 +31,7 @@ namespace BiblioMit.Controllers
             _userManager = userManager;
             _userService = userService;
         }
-        
+        [HttpGet]
         public IActionResult Index(int Id)
         {
             var post = _postService.GetById(Id);

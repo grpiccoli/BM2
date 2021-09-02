@@ -1,4 +1,4 @@
-﻿@{ var Model = new BiblioMit.Models.ViewModels.FilterVM
+﻿@{ var Model = new BiblioMit.Models.ViewModels.FilterVM((string[])ViewData["val"])
     {
         Controller = (string)ViewData["controller"],
         Action = (string)ViewData["action"],
@@ -6,7 +6,6 @@
         Asc = (bool)ViewData["asc"],
         Rpp = (int)ViewData["rpp"]
     };
-    Model.Val.AddRange((string[])ViewData["val"]);
 }
 
 @this.Block("Scripts", @<script>

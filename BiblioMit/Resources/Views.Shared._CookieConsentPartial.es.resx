@@ -126,4 +126,10 @@
   <data name="Learn More" xml:space="preserve">
     <value>Más Info</value>
   </data>
+  <data name="Ok, thanks" xml:space="preserve">
+    <value>Ok</value>
+  </data>
+  <data name="We use cookies to improve your website experience" xml:space="preserve">
+    <value>Usamos cookies para mejorar tu experiencia de usuario</value>
+  </data>
 </root>

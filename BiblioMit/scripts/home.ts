@@ -1,7 +1,9 @@
-﻿function setStyles() {
-    $("nav").removeClass("bg-dark");
-    $("footer a").removeClass("text-dark").addClass("text-light");
-    $("img[alt='epic solutions']").attr("src", "epic_light_hor.svg");
+﻿function setStyles(lightPage: boolean) {
+    document.querySelector("nav").classList.toggle("bg-dark", lightPage);
+    var foot = document.querySelector("footer a").classList;
+    foot.toggle("text-dark", lightPage)
+    foot.toggle("text-light", !lightPage);
+    (document.querySelector("img[alt='epic solutions']") as HTMLImageElement).src = lightPage ? "epic_hor.svg" : "epic_light_hor.svg";
 }
 function getAverageColourAsRGB(img: HTMLImageElement) {
     var canvas = document.createElement('canvas'),
@@ -64,6 +66,6 @@ function setContrast() {
     var isLight = brightness > 250;
     $("nav").toggleClass("navbar-dark", !isLight).toggleClass("navbar-light", isLight);
 }
-document.addEventListener("DOMContentLoaded", setStyles);
+//document.addEventListener("DOMContentLoaded", setStyles);
 //document.addEventListener("DOMContentLoaded", setContrast);
 //document.addEventListener("slid.bs.carousel", setContrast);

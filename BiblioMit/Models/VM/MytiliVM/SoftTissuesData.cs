@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
 
 namespace BiblioMit.Models.ViewModels
 {
     public static class SoftTissuesData
     {
-        public static List<Tissue> Tissues { get; } = new List<Tissue>
+        public static Collection<Tissue> Tissues { get; } = new Collection<Tissue>
                                                             {
                                                                 Tissue.DigestiveGland,
                                                                 Tissue.Foot,

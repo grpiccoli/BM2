@@ -116,7 +116,7 @@ namespace BiblioMit.Services
             if (files.Any())
             {
                 Task response1 = await AddRangeAsync(pwd, files).ConfigureAwait(false);
-                if (!response1.IsCompletedSuccessfully) throw new Exception(_localizer["Error when adding Plankton records"]);
+                if (!response1.IsCompletedSuccessfully) throw new InvalidOperationException(_localizer["Error when adding Plankton records"]);
             }
             var context = _httpContext.HttpContext;
             var userId = string.Empty;
@@ -395,7 +395,7 @@ namespace BiblioMit.Services
                         t = t.GetGenericArguments().Single();
                     }
                 }
-                var data = new Tdata
+                var data = new Tdata(r.Headers.Select(h => h.NormalizedName))
                 {
                     FieldName = t.Name,
                     Name = dt.Name,
@@ -404,14 +404,13 @@ namespace BiblioMit.Services
                     DecimalSeparator = r.DecimalSeparator,
                     DeleteAfter2ndNegative = r.DeleteAfter2ndNegative
                 };
-                data.Q.AddRangeOverride(r.Headers.Select(h => h.NormalizedName));
                 return data;
             }).Select(t => t.Result).Where(t => t != null).ToList();
             FirstOrDefaultAsyncMethod = typeof(EntityFrameworkQueryableExtensions).GetMethods(BindingFlags.Static | BindingFlags.Public)
                 .FirstOrDefault(m => m.Name == nameof(EntityFrameworkQueryableExtensions.FirstOrDefaultAsync) && m.GetParameters().Length == 3);
             if (FirstOrDefaultAsyncMethod == null)
             {
-                throw new Exception(_localizer[$"Cannot find \"System.Linq.FirstOrDefault\" method."]);
+                throw new InvalidOperationException(_localizer[$"Cannot find \"System.Linq.FirstOrDefault\" method."]);
             }
             if (type == typeof(PlanktonAssay))
             {
@@ -792,8 +791,8 @@ namespace BiblioMit.Services
             if (matrix == null) throw new ArgumentNullException($"matrix null error: {matrix}");
             if(!(matrix.ContainsKey((1, StartRow))
                 && PhytoStart.Headers.Any(h => h.NormalizedName == matrix.GetValue(1, StartRow))))
-                StartRow = matrix.SearchHeaders(PhytoStart.Headers.Select(h => h.NormalizedName).ToList()).Item2;
-            int end = matrix.SearchHeaders(PhytoEnd.Headers.Select(h => h.NormalizedName).ToList()).Item2;
+                StartRow = matrix.SearchHeaders(PhytoStart.Headers.Select(h => h.NormalizedName)).Item2;
+            int end = matrix.SearchHeaders(PhytoEnd.Headers.Select(h => h.NormalizedName)).Item2;
             if (end == 0 || StartRow == 0) 
                 throw new InputFormatterException($"start {PhytoStart.Description} or end {PhytoEnd.Description} not found");
             PlanktonAssay item = Activator.CreateInstance<PlanktonAssay>();
@@ -818,7 +817,7 @@ namespace BiblioMit.Services
             //check db for centre || psmb
             item.Psmb = await ParsePsmb(item).ConfigureAwait(false);
             if (item.PsmbId == 0 && item.Psmb == null)
-                throw new Exception($"No se pudo encontrar un Psmb o Centro válido para la declaración {item.Id} con fecha {item.SamplingDate}");
+                throw new InvalidOperationException($"No se pudo encontrar un Psmb o Centro válido para la declaración {item.Id} con fecha {item.SamplingDate}");
             //Get Phytos
             int groupId = 0;
             var speciesInFile = new HashSet<string>();
@@ -1022,7 +1021,7 @@ namespace BiblioMit.Services
             var dbSet = _context.Set<TEntity>();
             if (dbSet == null)
             {
-                throw new Exception($"{entityType} DB Contexts doesn't contains collection for this type.");
+                throw new InvalidOperationException($"{entityType} DB Contexts doesn't contains collection for this type.");
             }
             //get method
             var firstOrDefaultAsyncMethod = FirstOrDefaultAsyncMethod.MakeGenericMethod(entityType);
@@ -1237,7 +1236,7 @@ namespace BiblioMit.Services
                 nameof(Int32) => val.ParseInt(data.DeleteAfter2ndNegative, data.Operation),
                 nameof(Double) => val.ParseDouble(data.DecimalPlaces, data.DecimalSeparator,
                     data.DeleteAfter2ndNegative, data.Operation),
-                nameof(Boolean) => val[0] != 'N' || val[0] != 'F',
+                nameof(Boolean) => !val.ToUpperInvariant()[0].Equals('N') || val.ToUpperInvariant()[0].Equals('F'),
                 nameof(DateTime) => val.ParseDateTime(),
                 nameof(ProductionType) => val.ParseProductionType(),
                 nameof(Item) => val.ParseItem(),
@@ -1256,9 +1255,14 @@ namespace BiblioMit.Services
     }
     public class Tdata
     {
+        public Tdata() { }
+        public Tdata(IEnumerable<string> q)
+        {
+            Q = q;
+        }
         public string Name { get; set; }
         public string FieldName { get; set; }
-        public List<string> Q { get; } = new List<string>();
+        public IEnumerable<string> Q { get; internal set; }
         public string Operation { get; set; }
         public int? DecimalPlaces { get; set; }
         public char? DecimalSeparator { get; set; }

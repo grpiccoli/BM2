@@ -1,34 +1,10 @@
 ﻿@{
     ViewData["Title"] = "Manual";
+    BiblioMit.Models.VM.CSPTag.ScriptSrcElem.Add("'sha256-GJEZQIls++rklF1U8TzbLzeL533WmMBxQfECyLGzoxY='");
 }
 
-@section Styles{
-    <style>
-        header {
-            height: calc(100vh - 66px);
-        }
+<partial name="_Libs" model='new List<string> { "flowpaper" }' />
 
-        iframe {
-            width: 100vw;
-            height: calc(100vh - 66px);
-        }
-        footer{
-            background: linear-gradient(transparent,black) !important;
-            opacity: 0.5;
-        }
-    </style>
-}
-
-@section Scripts{
-    <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        $("footer a").removeClass("text-dark").addClass("text-light");
-        $("img[alt='epic solutions']").attr("src", "epic_light_hor.svg");
-    });
-    </script>
-}
-
-@section Header{
-    <iframe src="~/MANUAL_DE_USO_BIBLIOMIT/MANUAL_DE_USO_BIBLIOMIT.html"
-            title="@Localizer["User Manual"]"></iframe>
+@section Headers{
+    <iframe src="~/flowpaper/MANUAL_DE_USO_BIBLIOMIT.html" title="@Localizer["User Manual"]"></iframe>
 }

@@ -6,6 +6,7 @@ using BiblioMit.Models.Entities.Centres;
 using BiblioMit.Models.Entities.Digest;
 using BiblioMit.Models.Entities.Environmental;
 using BiblioMit.Models.Entities.Environmental.Plancton;
+using BiblioMit.Models.Entities.Ads;
 
 namespace BiblioMit.Data
 {
@@ -15,13 +16,13 @@ namespace BiblioMit.Data
             : base(options)
         {
         }
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(modelBuilder);
+            base.OnModelCreating(builder);
             // Customize the ASP.NET Identity model and override the defaults if needed.
             // For example, you can rename the ASP.NET Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);
-            modelBuilder?.Entity<ApplicationUser>(b =>
+            builder?.Entity<ApplicationUser>(b =>
             {
                 // Each User can have many UserClaims
                 b.HasMany(e => e.Claims)
@@ -33,13 +34,13 @@ namespace BiblioMit.Data
                 .HasForeignKey(ur => ur.UserId)
                 .IsRequired();
             });
-            modelBuilder.Entity<ApplicationRole>()
+            builder.Entity<ApplicationRole>()
                 .HasMany(e => e.Users)
                 .WithOne()
                 .HasForeignKey(e => e.RoleId)
                 .IsRequired();
 
-            modelBuilder.Entity<PlantProduct>(a => {
+            builder.Entity<PlantProduct>(a => {
                 a.HasKey(p => new { p.PlantId, p.ProductId });
 
                 a.HasOne(md => md.Plant)
@@ -50,7 +51,7 @@ namespace BiblioMit.Data
                     .WithMany(d => d.Plants)
                     .HasForeignKey(md => md.ProductId);
             });
-            modelBuilder.Entity<PlanktonAssayEmail>(a => {
+            builder.Entity<PlanktonAssayEmail>(a => {
                 a.HasKey(p => new { p.PlanktonAssayId, p.EmailId });
 
                 a.HasOne(md => md.PlanktonAssay)
@@ -61,7 +62,7 @@ namespace BiblioMit.Data
                     .WithMany(d => d.PlanktonAssayEmails)
                     .HasForeignKey(md => md.EmailId);
             });
-            modelBuilder.Entity<Phytoplankton>(a => {
+            builder.Entity<Phytoplankton>(a => {
                 a.HasKey(p => new { p.PlanktonAssayId, p.SpeciesId });
                 
                 a.HasOne(md => md.PlanktonAssay)
@@ -72,53 +73,53 @@ namespace BiblioMit.Data
                     .WithMany(d => d.Phytoplanktons)
                     .HasForeignKey(md => md.SpeciesId);
             });
-            modelBuilder.Entity<Analist>(a =>
+            builder.Entity<Analist>(a =>
             {
                 a.HasIndex(p => p.NormalizedName).IsUnique();
                 a.Property(p => p.NormalizedName).IsRequired();
             });
-            modelBuilder.Entity<SamplingEntity>(s =>
+            builder.Entity<SamplingEntity>(s =>
             {
                 s.HasIndex(p => p.NormalizedName).IsUnique();
                 s.Property(p => p.NormalizedName).IsRequired();
             });
-            modelBuilder.Entity<Email>(e =>
+            builder.Entity<Email>(e =>
             {
                 e.HasIndex(p => p.Address).IsUnique();
                 e.Property(p => p.Address).IsRequired();
             });
-            modelBuilder.Entity<Laboratory>(l =>
+            builder.Entity<Laboratory>(l =>
             {
                 l.HasIndex(p => p.NormalizedName).IsUnique();
                 l.Property(p => p.NormalizedName).IsRequired();
             });
-            modelBuilder.Entity<Station>(s =>
+            builder.Entity<Station>(s =>
             {
                 s.HasIndex(p => p.NormalizedName).IsUnique();
                 s.Property(p => p.NormalizedName).IsRequired();
             });
-            modelBuilder.Entity<PhylogeneticGroup>(s =>
+            builder.Entity<PhylogeneticGroup>(s =>
             {
                 s.HasIndex(p => p.NormalizedName).IsUnique();
                 s.Property(p => p.NormalizedName).IsRequired();
             });
-            modelBuilder.Entity<GenusPhytoplankton>(s =>
+            builder.Entity<GenusPhytoplankton>(s =>
             {
                 s.HasIndex(p => p.NormalizedName).IsUnique();
                 s.Property(p => p.NormalizedName).IsRequired();
             });
-            modelBuilder.Entity<SpeciesPhytoplankton>(s =>
+            builder.Entity<SpeciesPhytoplankton>(s =>
             {
                 s.HasIndex(p => new { p.GenusId, p.NormalizedName }).IsUnique();
                 s.Property(p => p.GenusId).IsRequired();
                 s.Property(p => p.NormalizedName).IsRequired();
             });
-            modelBuilder.Entity<Phone>(s =>
+            builder.Entity<Phone>(s =>
             {
                 s.HasIndex(p => p.Number).IsUnique();
                 s.Property(p => p.Number).IsRequired();
             });
-            modelBuilder.Entity<AreaCodeProvince>(a => {
+            builder.Entity<AreaCodeProvince>(a => {
                 a.HasKey(p => new { p.AreaCodeId, p.ProvinceId });
 
                 a.HasOne(md => md.AreaCode)
@@ -129,12 +130,12 @@ namespace BiblioMit.Data
                     .WithMany(d => d.AreaCodeProvinces)
                     .HasForeignKey(md => md.ProvinceId);
             });
-            modelBuilder.Entity<Commune>()
+            builder.Entity<Commune>()
                 .HasOne(p => p.Province)
                 .WithMany(p => p.Communes)
                 .HasForeignKey(i => i.ProvinceId)
                 .OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<Province>(r =>
+            builder.Entity<Province>(r =>
             {
                 r.HasOne(p => p.Region)
                 .WithMany(p => p.Provinces)
@@ -145,12 +146,12 @@ namespace BiblioMit.Data
                 .HasForeignKey(c => c.ProvinceId)
                 .OnDelete(DeleteBehavior.Restrict);
             });
-            modelBuilder.Entity<Region>()
+            builder.Entity<Region>()
                 .HasMany(r => r.Provinces)
                 .WithOne(p => p.Region)
                 .HasForeignKey(r => r.RegionId)
                 .OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<Polygon>(p => 
+            builder.Entity<Polygon>(p => 
             {
                 p.HasOne(p => p.Psmb)
                 .WithOne(p => p.Polygon)
@@ -162,7 +163,7 @@ namespace BiblioMit.Data
                 .HasForeignKey<CatchmentArea>(i => i.PolygonId)
                 .OnDelete(DeleteBehavior.Restrict);
             });
-            modelBuilder.Entity<Psmb>(a => {
+            builder.Entity<Psmb>(a => {
                 a.HasIndex(p => new { p.Code, p.CommuneId }).IsUnique();
                 a.Property(p => p.Code).IsRequired();
                 a.HasIndex(p => p.Acronym).IsUnique();
@@ -174,12 +175,12 @@ namespace BiblioMit.Data
                 .HasValue<PsmbArea>(PsmbType.PsmbArea)
                 .HasValue<ResearchCentre>(PsmbType.ResearchCentre);
             });
-            modelBuilder.Entity<Locality>()
+            builder.Entity<Locality>()
                 .HasDiscriminator<LocalityType>(nameof(Locality.Discriminator))
                 .HasValue<Region>(LocalityType.Region)
                 .HasValue<Province>(LocalityType.Province)
                 .HasValue<Commune>(LocalityType.Commune);
-            modelBuilder.Entity<SernapescaDeclaration>(d =>
+            builder.Entity<SernapescaDeclaration>(d =>
             {
                 d.HasDiscriminator<DeclarationType>(nameof(SernapescaDeclaration.Discriminator))
                 .HasValue<SeedDeclaration>(DeclarationType.Seed)
@@ -190,13 +191,19 @@ namespace BiblioMit.Data
                 d.Property(p => p.DeclarationNumber).IsRequired();
                 d.Property(p => p.Discriminator).IsRequired();
             });
-            modelBuilder.Entity<DeclarationDate>(d => 
+            builder.Entity<DeclarationDate>(d => 
             {
                 d.HasIndex(p => new { p.SernapescaDeclarationId, p.Date, p.RawMaterial, p.ProductionType, p.ItemType }).IsUnique();
                 d.Property(p => p.SernapescaDeclarationId).IsRequired();
                 d.Property(p => p.Date).IsRequired();
             });
         }
+        public DbSet<Payment> Payments { get; set; }
+        public DbSet<Banner> Banners { get; set; }
+        public DbSet<Btn> Btns { get; set; }
+        public DbSet<Caption> Captions { get; set; }
+        public DbSet<Img> Imgs { get; set; }
+        public DbSet<Rgb> Rgbs { get; set; }
         public DbSet<DeclarationDate> DeclarationDates { get; set; }
         public DbSet<SupplyDeclaration> SupplyDeclarations { get; set; }
         public DbSet<HarvestDeclaration> HarvestDeclarations { get; set; }

@@ -46,6 +46,7 @@ namespace BiblioMit.Controllers
         }
 
         // GET: Entries
+        [HttpGet]
         public IActionResult Index(int? id, int? pg, int? rpp, string srt,
             bool? asc, string[] val)
         {
@@ -79,7 +80,7 @@ namespace BiblioMit.Controllers
             Filters["Tipo"] = new List<string> { "Semilla", "Cosecha", "Abastecimiento", "Producción" };
             //}
 
-            ViewData[nameof(DeclarationType)] = DeclarationType.Supply.Enum2MultiSelect(Filters, "Name");
+            ViewData[nameof(DeclarationType)] = DeclarationType.Supply.Enum2MultiSelect(Filters[typeof(DeclarationType).ToString()], "Name");
 
             ViewData["Date"] = string.Format(CultureInfo.CurrentCulture, "'{0}'",
                 string.Join("','", _context.SernapescaEntries.Select(v => v.Date.Date.ToString("yyyy-M-d", CultureInfo.CurrentCulture)).Distinct().ToList()));
@@ -88,6 +89,7 @@ namespace BiblioMit.Controllers
         }
 
         // GET: Entries/Details/5
+        [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -176,7 +178,7 @@ namespace BiblioMit.Controllers
                 var result = string.Empty;
 
                 Stream stream = entry.InputFile.OpenReadStream();
-                using ExcelPackage package = new ExcelPackage(stream);
+                using ExcelPackage package = new(stream);
                 var t = entry.DeclarationType switch
                 {
                     DeclarationType.Seed => await _import.ReadAsync<SeedDeclaration>(package, entry).ConfigureAwait(false),
@@ -192,10 +194,11 @@ namespace BiblioMit.Controllers
                 ["Tipo"] = DeclarationType.Supply.Enum2ListNames().ToList()
             };
 
-            ViewData[nameof(DeclarationType)] = DeclarationType.Supply.Enum2MultiSelect(Filters, "Name");
+            ViewData[nameof(DeclarationType)] = DeclarationType.Supply.Enum2MultiSelect(Filters[typeof(DeclarationType).ToString()], "Name");
             return View(entry);
         }
         // GET: Entries/Edit/5
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -252,6 +255,7 @@ namespace BiblioMit.Controllers
             return View(entry);
         }
         // GET: Entries/Delete/5
+        [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using BiblioMit.Models.Entities.Ads;
 
 namespace BiblioMit.Models
 {
@@ -18,11 +19,12 @@ namespace BiblioMit.Models
         /// <summary>
         /// Navigation property for the roles this user belongs to.
         /// </summary>
-        public virtual ICollection<IdentityUserRole<string>> UserRoles { get; } = new List<IdentityUserRole<string>>();
+        public virtual IEnumerable<IdentityUserRole<string>> UserRoles { get; internal set; }
         /// <summary>
         /// Navigation property for the claims this user possesses.
         /// </summary>
-        public virtual ICollection<IdentityUserClaim<string>> Claims { get; } = new List<IdentityUserClaim<string>>();
+        public virtual IEnumerable<IdentityUserClaim<string>> Claims { get; internal set; }
+        public virtual ICollection<Banner> Banners { get; internal set; }
         //public virtual ICollection<PlataformaUser> Plataforma { get; } = new List<PlataformaUser>();
     }
 }

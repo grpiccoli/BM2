@@ -15,11 +15,19 @@
     var returnUrl = string.IsNullOrEmpty(Context.Request.Path) ? "~/" : $"~{Context.Request.Path.Value}{Context.Request.QueryString}";
 }
 
-<li class="nav-item dropdown text-center m-0">
-    <a class="nav-link dropdown-toggle" id="lang" role="button" data-mdb-toggle="dropdown"
+<li class="nav-item dropdown text-lg-center m-0">
+    <a class="nav-link dropdown-toggle" id="lang" role="button" data-bs-toggle="dropdown"
        aria-expanded="false">
         <div>
-            <i class="flag flag-@Localizer["gb"] m-0"></i>
+            <span class="flag flag-@Localizer["uk"] m-0">
+                <span class="path1"></span>
+                <span class="path2"></span>
+                <span class="path3"></span>
+                <span class="path4"></span>
+                <span class="path5"></span>
+                <span class="path6"></span>
+                <span class="path7"></span>
+            </span>
         </div>
         <span class="small">@Localizer["English"]</span>
     </a>
@@ -28,12 +36,20 @@
             <form id="selectLanguage" asp-controller="Home"
                   asp-action="SetLanguage" asp-route-returnUrl="@returnUrl"
                   method="post" role="form" asp-route-culture="@Localizer["es"].Value">
-                <a class="dropdown-item" onclick="$('#selectLanguage').submit();">
-                    <i class="flag flag-@Localizer["cl"]"></i> 
+                <button type="submit" class="dropdown-item">
+                    <span class="flag flag-@Localizer["cl"]">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                        <span class="path3"></span>
+                        <span class="path4"></span>
+                        <span class="path5"></span>
+                        <span class="path6"></span>
+                        <span class="path7"></span>
+                    </span> 
                     <span class="small">
                         @Localizer["Español"]
                     </span>
-                </a>
+                </button>
             </form>
         </li>
     </ul>

@@ -79,7 +79,7 @@ namespace BiblioMit.Services
             var pages = await browser.PagesAsync().ConfigureAwait(false);
             return pages[0];
         }
-        public async Task<Page> ForceGetPageAsync(Uri uri, List<string> block)
+        public async Task<Page> ForceGetPageAsync(Uri uri, ICollection<string> block)
         {
             var open = true;
             Page page = null;
@@ -99,7 +99,7 @@ namespace BiblioMit.Services
             };
             return page;
         }
-        public async Task<Page> GetPageAsync(Uri uri, List<string> block)
+        public async Task<Page> GetPageAsync(Uri uri, ICollection<string> block)
         {
             var browser = await GetBrowserAsync().ConfigureAwait(false);
             var pages = await browser.PagesAsync().ConfigureAwait(false);

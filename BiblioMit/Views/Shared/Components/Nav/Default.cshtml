@@ -1,31 +1,66 @@
-﻿@model List<BiblioMit.Views.Shared.Components.Nav.NavDDwnVM>
+﻿@model List<BiblioMit.Views.Components.Nav.NavDDwnVM>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark d-lg-block fixed-top m-0 p-0">
-    <div class="container-fluid m-0 p-0">
+<nav class="navbar navbar-expand-lg navbar-dark d-lg-block fixed-top m-0 p-0 @ViewData["navbar-bg"]">
+    <div class="container-fluid justify-content-start m-0 p-0 p-lg-0">
+        <button class="navbar-toggler p-2" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarMain" aria-controls="navbarMain"
+                aria-expanded="false" aria-label="Ver herramientas">
+            <span class="navbar-toggler-icon"></span>
+        </button>
         <!-- Navbar brand -->
-        <a class="navbar-brand p-3" href="#">
-            <div>
+        <a class="navbar-brand mr-auto mr-lg-3 ml-3 ml-lg-0 p-2" href="#">
+            <span>
                 <img src="~/images/ico/bibliomit.svg"
                      height="35" width="35"
                      alt="bibliomit icon"
                      loading="lazy" />
-            </div>
+            </span>
             BiblioMit
         </a>
-        <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#navbarApps" aria-controls="navbarApps" aria-expanded="false" aria-label="Ver herramientas">
-            <i class="fas fa-bars text-light"></i>
-        </button>
+        <div class="overlay d-flex d-lg-none" onclick="this.parentNode.firstChild.click"></div>
         <!-- Collapsible wrapper -->
-        <div class="collapse navbar-collapse" id="navbarApps">
+        <div class="collapse navbar-collapse sidebar" id="navbarMain">
             <ul class="navbar-nav me-auto mt-lg-0">
                 @foreach (var v in Model)
                 {
                     <partial name="_NavDDwn" model='v' />
                 }
             </ul>
-            <ul class="navbar-nav ms-auto d-flex flex-row">
+            <ul class="navbar-nav ms-auto mt-lg-0">
                 <partial name="_LoginPartial" model="new LoginViewModel()" />
             </ul>
         </div>
     </div>
 </nav>
+@*<div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" 
+     data-bs-mode="over" data-bs-hidden="true" data-bs-accordion="true" id="sidenav"
+     style="width: 240px; height: 100vh; position: fixed; transition: all 0.3s linear 0s; transform: translateX(0%); z-index: 10;">
+    <a class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none" data-bs-ripple-color="primary" href="#">
+        <span>
+            <img src="~/images/ico/bibliomit.svg"
+                 height="35" width="35"
+                 alt="bibliomit icon"
+                 loading="lazy" />
+        </span>
+        BiblioMit
+    </a>
+    <hr />
+    <ul class="nav nav-pills flex-column mb-auto">
+        @foreach (var v in Model)
+        {
+            <partial name="_SideNav" model='v' />
+        }
+        <li class="nav-item">
+            <a class="nav-link active">
+                <i class="far fa-smile me-3"></i><span data-bs-slim="false" style="display: unset;">Link 1</span>
+            </a>
+        </li>
+    </ul>
+    <ul class="nav nav-pills flex-column mb-auto">
+        <li class="sidenav-item">
+            <button id="slim-toggler" class="btn btn-primary ripple-surface" style="min-width: 124px;">
+                <i class="fas fa-bars text-light"></i>
+            </button>
+        </li>
+    </ul>
+</div>*@

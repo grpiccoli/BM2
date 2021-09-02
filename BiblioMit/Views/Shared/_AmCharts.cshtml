@@ -1,5 +1,9 @@
 ﻿@model string
-@{ string version = string.IsNullOrWhiteSpace(Model) ? "4" : Model; }
+@{ 
+    string version = string.IsNullOrWhiteSpace(Model) ? "4" : Model;
+    BiblioMit.Models.VM.CSPTag.ScriptSrcElem.Add("https://www.amcharts.com/");
+    BiblioMit.Models.VM.CSPTag.StyleSrcElem.Add("'unsafe-inline'");
+}
 @if (version[0] == '4')
 {
     @this.Blocks("TOPScripts",
@@ -12,9 +16,23 @@
 }
 else
 {
-    @this.Blocks("TOPScripts", 
+    @this.Blocks("TOPScripts",
     @<script src="https://www.amcharts.com/lib/@version/amcharts.js"></script>,
+    @<script src="https://www.amcharts.com/lib/@version/ammap.js"></script>,
     @<script src="https://www.amcharts.com/lib/@version/pie.js"></script>,
     @<script src="https://www.amcharts.com/lib/@version/gauge.js"></script>,
-    @<script src="https://www.amcharts.com/lib/@version/plugins/export/export.js"></script>)
+    @<script src="https://www.amcharts.com/lib/@version/themes/light.js"></script>,
+    @<script src="https://www.amcharts.com/lib/@version/xy.js"></script>,
+    @<script src="https://www.amcharts.com/lib/@version/serial.js"></script>,
+    @<script src="https://www.amcharts.com/lib/@version/plugins/dataloader/dataloader.min.js"></script>,
+    @<script src="https://www.amcharts.com/lib/@version/plugins/export/export.js"></script>);
+
+    var lang = Localizer["en"].Value;
+    if(lang != "en")
+    {
+    @this.Blocks("TOPScripts",
+    @<script src="https://www.amcharts.com/lib/@version/lang/@(Localizer["en"]).js"></script>);
+
+    }
+
 }

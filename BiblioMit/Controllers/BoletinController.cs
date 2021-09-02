@@ -85,6 +85,7 @@ namespace BiblioMit.Views
         private IQueryable<PlanktonAssay> GetAssays(int reg) => _context.PlanktonAssays.Where(a => a.Psmb.Commune.Province.RegionId == reg);
         [AllowAnonymous]
         [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" })]
+        [HttpGet]
         public async Task<JsonResult> GetXlsx(int year, int start, int end)
         {
             var config = new Config(year, start, end)
@@ -165,6 +166,7 @@ namespace BiblioMit.Views
         }
         [AllowAnonymous]
         [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "tipo", "year", "start", "end" })]
+        [HttpGet]
         public JsonResult GetProvincias(int tipo, int year, int start, int end)
         {
             var config = new Config(year, start, end);
@@ -225,6 +227,7 @@ namespace BiblioMit.Views
         }
         [AllowAnonymous]
         [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" })]
+        [HttpGet]
         public JsonResult GetComunas(int tipo, int year, int start, int end, bool tb)
         {
             if (!tb && tipo == (int)DeclarationType.Production) tipo += 10;
@@ -301,6 +304,7 @@ namespace BiblioMit.Views
 
         [AllowAnonymous]
         [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" })]
+        [HttpGet]
         public JsonResult GetMeses(int tipo, int year, int start, int end)
         {
             var config = new Config(year, start, end);
@@ -346,11 +350,13 @@ namespace BiblioMit.Views
             };
         }
         [AllowAnonymous]
+        [HttpGet]
         public ActionResult Index(int? yr, int? start, int? end, int? reg, int? ver, int? tp) =>
             RedirectToAction(nameof(Boletin), new { yr, start, end, reg, ver, tp });
 
         // GET: Boletin
         [AllowAnonymous]
+        [HttpGet]
         public ActionResult Boletin(int? yr, int? start, int? end, int? reg, int? ver, int? tp)
         {
             if (!reg.HasValue) reg = 110;
@@ -405,6 +411,7 @@ namespace BiblioMit.Views
         }
         [AllowAnonymous]
         [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" })]
+        [HttpGet]
         public JsonResult GetAttr(int tp)
         {
             var m = (DeclarationType)tp;
@@ -418,6 +425,7 @@ namespace BiblioMit.Views
         }
         [AllowAnonymous]
         [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "tipo", "year", "start", "end" })]
+        [HttpGet]
         public JsonResult GetRange(int yr)
         {
             var years = _context.DeclarationDates.Select(a => a.Date.Year).Distinct();
@@ -446,9 +454,11 @@ namespace BiblioMit.Views
         }
 
         // GET: Boletin/Details/5
+        [HttpGet]
         public ActionResult Details(int id) => View(id);
 
         // GET: Boletin/Create
+        [HttpGet]
         public ActionResult Create() => View();
 
         // POST: Boletin/Create
@@ -473,6 +483,7 @@ namespace BiblioMit.Views
         //}
 
         // GET: Boletin/Edit/5
+        [HttpGet]
         public ActionResult Edit(int id) => View(id);
 
         // POST: Boletin/Edit/5
@@ -488,6 +499,7 @@ namespace BiblioMit.Views
         //}
 
         // GET: Boletin/Delete/5
+        [HttpGet]
         public ActionResult Delete(int id) => View(id);
 
         // POST: Boletin/Delete/5

@@ -48,7 +48,7 @@ namespace BiblioMit.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync(Uri returnUrl = null)
         {
-            returnUrl ??= new Uri("~/");
+            returnUrl ??= new Uri("~/", UriKind.Relative);
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email };

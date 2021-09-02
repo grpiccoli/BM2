@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -87,12 +88,12 @@ namespace BiblioMit.Extensions
             var rowParsed = int.TryParse(cell[startIndex..], out int row);
             return rowParsed ? $"{(column.GetColumn() + columns).GetColumn()}{row + rows}" : null;
         }
-        public static List<int> AllIndexesOf(this string str, string value)
+        public static Collection<int> AllIndexesOf(this string str, string value)
         {
             if (string.IsNullOrEmpty(value) || string.IsNullOrEmpty(str))
                 //throw new ArgumentException("El texto a buscar no puede estar vacío", nameof(value));
                 return null;
-            List<int> indexes = new();
+            Collection<int> indexes = new();
             for (int index = 0; ; index += value.Length)
             {
                 index = str.IndexOf(value, index, StringComparison.InvariantCultureIgnoreCase);

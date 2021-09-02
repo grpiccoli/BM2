@@ -80,10 +80,10 @@ namespace BiblioMit.Services
             return GetAll().OrderByDescending(p => p.Created).Take(n);
         }
 
-        public IEnumerable<Post> GetPostsByForum(int Id)
+        public IEnumerable<Post> GetPostsByForum(int id)
         {
             return _context.Forums
-                .Where(f => f.Id == Id)
+                .Where(f => f.Id == id)
                 .FirstOrDefault()
                 .Posts;
         }

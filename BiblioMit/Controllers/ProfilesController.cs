@@ -27,6 +27,7 @@ namespace BiblioMit.Controllers
         }
 
         [Authorize(Roles = "Administrador", Policy = "Foros")]
+        [HttpGet]
         public IActionResult Index()
         {
             var profiles = _userService.GetAll()
@@ -47,7 +48,7 @@ namespace BiblioMit.Controllers
 
             return View(model);
         }
-
+        [HttpGet]
         public IActionResult Details(string id)
         {
             var user = _userService.GetById(id);

@@ -7,14 +7,14 @@ namespace BiblioMit.Models.AccountViewModels
         [Required]
         [EmailAddress]
         [Display(Name = "Correo")]
-        public string Email { get; set; }
+        public string EmailLogin { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
         [Display(Name = "Contraseña")]
-        public string Password { get; set; }
+        public string PasswordLogin { get; set; }
 
         [Display(Name = "Remember me?")]
-        public bool RememberMe { get; set; }
+        public bool RememberMeLogin { get; set; }
     }
 }

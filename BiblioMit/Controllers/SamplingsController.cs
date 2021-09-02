@@ -33,6 +33,7 @@ namespace BiblioMit.Controllers
         }
 
         // GET: Samplings
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             var ApplicationDbContext = _context.Samplings
@@ -42,6 +43,7 @@ namespace BiblioMit.Controllers
         }
 
         // GET: Samplings/Details/5
+        [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -62,6 +64,7 @@ namespace BiblioMit.Controllers
         }
 
         // GET: Samplings/Create
+        [HttpGet]
         public IActionResult Create()
         {
             ViewData["CentreId"] = new SelectList(_context.Psmbs
@@ -90,6 +93,7 @@ namespace BiblioMit.Controllers
         }
 
         // GET: Samplings/Edit/5
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -116,7 +120,7 @@ namespace BiblioMit.Controllers
                 .Include(i => i.Individuals)
                 .SingleOrDefaultAsync(s => s.Id == sampleId).ConfigureAwait(false);
 
-            Individual model = new Individual
+            Individual model = new()
             {
                 SamplingId = sample.Id,
                 Sampling = sample
@@ -167,7 +171,7 @@ namespace BiblioMit.Controllers
             var degrees = from Degree e in Enum.GetValues(typeof(Degree))
                           select new { Id = e, Name = e.GetAttrName() };
             ViewData["Degree"] = new SelectList(degrees, "Id", "Name");
-            IndividualSoftTissueViewModel model = new IndividualSoftTissueViewModel()
+            IndividualSoftTissueViewModel model = new()
             {
                 Id = id,
                 SamplingId = sample,
@@ -185,7 +189,7 @@ namespace BiblioMit.Controllers
 
             if (tissue)
             {
-                model.Tissues.AddRange(Enum.GetValues(typeof(Tissue))
+                Enum.GetValues(typeof(Tissue))
                     .Cast<Tissue>()
                     .Select(t => new TissueView
                     {
@@ -194,7 +198,7 @@ namespace BiblioMit.Controllers
                         Degree = softs.Any(s => s.Tissue == t) ? softs.FirstOrDefault(s => s.Tissue == t).Degree : null,
                         Text = t.GetAttrName(),
                         Value = ((int)t).ToString(CultureInfo.InvariantCulture),
-                    }).ToList());
+                    }).ToList().ForEach(t => model.Tissues.Add(t));
             }
 
             if (count && !tissue)
@@ -513,6 +517,7 @@ namespace BiblioMit.Controllers
         }
 
         // GET: Samplings/Delete/5
+        [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)

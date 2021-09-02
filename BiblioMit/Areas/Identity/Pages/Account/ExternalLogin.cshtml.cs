@@ -58,7 +58,7 @@ namespace BiblioMit.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnGetCallbackAsync(Uri returnUrl = null, string remoteError = null)
         {
-            returnUrl ??= new Uri("~/");
+            returnUrl ??= new Uri(HttpContext.Request.Host.ToUriComponent());
             if (remoteError != null)
             {
                 ErrorMessage = $"Error from external provider: {remoteError}";
@@ -100,7 +100,7 @@ namespace BiblioMit.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostConfirmationAsync(Uri returnUrl = null)
         {
-            returnUrl ??= new Uri("~/");
+            returnUrl ??= new Uri(HttpContext.Request.Host.ToUriComponent());
             // Get the information about the user from the external login provider
             var info = await _signInManager.GetExternalLoginInfoAsync().ConfigureAwait(false);
             if (info == null)

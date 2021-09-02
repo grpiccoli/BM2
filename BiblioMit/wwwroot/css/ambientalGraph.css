@@ -1,0 +1,21 @@
+﻿.choices {
+  width: 100%; }
+
+.popover {
+  max-width: 700px; }
+
+#chartdiv, #legendwrapper, #map, #parameters {
+  width: 100%;
+  border: 1px dotted #c99;
+  margin: 1em 0; }
+
+#chartdiv, #legendwrapper, #map {
+  height: 275px; }
+
+#legenddiv {
+  height: 150px; }
+
+#legendwrapper {
+  max-height: 200px;
+  overflow-x: auto;
+  overflow-y: auto; }

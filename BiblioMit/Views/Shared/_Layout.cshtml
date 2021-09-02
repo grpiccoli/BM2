@@ -1,4 +1,28 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var body = RenderBody();
+
+    #region scripts
+    var topScript = this.WriteBlocks("TOPScripts");
+    var script = this.WriteBlocks("Scripts");
+    #endregion scripts
+
+    var serviceWorkerNonce = Hash.Nonce();
+    BiblioMit.Models.VM.CSPTag.ScriptSrcElem.Add($"'nonce-{serviceWorkerNonce}'");
+    if (!ViewData.Keys.Contains("Title"))
+    {
+        ViewData["controller"] = this.ViewContext.RouteData.Values["controller"].ToString();
+        ViewData["action"] = this.ViewContext.RouteData.Values["action"].ToString();
+        ViewData["Title"] = ViewData["controller"] + " " + ViewData["action"];
+    }
+    if (!ViewData.Keys.Contains("footer-text"))
+    {
+        ViewData["footer-text"] = "text-dark";
+        ViewData["footer-logo"] = "~/epic_hor.svg";
+        ViewData["navbar-bg"] = "bg-dark";
+    }
+}
+
+<!DOCTYPE html>
 <html lang="@Localizer["en"]">
 <head>
     <meta charset="utf-8" />
@@ -8,19 +32,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no, maximum-scale=5" />
     <title>@ViewData["Title"] - BiblioMit</title>
     <base href="~/" />
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-
-        gtag('config', 'UA-46146363-2');
-    </script>
-    <script>
-        window['GoogleAnalyticsObject'] = 'ga';
-        window['ga'] = window['ga'] || function () {
-            (window['ga'].q = window['ga'].q || []).push(arguments)
-        };
-    </script>
+    <script src="~/js/gtag.min.js" asp-append-version="true"></script>
     <meta name="author" content="Epic Solutions" />
     <meta name="description" content="@Localizer["Library and digital repository for Mytilus chilensis Mussel species"]" />
     <open-graph-website site-name="BiblioMit"
@@ -50,22 +62,8 @@
     CreatorUsername = "@guille_arp",
     SiteUsername = "@guille_arp"
 })
-    <!-- Google Tag Manager -->
-    @*<script src="~/js/google-ads.js"></script>*@
     <environment exclude="Development">
-        <script>
-            (function (e, t, n, i, s, a, c) {
-                e[n] = e[n] || function () { (e[n].q = e[n].q || []).push(arguments) }
-                    ; a = t.createElement(i); c = t.getElementsByTagName(i)[0]; a.async = true; a.src = s; c.parentNode.insertBefore(a, c)
-            })(window, document, "galite", "script", "https://cdn.jsdelivr.net/npm/ga-lite@2/dist/ga-lite.min.js");
-            galite('create', 'UA-46146363-2', 'auto');
-            galite('send', 'pageview');
-        </script>
-        <!-- End Google Tag Manager -->
-        <!-- Global site tag (gtag.js) - Google Analytics -->
-        @*<script async src="https://www.googletagmanager.com/gtag/js?id=UA-46146363-2"></script>*@
-        @*<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>*@
-        @*<script src="~/js/google-ads.min.js" asp-append-version="true"></script>*@
+        <script src="~/js/galite.min.js" asp-append-version="true"></script>
         <meta name="google-site-verification" content="g-pGvrm_POLRtvTDGYJTTkKtecLY11qo0zOeNVMY2Eg" />
     </environment>
     <partial name="_Favicons" />
@@ -96,22 +94,20 @@
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" />
 
-    <partial name="_TagLibs" model='("TOP", new List<string> { "jquery", "mdb-ui-kit", "@fortawesome/fontawesome-free", "site", "modal-action", "modernizr-custom" })' />
+    <partial name="_TagLibs" model='("TOP", new List<string> { "bootstrap", "@fortawesome/fontawesome-free", "flags", "jquery", "modernizr-custom", "layout" })' />
+
     @this.WriteBlocks("TOPStyles")
     @this.WriteBlocks("Styles")
     @RenderSection("Styles", required: false)
+    <meta http-equiv="Content-Security-Policy" content="@Html.Raw(BiblioMit.Models.VM.CSPTag.GetString(Context.Request.Host))" />
+    @{ BiblioMit.Models.VM.CSPTag.Clear(); }
 </head>
 <body>
-    <!-- Google Tag Manager (noscript) -->
-    @*<noscript>
-            <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W7K9PRH"
-                    height="0" width="0" style="display:none;visibility:hidden"></iframe>
-        </noscript>*@
-    <!-- End Google Tag Manager (noscript) -->
     <header>
         @await Component.InvokeAsync("Nav")
         @RenderSection("NavBar", required: false)
-        @RenderSection("Header", required: false)
+        @this.WriteBlocks("Headers")
+        @RenderSection("Headers", required: false)
     </header>
     <main role="main">
         <div class="body-content container-fluid">
@@ -130,27 +126,9 @@
                      greeting_dialog_display="fade"
                      greeting_dialog_delay="4">
                 </div>
-                <script>
-                var chatbox = document.getElementById('fb-customer-chat');
-                chatbox.setAttribute("page_id", "1350128371792150");
-                chatbox.setAttribute("attribution", "page_inbox");
-                window.fbAsyncInit = function () {
-                    FB.init({
-                        xfbml: true,
-                        version: 'v11.0'
-                    });
-                };
-
-                (function (d, s, id) {
-                    var js, fjs = d.getElementsByTagName(s)[0];
-                    if (d.getElementById(id)) return;
-                    js = d.createElement(s); js.id = id;
-                    js.src = 'https://connect.facebook.net/@Localizer["en_GB"]/sdk/xfbml.customerchat.js';
-                    fjs.parentNode.insertBefore(js, fjs);
-                }(document, 'script', 'facebook-jssdk'));
-                </script>
+                <script src="~/js/facebookChat.min.js" asp-append-version="true"></script>
             </environment>
-            @RenderBody()
+            @body
             <partial name="_Modal" model='new BootstrapModel { Id = "modal-action", AreaLabeledId = "modal-action-label", Size = ModalSize.Medium }' />
         </div>
     </main>
@@ -158,12 +136,12 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-6 text-center">
-                    <a target="_blank" href="https://www.epicsolutions.cl" rel="noopener" class="text-dark">
-                        <img src="~/epic_hor.svg" alt="epic solutions" class="img-responsive" height="15" asp-append-version="true" /> &copy; @DateTime.Now.Year - BiblioMit
+                    <a target="_blank" href="https://www.epicsolutions.cl" rel="noopener" class="@ViewData["footer-text"] btn">
+                        <img src="@ViewData["footer-logo"]" alt="epic solutions" class="img-responsive" height="15" asp-append-version="true" /> &copy; @DateTime.Now.Year - BiblioMit
                     </a>
                 </div>
                 <div class="col-6 text-center">
-                    <a asp-controller="Home" asp-action="Analytics" class="text-dark">
+                    <a asp-controller="Home" asp-action="Analytics" class="@ViewData["footer-text"] btn">
                         <i class="fas fa-poll fa-fw"></i>&emsp;@Localizer["Total number of visits"]&emsp;<span id="counter"></span>
                     </a>
                 </div>
@@ -171,8 +149,11 @@
         </div>
     </footer>
     @this.WriteBlocks("TOPScripts")
+    @*@topScript*@
     @RenderSection("ScripTop", required: false)
     @this.WriteBlocks("Scripts")
+    @*@script*@
     @RenderSection("Scripts", required: false)
+    <script nonce="@serviceWorkerNonce">'serviceWorker' in navigator && navigator.serviceWorker.register('/serviceworker')</script>
 </body>
 </html>

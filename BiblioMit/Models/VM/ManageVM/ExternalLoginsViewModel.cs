@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
@@ -9,9 +10,9 @@ namespace BiblioMit.Models.ManageViewModels
 {
     public class ExternalLoginsViewModel
     {
-        public List<UserLoginInfo> CurrentLogins { get; } = new List<UserLoginInfo>();
+        public Collection<UserLoginInfo> CurrentLogins { get; } = new Collection<UserLoginInfo>();
 
-        public List<AuthenticationScheme> OtherLogins { get; } = new List<AuthenticationScheme>();
+        public Collection<AuthenticationScheme> OtherLogins { get; } = new Collection<AuthenticationScheme>();
 
         public bool ShowRemoveButton { get; set; }
 

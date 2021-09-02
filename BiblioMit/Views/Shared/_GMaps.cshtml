@@ -1,6 +1,12 @@
-﻿@{
+﻿<partial name="_Libs" model='new List<string> { "gmaps" }' />
+@{
     var culture = CultureInfo.CurrentCulture.Name.Split("-");
     var key = "AIzaSyCkBD_nY7LaeVohfyIt-M2a2BuIhuy-51c";
     this.Block("TOPScripts",
         @<script src="https://maps.googleapis.com/maps/api/js?key=@key&language=@culture[0]"></script>);
+    BiblioMit.Models.VM.CSPTag.ImgSrc.Add("https://maps.gstatic.com/");
+    BiblioMit.Models.VM.CSPTag.ImgSrc.Add("https://maps.googleapis.com/");
+    BiblioMit.Models.VM.CSPTag.ScriptSrcElem.Add("https://maps.googleapis.com/");
+    BiblioMit.Models.VM.CSPTag.StyleSrc.Add("'unsafe-inline'");
+    BiblioMit.Models.VM.CSPTag.StyleSrcElem.Add("'unsafe-inline'");
 }

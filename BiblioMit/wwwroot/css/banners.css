@@ -1,0 +1,29 @@
+﻿/* Carousel styling */
+#introCarousel,
+.carousel-inner,
+.carousel-item,
+.carousel-item.active {
+  height: 100vh; }
+
+footer {
+  background: linear-gradient(transparent, black) !important;
+  opacity: 0.5; }
+
+.carousel-item {
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center; }
+
+#introCarousel {
+  margin-top: -61.4px; }
+
+/* Height for devices larger than 576px */
+@media (min-width: 992px) {
+  .navbar {
+    z-index: 2000;
+    display: none; }
+    .navbar .nav-link {
+      color: #fff !important; } }
+
+body {
+  overflow: hidden; }

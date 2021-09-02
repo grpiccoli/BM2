@@ -22,6 +22,7 @@ namespace BiblioMit.Controllers
         {
             _context = context;
         }
+        [HttpGet]
         public IActionResult GetMap(PsmbType type, int[] c, int[] i)
         {
             if (c == null || i == null) throw new ArgumentNullException($"Argument c {c} and i {i} cannot be null");
@@ -77,11 +78,14 @@ namespace BiblioMit.Controllers
             }
             return centres;
         }
+        [HttpGet]
         public IActionResult Producers(int[] c, int[] i) => View(GetPsmbs<Farm>(c, i));
         // GET: Centres
         [AllowAnonymous]
+        [HttpGet]
         public IActionResult Research(int[] c, int[] i) => View(GetPsmbs<ResearchCentre>(c, i));
         // GET: Centres/Details/5
+        [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -96,6 +100,7 @@ namespace BiblioMit.Controllers
 
         // GET: Centres/Create
         [Authorize(Roles = "Administrador", Policy = "Centros")]
+        [HttpGet]
         public IActionResult Create()
         {
             var isAuthorized = User.IsInRole(Constants.ContactAdministratorsRole);
@@ -143,6 +148,7 @@ namespace BiblioMit.Controllers
 
         // GET: Centres/Edit/5
         [Authorize(Roles = "Editor,Administrador", Policy = "Centros")]
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             var isAuthorized = User.IsInRole(Constants.ContactAdministratorsRole);
@@ -190,6 +196,7 @@ namespace BiblioMit.Controllers
 
         // GET: Centres/Delete/5
         [Authorize(Roles = "Administrador", Policy = "Centros")]
+        [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
             var isAuthorized = User.IsInRole(Constants.ContactAdministratorsRole);

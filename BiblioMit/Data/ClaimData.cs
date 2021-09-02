@@ -1,23 +1,18 @@
-﻿using System.Collections.Generic;
-
-namespace BiblioMit.Data
+﻿namespace BiblioMit.Data
 {
-    public static class ClaimData
-    {
-        internal static List<string> UserClaims { get; } = new List<string>
-                                                            {
-                                                                "Instituciones",
-                                                                "Centros",
-                                                                "Coordenadas",
-                                                                "Producciones",
-                                                                "Contactos",
-                                                                "Usuarios",
-                                                                "Foros",
-                                                                "per",
-                                                                "sernapesca",
-                                                                "intemit",
-                                                                "mitilidb",
-                                                                "webmaster"
-                                                            };
+    public enum UserClaims 
+    { 
+        Institutions,
+        Centres,
+        Coordenates,
+        Production,
+        Contacts,
+        Users,
+        Forums,
+        Banners,
+        Digest,
+        PSMB,
+        Mitilidb,
+        Webmaster
     }
 }

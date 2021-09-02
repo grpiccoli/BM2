@@ -2,7 +2,9 @@
 using BiblioMit.Authorization;
 using BiblioMit.Blazor;
 using BiblioMit.Data;
+using BiblioMit.Extensions;
 using BiblioMit.Models;
+using BiblioMit.Models.VM;
 using BiblioMit.Services;
 using BiblioMit.Services.Hubs;
 using BiblioMit.Services.Interfaces;
@@ -25,11 +27,10 @@ using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using WebEssentials.AspNetCore.Pwa;
 
+[assembly: CLSCompliant(false)]
 namespace BiblioMit
 {
     public class Startup
@@ -63,6 +64,7 @@ namespace BiblioMit
             services.AddScoped<ISeed, SeedService>();
             services.AddScoped<IUpdateJsons, UpdateJsons>();
             services.AddScoped<INodeService, NodeService>();
+            services.AddScoped<IBannerService, BannerService>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<IImport, ImportService>();
             services.AddScoped<ITableToExcel, TableToExcelService>();
@@ -90,13 +92,17 @@ namespace BiblioMit
             services.AddScoped<IViewRenderService, ViewRenderService>();
 
             services.Configure<CookiePolicyOptions>(options =>
+            {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true);
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.None;
+            });
             services.ConfigureApplicationCookie(options =>
             {
                 options.AccessDeniedPath = "/Identity/Account/AccessDenied";
                 options.Cookie.Name = "BiblioMit";
                 options.Cookie.HttpOnly = true;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None;
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
                 options.LoginPath = "/Identity/Account/Login";
@@ -152,7 +158,11 @@ namespace BiblioMit
                 ).AddJsonOptions(o => 
                     o.JsonSerializerOptions.IgnoreNullValues = true);
 
-            services.AddProgressiveWebApp(new PwaOptions { EnableCspNonce = true });
+            services.AddProgressiveWebApp(new PwaOptions {
+                RegisterServiceWorker = false,
+                RegisterWebmanifest = false,
+                EnableCspNonce = true 
+            });
 
             services.ConfigureNonBreakingSameSiteCookies();
 
@@ -172,13 +182,24 @@ namespace BiblioMit
 
             services.AddAuthorization(options =>
             {
-                foreach (var item in ClaimData.UserClaims)
-                {
-                    options.AddPolicy(item, policy => policy.RequireClaim(item, item));
-                }
+                UserClaims.Banners.Enum2ListNames().ForEach(item =>
+                    options.AddPolicy(item, policy => policy.RequireClaim(item, item))
+                );
             });
 
             services.AddUrlHelper();
+
+            services.Configure<FlowSettings>(o =>
+            {
+                var dev = true;
+                var flowEnv = dev ? "Sandbox" : "Production";
+                var preffix = dev ? "sandbox" : "www";
+                o.ApiKey = Configuration[$"Flow:{flowEnv}:ApiKey"];
+                o.SecretKey = Configuration[$"Flow:{flowEnv}:SecretKey"];
+                o.Currency = "CLP";
+                o.EndPoint = new Uri($"https://{preffix}.flow.cl/api");
+            });
+            services.AddScoped<IFlow, FlowService>();
 
             //services.AddCors();
 
@@ -187,6 +208,7 @@ namespace BiblioMit
             });
             Libman.LoadJson();
             Bundler.LoadJson();
+            WebCompiler.LoadJson();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -201,16 +223,15 @@ namespace BiblioMit
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                app.UseHsts();
+                app.UseHsts(hsts => hsts.MaxAge(365));
             }
             app.UseCookiePolicy();
 
-            //app.UseSitemapMiddleware();
-            //app.UseCors(o => o.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+            app.UseRedirectValidation();
 
-            app.UseDefaultFiles();
+            app.UseXContentTypeOptions();
+            app.UseReferrerPolicy(opts => opts.NoReferrer());
 
-            //app.UseHttpsRedirection();
             FileExtensionContentTypeProvider provider = new();
             provider.Mappings[".webmanifest"] = "application/manifest+json";
 
@@ -251,6 +272,8 @@ namespace BiblioMit
             });
 
             app.UseRequestLocalization(app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>().Value);
+
+            app.UseXfo(xfo => xfo.Deny());
 
             app.UseAuthentication();
 

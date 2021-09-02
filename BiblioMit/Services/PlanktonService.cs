@@ -51,7 +51,8 @@ namespace BiblioMit.Services
                 UseCookies = true,
                 UseDefaultCredentials = false,
                 CookieContainer = cookieJar,
-                AllowAutoRedirect = false
+                AllowAutoRedirect = false,
+                CheckCertificateRevocationList = true
             };
             using HttpClient client = new(handler);
             foreach (PlanktonUser user in await _context.PlanktonUsers.ToListAsync(stoppingToken).ConfigureAwait(false))

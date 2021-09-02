@@ -60,7 +60,7 @@ namespace BiblioMit.Areas.Identity.Pages.Account
                 return Page();
             }
 
-            returnUrl ??= new Uri("~/");
+            returnUrl ??= new Uri("~/", UriKind.Relative);
 
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync().ConfigureAwait(false);
             if (user == null)

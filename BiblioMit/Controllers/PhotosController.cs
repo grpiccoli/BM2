@@ -44,6 +44,7 @@ namespace BiblioMit.Controllers
         }
 
         [AllowAnonymous]
+        [HttpGet]
         public IActionResult Gallery()
         {
             //var url = $"~/colecci-n-virtual/index.html";
@@ -53,7 +54,7 @@ namespace BiblioMit.Controllers
             //else
             //    return RedirectToAction("Index", "Home");
         }
-
+        [HttpGet]
         public IActionResult GetImg(string f, string d)
         {
             var name = Regex.Replace(f, ".*/", "");
@@ -65,6 +66,7 @@ namespace BiblioMit.Controllers
         }
 
         // GET: Photos
+        [HttpGet]
         public async Task <IActionResult> Index()
         {
             var photos = await _context.Photos
@@ -132,6 +134,7 @@ namespace BiblioMit.Controllers
         }
 
         // GET: Photos/Details/5
+        [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -150,6 +153,7 @@ namespace BiblioMit.Controllers
         }
 
         // GET: Photos/Create
+        [HttpGet]
         public IActionResult Create()
         {
             ViewData["IndividualId"] = _context.Individuals.GroupBy(i => i.SamplingId);
@@ -233,6 +237,7 @@ namespace BiblioMit.Controllers
         //}
 
         // GET: Photos/Edit/5
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -287,6 +292,7 @@ namespace BiblioMit.Controllers
         }
 
         // GET: Photos/Delete/5
+        [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
