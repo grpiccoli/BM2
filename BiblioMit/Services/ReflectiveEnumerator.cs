@@ -12,7 +12,7 @@ namespace BiblioMit.Services
 
         public static IEnumerable<T> GetEnumerableOfType<T>(params object[] constructorArgs) where T: class
         {
-            List<T> objects = new List<T>();
+            List<T> objects = new();
             foreach(Type type in 
                 Assembly.GetAssembly(typeof(T)).GetTypes()
                 .Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(T))))

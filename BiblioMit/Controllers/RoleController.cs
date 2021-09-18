@@ -23,7 +23,7 @@ namespace BiblioMit.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            List<AppRoleListViewModel> model = new List<AppRoleListViewModel>();
+            List<AppRoleListViewModel> model = new();
             model = _roleManager.Roles.Select(r => new AppRoleListViewModel
             {
                 Id = r.Id,
@@ -38,7 +38,7 @@ namespace BiblioMit.Controllers
         [Authorize(Roles ="Editor,Administrator")]
         public async Task<PartialViewResult> AddEditAppRole(string id)
         {
-            AppRoleViewModel model = new AppRoleViewModel();
+            AppRoleViewModel model = new();
             if (!string.IsNullOrEmpty(id))
             {
                 ApplicationRole applicationRole = await _roleManager.FindByIdAsync(id).ConfigureAwait(false);

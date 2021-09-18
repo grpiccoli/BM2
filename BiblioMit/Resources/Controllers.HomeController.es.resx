@@ -123,4 +123,7 @@
   <data name="eng" xml:space="preserve">
     <value>esp</value>
   </data>
+  <data name="en_US" xml:space="preserve">
+    <value>es_ES</value>
+  </data>
 </root>

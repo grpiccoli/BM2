@@ -15,7 +15,7 @@ namespace BiblioMit.Controllers
     [ApiController]
     public class SitemapController : ControllerBase
     {
-        private static readonly List<Uri> lists = new List<Uri> { new Uri("https://www.bibliomit.cl") };
+        private static readonly List<Uri> lists = new() { new Uri("https://www.bibliomit.cl") };
         [Route("/sitemap.xml")]
         public async Task Invoke()
         {

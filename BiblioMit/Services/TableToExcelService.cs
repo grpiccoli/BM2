@@ -32,7 +32,7 @@ namespace BiblioMit.Services
         public async Task<ExcelPackage> ProcessAsync(Stream html)
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            ExcelPackage excel = new ExcelPackage();
+            ExcelPackage excel = new();
             sheet = excel.Workbook.Worksheets.Add("sheet1");
             var parser = new HtmlParser();
             var document = await parser.ParseDocumentAsync(html).ConfigureAwait(false);

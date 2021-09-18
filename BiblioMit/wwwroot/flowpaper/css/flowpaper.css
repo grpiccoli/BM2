@@ -1,5 +1,5 @@
 #toolbar_documentViewer > img.flowpaper_tbbutton.flowpaper_bttnFullscreen {
-    display: none;
+    display: none !important;
 }
 html, body {
     height: 100%;

@@ -53,6 +53,21 @@ namespace BiblioMit.Controllers
             _nodeService = nodeService;
         }
         [HttpGet]
+        [Route("flowpaper/MANUAL_DE_USO_BIBLIOMIT")]
+        [Route("flowpaper/colecci-n-virtual")]
+        public IActionResult Flowpaper()
+        {
+            var name = Request.Path.Value.Split("/").Last();
+            var locale = _localizer["en_US"].Value;
+            var model = name switch
+            {
+                "colecci-n-virtual" => new Flowpaper { Name = name, Reload = 1516301843374, LocaleChain = locale },
+                "MANUAL_DE_USO_BIBLIOMIT" => new Flowpaper { Name = name, Reload = 1512490982155, LocaleChain = locale },
+                _ => null
+            };
+            return View("Flowpaper", model);
+        }
+        [HttpGet]
         public IActionResult Manual()
         {
             return View();

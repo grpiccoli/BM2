@@ -1,0 +1,18 @@
+﻿@model BiblioMit.Models.VM.Flowpaper
+
+@{ 
+    ViewData["Title"] = Model.Name;
+    BiblioMit.Models.VM.CSPTag.StyleSrcElem.Add("'sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU='");
+    BiblioMit.Models.VM.CSPTag.StyleSrcElem.Add("'sha256-PLhQ1IguHjjEeFz1rcHAp1G0kdXEviAPtpMGhKEoxLw='");
+    BiblioMit.Models.VM.CSPTag.ScriptSrc.Add("'unsafe-eval'");
+    BiblioMit.Models.VM.CSPTag.StyleSrc.Add("'unsafe-inline'");
+}
+
+<partial name="_Pg" />
+
+<div id="documentViewer" class="flowpaper_viewer"></div>
+<div id="params" 
+     data-name="@Model.Name"
+     data-reload="@Model.Reload"
+     data-locale="@Model.LocaleChain"
+     ></div>

@@ -60,7 +60,7 @@ namespace BiblioMit.Views.Components.Nav
                             new Link
                             {
                                 Controller = "Home",
-                                Action = "Manual",
+                                Action = "Flowpaper",
                                 Name = _localizer["User Manual"],
                                 Icon = "far fa-question-circle"
                             },
@@ -225,8 +225,8 @@ namespace BiblioMit.Views.Components.Nav
                         {
                             new Link
                             {
-                                Controller = "Photos",
-                                Action = "Gallery",
+                                Controller = "Home",
+                                Action = "Flowpaper",
                                 Name = _localizer["Histopathology Gallery"],
                                 Icon = "fas fa-disease"
                             }

@@ -15,7 +15,7 @@ namespace BiblioMit.Extensions
             Regex.Replace(text?.ToUpperInvariant().RemoveDiacritics(), @"[^A-Z]", "");
         public static object Evaluate(object num, string operation)
         {
-            Expression e = new Expression(($"{num}{operation}"));
+            Expression e = new(($"{num}{operation}"));
             return e.Evaluate();
         }
         public static double? ParseDouble(
@@ -44,7 +44,7 @@ namespace BiblioMit.Extensions
             {
                 text = Regex.Replace(text, @"\D", "");
                 if (string.IsNullOrEmpty(text)) return null;
-                text = $"{text.Substring(0, text.Length - decimalPlaces.Value)}.{text.Substring(text.Length - decimalPlaces.Value)}";
+                text = $"{text.Substring(0, text.Length - decimalPlaces.Value)}.{text[^decimalPlaces.Value..]}";
                 num = double.Parse(text, CultureInfo.InvariantCulture);
             }
             else

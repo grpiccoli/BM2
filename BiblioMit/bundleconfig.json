@@ -1,14 +1,32 @@
 [
   {
+    "outputFileName": "wwwroot/flowpaper/js/FlowPaperViewer.js",
+    "inputFiles": [
+      "scripts/flowpaper/FlowPaperViewer.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/flowpaper/js/homeFlowpaper.min.js",
+    "inputFiles": [
+      "scripts/flowpaper/jquery.min.js",
+      "scripts/flowpaper/jquery.extensions.min.js",
+      "scripts/flowpaper/three.min.js",
+      "scripts/flowpaper/flowpaper.js",
+      "scripts/flowpaper/flowpaper_handlers.js",
+      "scripts/flowpaper/flowpaperLoader.js",
+      "scripts/flowpaper/footerChange.js"
+    ]
+  },
+  {
     "outputFileName": "wwwroot/js/homeSimac.min.js",
     "inputFiles": [
       "wwwroot/js/homeSimac.js"
     ]
   },
   {
-    "outputFileName": "wwwroot/js/boletin.min.js",
+    "outputFileName": "wwwroot/js/boletinBoletin.min.js",
     "inputFiles": [
-      "scripts/boletin.js"
+      "scripts/boletinBoletin.js"
     ]
   },
   {
@@ -32,7 +50,7 @@
   {
     "outputFileName": "wwwroot/js/facebookChat.min.js",
     "inputFiles": [
-      "wwwroot/js/facebookChat.js"
+      "scripts/facebookChat.js"
     ]
   },
   {
@@ -134,8 +152,8 @@
   {
     "outputFileName": "wwwroot/css/columnasColumnas.min.css",
     "inputFiles": [
-      "styles/dinamicTable.css",
-      "styles/gridPlanilla.css"
+      "wwwroot/css/dinamicTable.min.css",
+      "wwwroot/css/gridPlanilla.min.css"
     ]
   },
   {
@@ -249,7 +267,7 @@
   {
     "outputFileName": "wwwroot/js/clock.min.js",
     "inputFiles": [
-      "wwwroot/js/clock.js"
+      "scripts/clock.js"
     ]
   }
 ]

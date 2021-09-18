@@ -21,27 +21,27 @@
     <PackageReference Include="AngleSharp.Xml" Version="0.16.0" />
     <PackageReference Include="AspNetCore.IServiceCollection.AddIUrlHelper" Version="1.1.0" />
     <PackageReference Include="BlazorDateRangePicker" Version="3.6.0" />
-    <PackageReference Include="BlazorGoogleMaps" Version="1.0.17" />
+    <PackageReference Include="BlazorGoogleMaps" Version="1.1.5" />
     <PackageReference Include="Boxed.AspNetCore.TagHelpers" Version="5.1.0" />
     <PackageReference Include="BuildBundlerMinifier" Version="3.2.449" />
     <PackageReference Condition="'$(OS)' == 'Windows_NT'" Include="BuildWebCompiler" Version="1.12.405" />
     <PackageReference Include="CoreCLR-NCalc" Version="2.2.92" />
     <PackageReference Include="DocumentFormat.OpenXml" Version="2.13.1" />
     <PackageReference Include="EPPlus" Version="5.7.4" />
-    <PackageReference Include="Google.Apis.AnalyticsReporting.v4" Version="1.54.0.2197" />
+    <PackageReference Include="Google.Apis.AnalyticsReporting.v4" Version="1.55.0.2197" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.36" />
     <PackageReference Include="LazZiya.ExpressLocalization" Version="4.0.4" />
     <PackageReference Include="LoreSoft.Blazor.Controls" Version="6.6.2" />
     <!--<PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.250" />-->
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="5.0.9" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="5.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="5.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="5.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor" Version="0.7.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.9" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.9" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.9" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.9" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0" />
     <PackageReference Include="Microsoft.Build.Framework" Version="16.11.0" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.11.0" />
@@ -49,13 +49,13 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.9">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.10">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.9" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.9" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.9">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.10">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
@@ -71,14 +71,14 @@
     <PackageReference Include="NWebsec.AspNetCore.Mvc.TagHelpers" Version="3.0.0" />
     <PackageReference Include="Pluralize.NET.Core" Version="1.0.0" />
     <PackageReference Include="PuppeteerSharp" Version="5.0.0" />
-    <PackageReference Include="Radzen.Blazor" Version="3.9.5" />
+    <PackageReference Include="Radzen.Blazor" Version="3.9.10" />
     <PackageReference Include="ResXResourceReader.NetStandard" Version="1.0.1" />
     <PackageReference Include="Schema.NET" Version="10.0.0" />
     <!--<PackageReference Include="PaulMiami.AspNetCore.Mvc.Recaptcha" Version="1.2.1" />-->
     <PackageReference Include="Sendgrid" Version="9.24.2" />
     <PackageReference Include="System.CodeDom" Version="5.0.0" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
     <PackageReference Include="System.Resources.Extensions" Version="5.0.0" />
     <PackageReference Include="System.Resources.Reader" Version="4.3.0" />
     <PackageReference Include="System.Xml.ReaderWriter" Version="4.3.1" />
@@ -218,6 +218,16 @@
     <None Remove="scripts\dragndrop.ts" />
     <None Remove="scripts\entriesCreate.js" />
     <None Remove="scripts\entry.ts" />
+    <None Remove="scripts\flowpaper\flowpaper.js" />
+    <None Remove="scripts\flowpaper\flowpaperLoader.js" />
+    <None Remove="scripts\flowpaper\FlowPaperViewer.js" />
+    <None Remove="scripts\flowpaper\flowpaper_handlers.js" />
+    <None Remove="scripts\flowpaper\footerChange.js" />
+    <None Remove="scripts\flowpaper\fpsmeter.min.js" />
+    <None Remove="scripts\flowpaper\jquery.extensions.min.js" />
+    <None Remove="scripts\flowpaper\jquery.min.js" />
+    <None Remove="scripts\flowpaper\popover.min.js" />
+    <None Remove="scripts\flowpaper\three.min.js" />
     <None Remove="scripts\format-phone.ts" />
     <None Remove="scripts\get-sii-rut-data.ts" />
     <None Remove="scripts\gmaps-address-autocomplete.ts" />
@@ -227,6 +237,24 @@
     <None Remove="scripts\sendDisabledSelects.ts" />
     <None Remove="scripts\translate.ts" />
     <None Remove="scripts\validate-localization.ts" />
+    <None Remove="styles\scripts\boletinBoletin.js" />
+    <None Remove="styles\scripts\clock.js" />
+    <None Remove="styles\scripts\entriesCreate.js" />
+    <None Remove="styles\scripts\flowpaper\flowpaper.js" />
+    <None Remove="styles\scripts\flowpaper\flowpaperLoader.js" />
+    <None Remove="styles\scripts\flowpaper\flowpaper_handlers.js" />
+    <None Remove="styles\scripts\flowpaper\jquery.extensions.min.js" />
+    <None Remove="styles\scripts\flowpaper\jquery.min.js" />
+    <None Remove="styles\scripts\flowpaper\three.min.js" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <TypeScriptCompile Remove="styles\scripts\entry.ts" />
+    <TypeScriptCompile Remove="styles\scripts\parseNumber.ts" />
+    <TypeScriptCompile Remove="styles\scripts\piechart.ts" />
+    <TypeScriptCompile Remove="styles\scripts\progress.ts" />
+    <TypeScriptCompile Remove="styles\scripts\sendDisabledSelects.ts" />
+    <TypeScriptCompile Remove="styles\scripts\translate.ts" />
   </ItemGroup>
   
   <ItemGroup>
@@ -235,11 +263,77 @@
     
   <ItemGroup>
     <Content Include="scripts\entry.ts" />
+    <Content Include="scripts\flowpaper\flowpaper.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="scripts\flowpaper\flowpaperLoader.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="scripts\flowpaper\FlowPaperViewer.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="scripts\flowpaper\flowpaper_handlers.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="scripts\flowpaper\fpsmeter.min.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="scripts\flowpaper\jquery.extensions.min.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="scripts\flowpaper\jquery.min.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="scripts\flowpaper\popover.min.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="scripts\flowpaper\three.min.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <Content Include="scripts\parseNumber.ts" />
     <Content Include="scripts\piechart.ts" />
     <Content Include="scripts\progress.ts" />
     <Content Include="scripts\sendDisabledSelects.ts" />
     <Content Include="scripts\translate.ts" />
+    <Content Include="styles\scripts\entry.ts" />
+    <Content Include="styles\scripts\flowpaper\flowpaper.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="styles\scripts\flowpaper\flowpaperLoader.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="styles\scripts\flowpaper\flowpaper_handlers.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="styles\scripts\flowpaper\jquery.extensions.min.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="styles\scripts\flowpaper\jquery.min.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="styles\scripts\flowpaper\three.min.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="styles\scripts\parseNumber.ts" />
+    <Content Include="styles\scripts\piechart.ts" />
+    <Content Include="styles\scripts\progress.ts" />
+    <Content Include="styles\scripts\sendDisabledSelects.ts" />
+    <Content Include="styles\scripts\translate.ts" />
   </ItemGroup>
   
   <ItemGroup>
@@ -247,7 +341,11 @@
     <TypeScriptCompile Include="scripts\boletinBoletin.js" />
     <TypeScriptCompile Include="scripts\clock.js" />
     <TypeScriptCompile Include="scripts\entriesCreate.js" />
+    <TypeScriptCompile Include="scripts\flowpaper\footerChange.js" />
     <TypeScriptCompile Include="scripts\validate-localization.ts" />
+    <TypeScriptCompile Include="styles\scripts\boletinBoletin.js" />
+    <TypeScriptCompile Include="styles\scripts\clock.js" />
+    <TypeScriptCompile Include="styles\scripts\entriesCreate.js" />
   </ItemGroup>
   
   <!--<ItemGroup>
@@ -271,8 +369,8 @@
 	<Folder Include="html\" />
 	<Folder Include="Pages\Shared\" />
 	<Folder Include="scripts\types_old\" />
+	<Folder Include="styles\scripts\types_old\" />
     <Folder Include="wwwroot\images\markers\" />
-    <Folder Include="wwwroot\js\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -338,6 +436,10 @@
 
   <ItemGroup>
     <TypeScriptCompile Update="scripts\chat.ts">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </TypeScriptCompile>
+    <TypeScriptCompile Update="styles\scripts\chat.ts">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </TypeScriptCompile>

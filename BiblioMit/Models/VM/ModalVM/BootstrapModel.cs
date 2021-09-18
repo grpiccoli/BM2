@@ -10,16 +10,12 @@
         {
             get
             {
-                switch (this.Size)
+                return Size switch
                 {
-                    case ModalSize.Small:
-                        return "modal-sm";
-                    case ModalSize.Large:
-                        return "modal-lg";
-                    case ModalSize.Medium:
-                    default:
-                        return "";
-                }
+                    ModalSize.Small => "modal-sm",
+                    ModalSize.Large => "modal-lg",
+                    _ => "",
+                };
             }
         }        
     }
