@@ -58,14 +58,13 @@ if (esp) {
 }
 var semaforo = !document.getElementById('semaforo').classList.contains('d-none');
 var epsmb = document.getElementById('psmb');
-var evariable = document.getElementById('variable');
-var etl = document.getElementById('tl');
-choiceOps.placeholderValue = esp ? 'Seleccione áreas' : 'Select areas';
 var psmb = new Choices(epsmb, choiceOps);
-choiceOps.placeholderValue = esp ? 'Seleccione variables' : 'Select Variables';
+var evariable = document.getElementById('variable');
 var variables = new Choices(evariable, choiceOps);
-choiceOps.placeholderValue = esp ? 'Variables semáforo' : 'Semaforo Variables';
+var etl = document.getElementById('tl');
 var tl = new Choices(etl, choiceOps);
+var evariables = document.getElementById('variables');
+var customs = new Choices(evariables, choiceOps);
 var map = new google.maps.Map(document.getElementById('map'), {
     mapTypeId: 'terrain'
 });
@@ -74,40 +73,20 @@ var infowindow = new google.maps.InfoWindow({
 });
 var tableInfo = [];
 var polygons = {};
+var stats = {};
 var bnds = new google.maps.LatLngBounds();
 var markers = [];
-var titles = esp ?
-    ["Código", "Comuna", "Provincia", "Región", "Área", "Fuentes"] :
-    ["Code", "Commune", "Province", "Region", "Area", "Sources"];
+var clusters;
 var showInfo = function (_e) {
     var id = this.zIndex;
-    var content = `<h4>${tableInfo[id].name}</h4><table class="table"><tr><th scope="row">${titles[0]}</th><td align="right">${tableInfo[id].code}</td></tr>`;
-    if (tableInfo[id].comuna !== null)
-        content +=
-            `<tr><th scope="row">${titles[1]}</th><td align="right">${tableInfo[id].comuna}</td></tr>`;
-    if (tableInfo[id].provincia !== null)
-        content +=
-            `<tr><th scope="row">${titles[2]}</th><td align="right">${tableInfo[id].provincia}</td></tr>`;
-    content +=
-        `<tr><th scope="row">${titles[3]}</th><td align="right">Los Lagos</td>
-</tr><tr><th scope="row">${titles[4]} (ha)</th>
-<td align="right">${Area(polygons[id].getPath().getArray())}</td>
-</tr>
-<tr><th scope="row">${titles[5]}</th><td></td></tr>
-<tr><td>Sernapesca</td>
-<td align="right">
-<a target="_blank" href="https://www.sernapesca.cl" rel="noopener">
-<img src="../images/ico/sernapesca.svg" height="20" /></a></td></tr>
-<tr><td>PER Mitílidos</td>
-<td align="right">
-<a target="_blank" href="https://www.mejillondechile.cl" rel="noopener">
-<img src="../images/ico/mejillondechile.min.png" height="20" /></a></td></tr>
-<tr><td>Subpesca</td>
-<td align="right">
-<a target="_blank" href="https://www.subpesca.cl" rel="noopener">
-<img src="../images/ico/subpesca.png" height="20" /></a></td></tr>`;
-    infowindow.setContent(content);
-    infowindow.open(map, this);
+    fetch(`/ambiental/getcontent?Name=${tableInfo[id].name}&Code=${tableInfo[id].code}&Commune=${tableInfo[id].comuna}&Province=${tableInfo[id].provincia}&Area=${Area(polygons[id].getPath().getArray())}`, {
+        credentials: "same-origin"
+    })
+        .then(r => r.text())
+        .then(t => {
+        infowindow.setContent(t);
+        infowindow.open(map, this);
+    });
 };
 var addListenerOnPolygon = function (e) {
     if ($.isEmptyObject(e)) {
@@ -202,15 +181,22 @@ var loadDates = function () {
 var fetchData = function (url, tag, name) {
     return __awaiter(this, void 0, void 0, function* () {
         if (!(tag in chart.exporting.dataFields)) {
+            var parts = tag.split('_');
+            var psmbid = parts.splice(1, 1)[0];
+            var vartag = parts.join('_');
             chart.exporting.dataFields[tag] = name;
             return yield fetch(url)
                 .then(data => data.json())
                 .then(j => {
                 var counter = 0;
-                chart.data.map((c) => {
+                var tmpstats = {};
+                chart.data.forEach((c) => {
                     if (counter < j.length && c.date === j[counter].date) {
                         c[tag] = j[counter].value;
                         counter++;
+                        if (counter == j.length) {
+                            stats[vartag][psmbid] = j[counter].value;
+                        }
                     }
                 });
                 var serie = chart.series.push(new am4charts.LineSeries());
@@ -245,6 +231,10 @@ var loadData = function (e, isPsmb) {
             arr.map((p) => generatefetchData(e.detail, p, sd, ed));
         Promise.all(promises).then(_ => {
             chart.invalidateData();
+            stats.forEach((s) => {
+                var max = Math.max(...s);
+                var min = Math.min(...s);
+            });
         });
     });
 };
@@ -363,7 +353,7 @@ var init = function () {
                 return true;
             });
             var tlchoices = Promise.all([tllist]).then(r => { tl.setChoices(r[0]); return true; });
-            var clusters = Promise.all([cuencadata, comunadata, psmbdata]).then(_ => new MarkerClusterer(map, markers, { imagePath: '/images/markers/m' }));
+            clusters = Promise.all([cuencadata, comunadata, psmbdata]).then(_ => new MarkerClusterer(map, markers, { imagePath: '/images/markers/m' }));
             var callDatas = function (a, sd, ed, psmbs, sps, tls, groupId) {
                 var nogroup = groupId === 0;
                 var promises = nogroup ?
@@ -445,7 +435,7 @@ var init = function () {
                 variables.setChoices([r[1]]);
                 return true;
             });
-            var clusters = Promise.all([cuencadata, comunadata]).then(_ => new MarkerClusterer(map, markers, { imagePath: '/images/markers/m' }));
+            clusters = Promise.all([cuencadata, comunadata]).then(_ => new MarkerClusterer(map, markers, { imagePath: '/images/markers/m' }));
             Promise.all([buildchart, psmbchoices, variablechoices, clusters]).then(_ => {
                 chart.events.on('validated', loaderStop);
                 loaderStop();
@@ -529,5 +519,46 @@ $('#table2excel').click(function () {
 });
 document.getElementById('legenddiv').addEventListener('DOMSubtreeModified', function (_e) {
     document.getElementById("legenddiv").style.height = chart.legend.contentHeight + "px";
+});
+document.getElementById("pin-switch").addEventListener('change', function () {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (this.checked) {
+            (yield clusters).addMarkers(markers);
+        }
+        else {
+            (yield clusters).clearMarkers();
+            Object.values(markers).forEach((m) => {
+                m.setMap(null);
+            });
+        }
+    });
+});
+document.getElementById("polygon-switch").addEventListener('change', function () {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (this.checked) {
+            Object.values(polygons).forEach((m) => {
+                m.setMap(map);
+            });
+        }
+        else {
+            Object.values(polygons).forEach((m) => {
+                m.setMap(null);
+            });
+        }
+    });
+});
+document.getElementById("stat-switch").addEventListener('change', function () {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (this.checked) {
+            Object.values(stats).forEach((m) => {
+                m.setMap(map);
+            });
+        }
+        else {
+            Object.values(stats).forEach((m) => {
+                m.setMap(null);
+            });
+        }
+    });
 });
 //# sourceMappingURL=ambientalGraph.js.map

@@ -80,7 +80,7 @@ namespace BiblioMit.Controllers
             Filters["Tipo"] = new List<string> { "Semilla", "Cosecha", "Abastecimiento", "Producción" };
             //}
 
-            ViewData[nameof(DeclarationType)] = DeclarationType.Supply.Enum2MultiSelect(Filters[typeof(DeclarationType).ToString()], "Name");
+            ViewData[nameof(DeclarationType)] = DeclarationType.Supply.Enum2MultiSelect();
 
             ViewData["Date"] = string.Format(CultureInfo.CurrentCulture, "'{0}'",
                 string.Join("','", _context.SernapescaEntries.Select(v => v.Date.Date.ToString("yyyy-M-d", CultureInfo.CurrentCulture)).Distinct().ToList()));

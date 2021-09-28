@@ -15,7 +15,16 @@
     <div class="clear">
         <partial name="_ClearFilters" model="@Url.RouteUrl(this.ViewContext.RouteData.Values)" />
     </div>
-    <div id="constrainer2">
+    <div id="constrainer2" data-url="@Html.Raw(Url.Action("Editar",(string)ViewData["controller"],
+                          new {
+                              id = "P0",
+                              description = "A1",
+                              headers = "C2",
+                              conversion = "C3",
+                              places = "C4",
+                              sep = "C5",
+                              negative = "C6"
+                          }))">
         <table class="table">
             <thead>
                 <tr>
@@ -118,35 +127,3 @@
 </div>
 <partial name="_ValidationScriptsPartial" />
 <partial name="_Filter" view-data="@ViewData" />
-@section Scripts {
-    <script>
-        $('td[contenteditable=true]').focus(function () {
-            $(this).data("initialText", $(this).html());
-        }).blur(function () {
-            if ($(this).data("initialText") !== $(this).html()) {
-                var $cell = $(this).parent();
-                var id = $cell.attr('id');
-                var values = [];
-                $cell.children('td').each(function () {
-                    values.push($(this).html().replace(/^\s*/, '').replace(/\s*$/, ''));
-                });
-                var url = '@Html.Raw(Url.Action("Editar",(string)ViewData["controller"],
-                          new {
-                              id = "P0",
-                              description = "A1",
-                              headers = "C2",
-                              conversion = "C3",
-                              places = "C4",
-                              sep = "C5",
-                              negative = "C6"
-                          }))';
-                url = url.replace("P0", id).replace("A1", values[2]).replace("C2", values[3])
-                    .replace("C3", values[4]).replace("C4", values[5]).replace("C5", values[6]).replace("C6", values[7]);
-                //alert(url.replace('&', '\n').replace('?','?\n'));
-                $.post(url, { "__RequestVerificationToken": $("input[name='__RequestVerificationToken']").val() }, function (r) {
-                    alert('cambios guardados en la base de datos. Presione Ctrl+Z para deshacer');
-                });
-            }
-        });
-    </script>
-}

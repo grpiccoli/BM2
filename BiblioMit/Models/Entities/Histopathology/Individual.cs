@@ -38,5 +38,6 @@ namespace BiblioMit.Models
         public virtual ICollection<Valve> Valves { get; } = new List<Valve>();
         [Display(Name = "Soft Tissue")]
         public virtual ICollection<Soft> Softs { get; } = new List<Soft>();
+        public virtual ICollection<Photo> Photos { get; } = new List<Photo>();
     }
 }

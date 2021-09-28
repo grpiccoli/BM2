@@ -36,9 +36,10 @@ namespace BiblioMit.Services
             .ConfigureAwait(false);
         public async Task<IList<Banner>> GetBannersShuffledAsync() =>
             (await GetBannersAsync().ConfigureAwait(false)).Shuffle();
-        public async Task<Carousel> GetCarouselAsync(bool activeOnly)
+        public async Task<Carousel> GetCarouselAsync(bool activeOnly, bool shuffle)
         {
-            var model = await GetBannersShuffledAsync().ConfigureAwait(false);
+            var model = shuffle ? await GetBannersShuffledAsync().ConfigureAwait(false)
+                : await GetBannersAsync().ConfigureAwait(false);
 
             if (activeOnly)
             {
@@ -50,15 +51,15 @@ namespace BiblioMit.Services
             }
             else
             {
-                model = model.Where(b => b.Payments.Any()).ToList();
+                //.Where(b => b.Payments.Any())
+                model = model.ToList();
             }
 
             var modelo = new Carousel();
 
-            var mask = "background-color: rgba(0, 0, 0, 0.6)";
-
             foreach (var item in model.Select((value, i) => new { i, value }))
             {
+                var mask = "background-color: rgba(0, 0, 0, 0.6)";
                 var active = item.i == 0 ? "active" : "";
                 var lang = _localizer["en"].Value;
                 var text = item.value.Texts.FirstOrDefault(t => t.Lang.ToString() == lang);
@@ -80,19 +81,18 @@ namespace BiblioMit.Services
                 }
                 if (text.Btns != null && text.Btns.Any())
                 {
-                    btns = string.Join("", text.Btns.Select(b => @$"<a class=""btn btn-outline-light btn-lg m-2"" href=""{b.Uri}"";
+                    btns = string.Join("", text.Btns.Select(b => @$"<a id=""{b.Id}"" class=""btn-banner btn btn-outline-light btn-lg m-2"" href=""{b.Uri}""
 role=""button"" rel=""nofollow"" target=""_blank"">{b.Title}</a>"));
                 }
                 mask = $@".banner-{item.i} .mask{{{mask};}}";
+                if (!string.IsNullOrWhiteSpace(text.Color))
+                    mask += $@"[id=""{text.Id}""]{{color:{text.Color} !important}}";
                 modelo.Styles.Add(string.Join(" ", item.value.Imgs.Select(i => $@"@media (max-width: {(int)i.Size}px){{ 
-.banner-{item.i}{{
-background-image: url('{i.FileName}') 
-}}
-}}")) + mask);
+.banner-{item.i}{{background-image: url('../Home/GetBanner?f={i.FileName}');}}}}")) + mask);
                 modelo.Items.Add(@$"<div class=""carousel-item banner-{item.i} {active}"">
                      <div class=""mask"">
                            <div class=""d-flex justify-content-center align-items-center h-100"">
-                                <div class=""text-white text-center {text.Position.GetAttrName()} d-none d-md-block"">
+                                <div id=""{text.Id}"" data-lang=""{text.Lang}"" data-position=""{text.Position.GetAttrName()}"" class=""caption text-white text-center {text.Position.GetAttrDescription()} d-none d-md-block"">
                                      <h1 class=""mb-3"">{text.Title}</h1>
                                      <h5 class=""mb-4"">{text.Subtitle}</h5>
                                         {btns}

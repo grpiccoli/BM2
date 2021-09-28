@@ -23,6 +23,7 @@ using BiblioMit.Extensions;
 using BiblioMit.Data;
 using Microsoft.EntityFrameworkCore;
 using BiblioMit.Services.Interfaces;
+using System.Text.RegularExpressions;
 
 namespace BiblioMit.Controllers
 {
@@ -53,19 +54,26 @@ namespace BiblioMit.Controllers
             _nodeService = nodeService;
         }
         [HttpGet]
-        [Route("flowpaper/MANUAL_DE_USO_BIBLIOMIT")]
-        [Route("flowpaper/colecci-n-virtual")]
-        public IActionResult Flowpaper()
+        public IActionResult Flowpaper(string n)
         {
-            var name = Request.Path.Value.Split("/").Last();
+            //var name = Request.Path.Value.Split("/").Last();
             var locale = _localizer["en_US"].Value;
-            var model = name switch
+            var model = n switch
             {
-                "colecci-n-virtual" => new Flowpaper { Name = name, Reload = 1516301843374, LocaleChain = locale },
-                "MANUAL_DE_USO_BIBLIOMIT" => new Flowpaper { Name = name, Reload = 1512490982155, LocaleChain = locale },
-                _ => null
+                "gallery" => new Flowpaper { Name = "colecci-n-virtual", Reload = 1516301843374, LocaleChain = locale },
+                _ => new Flowpaper { Name = "MANUAL_DE_USO_BIBLIOMIT", Reload = 1512490982155, LocaleChain = locale }
             };
             return View("Flowpaper", model);
+        }
+        [HttpGet]
+        public IActionResult GetBanner(string f)
+        {
+            var name = Regex.Replace(f, ".*/", "");
+
+            var full = Path.Combine(Directory.GetCurrentDirectory(),
+                                    "BannerImgs", name);
+
+            return PhysicalFile(full, "image/jpg");
         }
         [HttpGet]
         public IActionResult Manual()

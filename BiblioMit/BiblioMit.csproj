@@ -21,13 +21,13 @@
     <PackageReference Include="AngleSharp.Xml" Version="0.16.0" />
     <PackageReference Include="AspNetCore.IServiceCollection.AddIUrlHelper" Version="1.1.0" />
     <PackageReference Include="BlazorDateRangePicker" Version="3.6.0" />
-    <PackageReference Include="BlazorGoogleMaps" Version="1.1.5" />
+    <PackageReference Include="BlazorGoogleMaps" Version="1.1.7" />
     <PackageReference Include="Boxed.AspNetCore.TagHelpers" Version="5.1.0" />
     <PackageReference Include="BuildBundlerMinifier" Version="3.2.449" />
     <PackageReference Condition="'$(OS)' == 'Windows_NT'" Include="BuildWebCompiler" Version="1.12.405" />
     <PackageReference Include="CoreCLR-NCalc" Version="2.2.92" />
     <PackageReference Include="DocumentFormat.OpenXml" Version="2.13.1" />
-    <PackageReference Include="EPPlus" Version="5.7.4" />
+    <PackageReference Include="EPPlus" Version="5.7.5" />
     <PackageReference Include="Google.Apis.AnalyticsReporting.v4" Version="1.55.0.2197" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.36" />
     <PackageReference Include="LazZiya.ExpressLocalization" Version="4.0.4" />
@@ -54,8 +54,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.10" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.10" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.10">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.9">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
@@ -71,11 +71,11 @@
     <PackageReference Include="NWebsec.AspNetCore.Mvc.TagHelpers" Version="3.0.0" />
     <PackageReference Include="Pluralize.NET.Core" Version="1.0.0" />
     <PackageReference Include="PuppeteerSharp" Version="5.0.0" />
-    <PackageReference Include="Radzen.Blazor" Version="3.9.10" />
+    <PackageReference Include="Radzen.Blazor" Version="3.10.1" />
     <PackageReference Include="ResXResourceReader.NetStandard" Version="1.0.1" />
     <PackageReference Include="Schema.NET" Version="10.0.0" />
     <!--<PackageReference Include="PaulMiami.AspNetCore.Mvc.Recaptcha" Version="1.2.1" />-->
-    <PackageReference Include="Sendgrid" Version="9.24.2" />
+    <PackageReference Include="Sendgrid" Version="9.24.3" />
     <PackageReference Include="System.CodeDom" Version="5.0.0" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
@@ -198,8 +198,14 @@
     <Compile Remove="Migrations\20200823022948_PlanktonUsers.cs" />
     <Compile Remove="Migrations\20200823022948_PlanktonUsers.Designer.cs" />
   </ItemGroup>
+
+	<ItemGroup>
+	  <Content Remove="wwwroot\js\FlowPaperViewer.js" />
+	</ItemGroup>
   
   <ItemGroup>
+    <None Remove="BannerImgs\87a36c4e7ac349ad932a71428ddb07a4_th.jpg" />
+    <None Remove="BannerImgs\mussels-shells-mytilus-watt-area-53131.min.jpg" />
     <None Remove="Data\Ads\Banners.tsv" />
     <None Remove="Data\Ads\Btns.tsv" />
     <None Remove="Data\Ads\Captions.tsv" />
@@ -207,6 +213,7 @@
     <None Remove="Data\Ads\Payments.tsv" />
     <None Remove="Data\Ads\Rgbs.tsv" />
     <None Remove="Data\Environmental\PlanktonUsers.tsv" />
+    <None Remove="scripts\bannersIndex.js" />
     <None Remove="scripts\bibliomit.ts" />
     <None Remove="scripts\boletinBoletin.js" />
     <None Remove="scripts\charts.ts" />
@@ -232,11 +239,15 @@
     <None Remove="scripts\get-sii-rut-data.ts" />
     <None Remove="scripts\gmaps-address-autocomplete.ts" />
     <None Remove="scripts\parseNumber.ts" />
+    <None Remove="scripts\photosIndex.js" />
     <None Remove="scripts\piechart.ts" />
     <None Remove="scripts\progress.ts" />
     <None Remove="scripts\sendDisabledSelects.ts" />
     <None Remove="scripts\translate.ts" />
     <None Remove="scripts\validate-localization.ts" />
+    <None Remove="styles\flowpaper\flowpaper.css" />
+    <None Remove="styles\flowpaper\popover-theme.css" />
+    <None Remove="styles\flowpaper\popover.css" />
     <None Remove="styles\scripts\boletinBoletin.js" />
     <None Remove="styles\scripts\clock.js" />
     <None Remove="styles\scripts\entriesCreate.js" />
@@ -259,9 +270,18 @@
   
   <ItemGroup>
     <_ContentIncludedByDefault Remove="wwwroot\css\about.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\js\FlowPaperViewer.js" />
   </ItemGroup>
     
   <ItemGroup>
+    <Content Include="BannerImgs\87a36c4e7ac349ad932a71428ddb07a4_th.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="BannerImgs\mussels-shells-mytilus-watt-area-53131.min.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <Content Include="scripts\entry.ts" />
     <Content Include="scripts\flowpaper\flowpaper.js">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
@@ -304,6 +324,18 @@
     <Content Include="scripts\progress.ts" />
     <Content Include="scripts\sendDisabledSelects.ts" />
     <Content Include="scripts\translate.ts" />
+    <Content Include="styles\flowpaper\flowpaper.css">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="styles\flowpaper\popover-theme.css">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="styles\flowpaper\popover.css">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <Content Include="styles\scripts\entry.ts" />
     <Content Include="styles\scripts\flowpaper\flowpaper.js">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
@@ -337,11 +369,13 @@
   </ItemGroup>
   
   <ItemGroup>
+    <TypeScriptCompile Include="scripts\bannersIndex.js" />
     <TypeScriptCompile Include="scripts\bibliomit.ts" />
     <TypeScriptCompile Include="scripts\boletinBoletin.js" />
     <TypeScriptCompile Include="scripts\clock.js" />
     <TypeScriptCompile Include="scripts\entriesCreate.js" />
     <TypeScriptCompile Include="scripts\flowpaper\footerChange.js" />
+    <TypeScriptCompile Include="scripts\photosIndex.js" />
     <TypeScriptCompile Include="scripts\validate-localization.ts" />
     <TypeScriptCompile Include="styles\scripts\boletinBoletin.js" />
     <TypeScriptCompile Include="styles\scripts\clock.js" />
@@ -371,6 +405,10 @@
 	<Folder Include="scripts\types_old\" />
 	<Folder Include="styles\scripts\types_old\" />
     <Folder Include="wwwroot\images\markers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\js\FlowPaperViewer.js" />
   </ItemGroup>
 
   <ItemGroup>

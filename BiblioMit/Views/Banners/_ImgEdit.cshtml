@@ -1,0 +1,23 @@
+﻿@model BiblioMit.Models.Entities.Ads.ImgVM
+
+<button id="btn-img-edit" class="btn btn-outline-info"><i class="fas fa-edit"></i></button>
+
+<div id="img-edit" class="d-none">
+    <form id="img-form" asp-action="AddImg">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="Size" class="control-label"></label>
+            <select asp-for="Size" asp-items="Html.GetEnumSelectList<BiblioMit.Models.Entities.Ads.Size>()" class="form-control">
+            </select>
+            <span asp-validation-for="Size" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="FileName" class="control-label"></label>
+            <input asp-for="FileName" class="form-control" />
+            <span asp-validation-for="FileName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Guardar" class="btn btn-primary" />
+        </div>
+    </form>
+</div>

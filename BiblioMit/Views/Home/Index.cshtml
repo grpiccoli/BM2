@@ -10,7 +10,7 @@
     BiblioMit.Models.VM.CSPTag.StyleSrcElem.Add($"'nonce-{styleNonce}'");
 }
 @* "signalr", "/chat.min"*@
-<partial name="_Libs" model='new List<string> { "home" }' />
+<partial name="_Libs" model='new List<string> { "home", "banners" }' />
 
 @section Styles{
     <style nonce="@styleNonce">@Html.Raw(string.Join(string.Empty, Model.Styles))</style>

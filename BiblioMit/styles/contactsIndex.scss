@@ -1,0 +1,19 @@
+﻿table.table {
+    thead {
+        font-size: 12px;
+    }
+
+    tbody {
+        font-size: 11px;
+
+        tr td .details-row {
+            width: 35vw;
+            .bibicon{
+                font-size:64px;
+            }
+        }
+    }
+}
+.w-45w {
+    width: 45vw;
+}

@@ -108,7 +108,7 @@
       ]
     },
     {
-      "library": "bootstrap-select@1.13.18",
+      "library": "bootstrap-select@1.14.0-beta2",
       "destination": "wwwroot/lib/bootstrap-select",
       "files": [
         "dist/css/bootstrap-select.min.css",
@@ -245,9 +245,13 @@
       "files": [ "dist/umd/popper.min.js" ]
     },
     {
+      "provider": "unpkg",
       "library": "tippy.js@6.3.1",
       "destination": "wwwroot/lib/tippy.js",
-      "files": [ "dist/tippy-bundle.umd.js" ]
+      "files": [
+        "dist/tippy-bundle.umd.min.js",
+        "dist/tippy.css"
+      ]
     },
     {
       "library": "qrcodejs@1.0.0",

@@ -54,19 +54,19 @@ if (esp) {
 }
 //is semaforo?
 var semaforo = !document.getElementById('semaforo').classList.contains('d-none');
-//choice elements
-var epsmb = document.getElementById('psmb');
-var evariable = document.getElementById('variable');
-var etl = document.getElementById('tl');
+//choice elements//
 //psmb load choices
-choiceOps.placeholderValue = esp ? 'Seleccione áreas' : 'Select areas';
+var epsmb = document.getElementById('psmb');
 var psmb = new Choices(epsmb, choiceOps);
 //variable load choices
-choiceOps.placeholderValue = esp ? 'Seleccione variables' : 'Select Variables';
+var evariable = document.getElementById('variable');
 var variables = new Choices(evariable, choiceOps);
 //semaforo
-choiceOps.placeholderValue = esp ? 'Variables semáforo' : 'Semaforo Variables';
+var etl = document.getElementById('tl');
 var tl = new Choices(etl, choiceOps);
+//variables
+var evariables = document.getElementById('variables');
+var customs = new Choices(evariables, choiceOps);
 //define info
 var map = new google.maps.Map(document.getElementById('map'), {
     mapTypeId: 'terrain'
@@ -76,41 +76,23 @@ var infowindow = new google.maps.InfoWindow({
 });
 var tableInfo: any = [];
 var polygons: any = {};
+var stats: any = {};
 var bnds: google.maps.LatLngBounds = new google.maps.LatLngBounds();
 var markers: any = [];
-var titles = esp ?
-    ["Código", "Comuna", "Provincia", "Región", "Área", "Fuentes"] :
-    ["Code", "Commune", "Province", "Region", "Area", "Sources"];
+var clusters: any;
 var showInfo = function (_e: any) {
     var id = this.zIndex;
-    var content =
-        `<h4>${tableInfo[id].name}</h4><table class="table"><tr><th scope="row">${titles[0]}</th><td align="right">${tableInfo[id].code}</td></tr>`;
-    if (tableInfo[id].comuna !== null)
-        content +=
-            `<tr><th scope="row">${titles[1]}</th><td align="right">${tableInfo[id].comuna}</td></tr>`;
-    if (tableInfo[id].provincia !== null)
-        content +=
-            `<tr><th scope="row">${titles[2]}</th><td align="right">${tableInfo[id].provincia}</td></tr>`;
-    content +=
-        `<tr><th scope="row">${titles[3]}</th><td align="right">Los Lagos</td>
-</tr><tr><th scope="row">${titles[4]} (ha)</th>
-<td align="right">${Area(polygons[id].getPath().getArray())}</td>
-</tr>
-<tr><th scope="row">${titles[5]}</th><td></td></tr>
-<tr><td>Sernapesca</td>
-<td align="right">
-<a target="_blank" href="https://www.sernapesca.cl" rel="noopener">
-<img src="../images/ico/sernapesca.svg" height="20" /></a></td></tr>
-<tr><td>PER Mitílidos</td>
-<td align="right">
-<a target="_blank" href="https://www.mejillondechile.cl" rel="noopener">
-<img src="../images/ico/mejillondechile.min.png" height="20" /></a></td></tr>
-<tr><td>Subpesca</td>
-<td align="right">
-<a target="_blank" href="https://www.subpesca.cl" rel="noopener">
-<img src="../images/ico/subpesca.png" height="20" /></a></td></tr>`;
-    infowindow.setContent(content);
-    infowindow.open(map, this);
+    fetch(`/ambiental/getcontent?Name=${tableInfo[id].name
+        }&Code=${tableInfo[id].code}&Commune=${tableInfo[id].comuna
+        }&Province=${tableInfo[id].provincia}&Area=${Area(polygons[id].getPath().getArray())}`,
+        {
+            credentials: "same-origin"
+        })
+        .then(r => r.text())
+        .then(t => {
+            infowindow.setContent(t);
+            infowindow.open(map, this);
+        });
 }
 var addListenerOnPolygon = function(e: any) {
     if ($.isEmptyObject(e)) {
@@ -126,7 +108,7 @@ var addListenerOnPolygon = function(e: any) {
             psmb.setChoiceByValue(this.zIndex);
         }
     }
-};
+}
 //define map
 var processMapData = function (dato: any) {
     var consessionPolygon = new google.maps.Polygon({
@@ -207,17 +189,24 @@ var loadDates = function() {
     return chart.data;
 }
 //fetch each series from server and loaded into graph
-var fetchData = async function(url: string, tag: string, name: string) {
+var fetchData = async function (url: string, tag: string, name: string) {
     if (!(tag in chart.exporting.dataFields)) {
+        var parts = tag.split('_');
+        var psmbid = parts.splice(1, 1)[0];
+        var vartag = parts.join('_')
         chart.exporting.dataFields[tag] = name;
         return await fetch(url)
             .then(data => data.json())
             .then(j => {
                 var counter = 0;
-                chart.data.map((c: any) => {
+                var tmpstats: any = {};
+                chart.data.forEach((c: any) => {
                     if (counter < j.length && c.date === j[counter].date) {
                         c[tag] = j[counter].value;
                         counter++;
+                        if (counter == j.length) {
+                            stats[vartag][psmbid] = j[counter].value;
+                        }
                     }
                 });
                 var serie = chart.series.push(new am4charts.LineSeries());
@@ -248,6 +237,23 @@ var loadData = async function(e: any, isPsmb: boolean) {
         arr.map((p: any) => generatefetchData(e.detail, p, sd, ed));
     Promise.all(promises).then(_ => {
         chart.invalidateData();
+        stats.forEach((s:any) => {
+            var max = Math.max(...s);
+            var min = Math.min(...s);
+            s.forEach((p:any) => {
+                var marker = markers.find((m:any) => m.zIndex == p);
+                new google.maps.Circle({
+                    strokeColor: "#FF0000",
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                    fillColor: "#FF0000",
+                    fillOpacity: 0.35,
+                    map,
+                    center: marker.position,
+                    radius: ,
+                });
+            });
+        });
     });
 }
 //passive support
@@ -366,7 +372,7 @@ var init = async function () {
             return true;
         });
         var tlchoices = Promise.all([tllist]).then(r => { tl.setChoices(r[0]); return true; });
-        var clusters = Promise.all([cuencadata, comunadata, psmbdata]).then(_ => new MarkerClusterer(map, markers, { imagePath: '/images/markers/m' }));
+        clusters = Promise.all([cuencadata, comunadata, psmbdata]).then(_ => new MarkerClusterer(map, markers, { imagePath: '/images/markers/m' }));
         var callDatas = function (a: any, sd: any, ed: any, psmbs: any, sps: any, tls: any, groupId: number) {
             var nogroup = groupId === 0;
             var promises = nogroup ?
@@ -449,7 +455,7 @@ var init = async function () {
             variables.setChoices([r[1]]);
             return true;
         });
-        var clusters = Promise.all([cuencadata, comunadata]).then(_ => new MarkerClusterer(map, markers, { imagePath: '/images/markers/m' }));
+        clusters = Promise.all([cuencadata, comunadata]).then(_ => new MarkerClusterer(map, markers, { imagePath: '/images/markers/m' }));
         Promise.all([buildchart, psmbchoices, variablechoices, clusters]).then(_ => {
             chart.events.on('validated', loaderStop);
             loaderStop();
@@ -542,4 +548,36 @@ $('#table2excel').click(function () {
 //overflow scroll legend if to many elements added
 document.getElementById('legenddiv').addEventListener('DOMSubtreeModified', function (_e) {
     document.getElementById("legenddiv").style.height = chart.legend.contentHeight + "px";
+});
+document.getElementById("pin-switch").addEventListener('change', async function () {
+    if ((<HTMLInputElement>this).checked) {
+        (await clusters).addMarkers(markers);
+    } else {
+        (await clusters).clearMarkers();
+        Object.values(markers).forEach((m: any) => {
+            m.setMap(null);
+        });
+    }
+});
+document.getElementById("polygon-switch").addEventListener('change', async function () {
+    if ((<HTMLInputElement>this).checked) {
+        Object.values(polygons).forEach((m: any) => {
+            m.setMap(map);
+        });
+    } else {
+        Object.values(polygons).forEach((m: any) => {
+            m.setMap(null);
+        });
+    }
+});
+document.getElementById("stat-switch").addEventListener('change', async function () {
+    if ((<HTMLInputElement>this).checked) {
+        Object.values(stats).forEach((m: any) => {
+            m.setMap(map);
+        });
+    } else {
+        Object.values(stats).forEach((m: any) => {
+            m.setMap(null);
+        });
+    }
 });

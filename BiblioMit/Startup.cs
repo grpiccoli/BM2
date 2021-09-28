@@ -227,7 +227,10 @@ namespace BiblioMit
             }
             app.UseCookiePolicy();
 
-            app.UseRedirectValidation();
+            app.UseRedirectValidation(opts => {
+                opts.AllowSameHostRedirectsToHttps();
+                opts.AllowedDestinations("https://sandbox.flow.cl/app/web/pay.php");
+            });
 
             app.UseXContentTypeOptions();
             app.UseReferrerPolicy(opts => opts.NoReferrer());

@@ -34,10 +34,10 @@
 
 <hr class="section-heading-spacer">
 <form id="search" asp-action="Index" method="get" class="form-inline">
-    <div class="form-group col-12 col-md-4">
+    <div class="input-group mb-3">
         <select name="src" data-language="@Localizer["en"]"
                 placeholder="@Localizer["Select at least 1 repository to search"]"
-                class="custom-select selectpicker form-control w-100" multiple data-live-search="true"
+                class="custom-select selectpicker form-control" multiple data-live-search="true"
                 data-actions-box="true" data-size="5"
                 title="@Localizer["Select one or more repositories"] …" data-selected-text-format="count > 3">
             <optgroup label="@Localizer["Thesis and Articles of Universities & Research Centres"]">
@@ -65,49 +65,41 @@
                 }
             </optgroup>
         </select>
-    </div>
-    <div class="input-group col-12 col-md-8">
-        <div class="input-group-btn">
-            <div class="dropdown">
-                <button class="btn btn-secondary" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="fas fa-sliders-h"></i>
-                </button>
-                <div class="dropdown-menu bloc">
-                    <div class="form-group">
-                        <label class="dropdown-header">@Localizer["Criteria"]:</label>
-                        <select class="form-control w-100" name="srt" size="4">
-                            <option value="" selected="@(string.IsNullOrWhiteSpace(srt))">@Localizer["Default"]</option>
-                            <option value="score" selected="@srt.Contains("score")">@Localizer["Score"]</option>
-                            <option value="title" selected="@srt.Contains("title")">@Localizer["Title"]</option>
-                            <option value="date" selected="@srt.Contains("date")">@Localizer["Date"]</option>
-                        </select>
-                    </div>
-                    <div class="dropdown-divider"></div>
-                    <div class="form-group">
-                        <label class="dropdown-header">@Localizer["Order"]:</label>
-                        <select class="form-control w-100" name="asc" size="2">
-                            <option value="false" selected="@(!asc)">@Localizer["Descendent"]</option>
-                            <option value="true" selected="@asc">@Localizer["Ascendent"]</option>
-                        </select>
-                    </div>
-                    <div class="dropdown-divider"></div>
-                    <div class="form-group">
-                        <label class="dropdown-header">@Localizer["Results per page"]:</label>
-                        <select class="form-control w-100" name="trpp" size="5">
-                            <option value="5" selected="@(trpp==5)">5</option>
-                            <option value="10" selected="@(trpp==10)">10</option>
-                            <option value="20" selected="@(trpp==20)">20</option>
-                            <option value="50" selected="@(trpp==50)">50</option>
-                            <option value="100" selected="@(trpp==100)">100</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fas fa-sliders-h"></i>
+        </button>
+        <ul class="dropdown-menu bloc">
+            <li>
+                <label class="dropdown-header">@Localizer["Criteria"]:</label>
+                <select class="form-control w-100" name="srt" size="4">
+                    <option value="" selected="@(string.IsNullOrWhiteSpace(srt))">@Localizer["Default"]</option>
+                    <option value="score" selected="@srt.Contains("score")">@Localizer["Score"]</option>
+                    <option value="title" selected="@srt.Contains("title")">@Localizer["Title"]</option>
+                    <option value="date" selected="@srt.Contains("date")">@Localizer["Date"]</option>
+                </select>
+            </li>
+            <li><div class="dropdown-divider"></div></li>
+            <li>
+                <label class="dropdown-header">@Localizer["Order"]:</label>
+                <select class="form-control w-100" name="asc" size="2">
+                    <option value="false" selected="@(!asc)">@Localizer["Descendent"]</option>
+                    <option value="true" selected="@asc">@Localizer["Ascendent"]</option>
+                </select>
+            </li>
+            <li><div class="dropdown-divider"></div></li>
+            <li>
+                <label class="dropdown-header">@Localizer["Results per page"]:</label>
+                <select class="form-control w-100" name="trpp" size="5">
+                    <option value="5" selected="@(trpp==5)">5</option>
+                    <option value="10" selected="@(trpp==10)">10</option>
+                    <option value="20" selected="@(trpp==20)">20</option>
+                    <option value="50" selected="@(trpp==50)">50</option>
+                    <option value="100" selected="@(trpp==100)">100</option>
+                </select>
+            </li>
+        </ul>
         <input id="q" class="form-control" type="text" name="q" placeholder="@Localizer["Search terms"] e.g. Mytilus" value="@ViewData["q"]" />
-        <span class="input-group-btn">
-            <button class="btn btn-primary" type="submit" value="Buscar"><i class="fas fa-search fa-fw"></i>&nbsp;@Localizer["Search"]</button>
-        </span>
+        <button class="btn btn-primary" type="submit" value="Buscar"><i class="fas fa-search fa-fw"></i>&nbsp;@Localizer["Search"]</button>
     </div>
 </form>
 

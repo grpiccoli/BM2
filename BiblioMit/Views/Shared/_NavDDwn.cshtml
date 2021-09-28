@@ -26,8 +26,8 @@
             {
                 <li>
                     <a class="dropdown-item"
-                       asp-area=""
-                       asp-controller="@item.Controller" asp-action="@item.Action">
+                        asp-area=""
+                        asp-controller="@item.Controller" asp-action="@item.Action" asp-all-route-data="item.Parameters">
                         <i class="@item.Icon fa-tw"></i>&emsp;@item.Name
                     </a>
                 </li>

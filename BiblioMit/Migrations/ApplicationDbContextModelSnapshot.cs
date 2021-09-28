@@ -16,7 +16,7 @@ namespace BiblioMit.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.7")
+                .HasAnnotation("ProductVersion", "5.0.10")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("BiblioMit.Models.Analist", b =>
@@ -424,6 +424,9 @@ namespace BiblioMit.Migrations
                     b.Property<int?>("BannerId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Color")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Lang")
                         .HasColumnType("int");
 
@@ -622,6 +625,49 @@ namespace BiblioMit.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("PlanktonUsers");
+                });
+
+            modelBuilder.Entity("BiblioMit.Models.Entities.Variables.Variable", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("PsmbId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Value")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VariableTypeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PsmbId");
+
+                    b.HasIndex("VariableTypeId");
+
+                    b.ToTable("Variables");
+                });
+
+            modelBuilder.Entity("BiblioMit.Models.Entities.Variables.VariableType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Units")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("VariableTypes");
                 });
 
             modelBuilder.Entity("BiblioMit.Models.Entry", b =>
@@ -1999,6 +2045,25 @@ namespace BiblioMit.Migrations
                     b.Navigation("Group");
                 });
 
+            modelBuilder.Entity("BiblioMit.Models.Entities.Variables.Variable", b =>
+                {
+                    b.HasOne("BiblioMit.Models.Psmb", "Psmb")
+                        .WithMany("Variables")
+                        .HasForeignKey("PsmbId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("BiblioMit.Models.Entities.Variables.VariableType", "VariableType")
+                        .WithMany("Variables")
+                        .HasForeignKey("VariableTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Psmb");
+
+                    b.Navigation("VariableType");
+                });
+
             modelBuilder.Entity("BiblioMit.Models.Entry", b =>
                 {
                     b.HasOne("BiblioMit.Models.ApplicationUser", "ApplicationUser")
@@ -2052,7 +2117,7 @@ namespace BiblioMit.Migrations
             modelBuilder.Entity("BiblioMit.Models.Photo", b =>
                 {
                     b.HasOne("BiblioMit.Models.Individual", "Individual")
-                        .WithMany()
+                        .WithMany("Photos")
                         .HasForeignKey("IndividualId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2542,6 +2607,11 @@ namespace BiblioMit.Migrations
                     b.Navigation("Assays");
                 });
 
+            modelBuilder.Entity("BiblioMit.Models.Entities.Variables.VariableType", b =>
+                {
+                    b.Navigation("Variables");
+                });
+
             modelBuilder.Entity("BiblioMit.Models.Forum", b =>
                 {
                     b.Navigation("Posts");
@@ -2549,6 +2619,8 @@ namespace BiblioMit.Migrations
 
             modelBuilder.Entity("BiblioMit.Models.Individual", b =>
                 {
+                    b.Navigation("Photos");
+
                     b.Navigation("Softs");
 
                     b.Navigation("Valves");
@@ -2621,6 +2693,8 @@ namespace BiblioMit.Migrations
                     b.Navigation("PlanktonAssays");
 
                     b.Navigation("Samplings");
+
+                    b.Navigation("Variables");
                 });
 
             modelBuilder.Entity("BiblioMit.Models.Registry", b =>

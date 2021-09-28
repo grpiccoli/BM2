@@ -6,13 +6,11 @@ using BiblioMit.Models;
 using BiblioMit.Models.ForumViewModels;
 using BiblioMit.Models.PostViewModels;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 //using Amazon.S3;
-using System.IO;
 //using Amazon.S3.Model;
-using BiblioMit.Services;
 using Microsoft.AspNetCore.Authorization;
 using System.Globalization;
+using BiblioMit.Data;
 
 namespace BiblioMit.Controllers
 {
@@ -88,7 +86,7 @@ namespace BiblioMit.Controllers
             return RedirectToAction("Topic", new { id, searchQuery });
         }
 
-        [Authorize(Roles = "Administrador",Policy ="Foros")]
+        [Authorize(Roles = nameof(RoleData.Administrator), Policy = nameof(UserClaims.Forums))]
         [HttpGet]
         public IActionResult Create()
         {
@@ -97,7 +95,7 @@ namespace BiblioMit.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Administrador", Policy = "Foros")]
+        [Authorize(Roles = nameof(RoleData.Administrator), Policy = nameof(UserClaims.Forums))]
         [ValidateAntiForgeryToken]
         [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> AddForum(AddForumModel model)

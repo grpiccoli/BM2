@@ -1,5 +1,9 @@
 ﻿[
   {
+    "outputFile": "wwwroot/css/tableFilter.css",
+    "inputFile": "styles/tableFilter.scss"
+  },
+  {
     "outputFile": "wwwroot/css/publicationsIndex.css",
     "inputFile": "styles/publicationsIndex.scss"
   },
@@ -86,5 +90,9 @@
   {
     "outputFile": "wwwroot/css/flowpaper.css",
     "inputFile": "styles/flowpaper.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/bannersIndex.css",
+    "inputFile": "styles/bannersIndex.scss"
   }
 ]

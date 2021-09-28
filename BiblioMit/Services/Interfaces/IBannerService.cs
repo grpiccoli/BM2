@@ -10,6 +10,6 @@ namespace BiblioMit.Services.Interfaces
         IQueryable<Banner> GetBanners();
         Task<List<Banner>> GetBannersAsync();
         Task<IList<Banner>> GetBannersShuffledAsync();
-        Task<Carousel> GetCarouselAsync(bool activeOnly = true);
+        Task<Carousel> GetCarouselAsync(bool activeOnly = true, bool shuffle = true);
     }
 }

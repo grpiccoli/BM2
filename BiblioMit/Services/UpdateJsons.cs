@@ -35,7 +35,7 @@ namespace BiblioMit.Services
             _context = context;
             _environment = environment;
             _localizer = localizer;
-            _ambiental = new AmbientalController(_context, _localizer);
+            _ambiental = new AmbientalController(_context, environment, _localizer);
             _jsonPath = Path.Combine(_environment.ContentRootPath, "json");
         }
         public void SeedUpdate()
@@ -48,6 +48,9 @@ namespace BiblioMit.Services
             WriteJson(nameof(_ambiental.TLList));
 
             WriteJson(nameof(_ambiental.RegionList));
+
+            WriteJson(nameof(_ambiental.GetPhotos));
+
             CenterUpdate();
             PlanktonUpdate();
         }

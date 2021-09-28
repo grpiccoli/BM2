@@ -1,6 +1,14 @@
 [
   {
-    "outputFileName": "wwwroot/flowpaper/js/FlowPaperViewer.js",
+    "outputFileName": "wwwroot/css/homeFlowpaper.min.css",
+    "inputFiles": [
+      "styles/flowpaper/flowpaper.css",
+      "styles/flowpaper/popover.css",
+      "styles/flowpaper/popover-theme.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/FlowPaperViewer.js",
     "inputFiles": [
       "scripts/flowpaper/FlowPaperViewer.js"
     ]
@@ -15,6 +23,30 @@
       "scripts/flowpaper/flowpaper_handlers.js",
       "scripts/flowpaper/flowpaperLoader.js",
       "scripts/flowpaper/footerChange.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/bannersIndex.min.js",
+    "inputFiles": [
+      "scripts/bannersIndex.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/photosIndex.min.js",
+    "inputFiles": [
+      "scripts/photosIndex.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/tableFilter.min.js",
+    "inputFiles": [
+      "wwwroot/js/tableFilter.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/columnasColumnas.min.js",
+    "inputFiles": [
+      "wwwroot/js/columnasColumnas.js"
     ]
   },
   {

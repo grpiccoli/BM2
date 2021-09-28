@@ -9,7 +9,7 @@
         "Fecha";
 }
 
-<partial name="_Libs" model='new List<string> { "bootstrap-select" }' />
+<partial name="_Libs" model='new List<string> { "bootstrap-select", "bootstrap-datepicker", "tableFilter" }' />
 
 @switch (Model.Type)
 {
@@ -21,68 +21,39 @@
                 {
                     <div class="input-group date">
                         <div class="input-group-prepend">
-                            <span id="btn@(Model.Id)" class="input-group-text" onclick="$('#@Model.Id').datepicker('show')"><i class="far fa-calendar-alt"></i></span>
+                            <span id="btn@(Model.Id)" class="input-group-text calendarShow"><i class="far fa-calendar-alt"></i></span>
                         </div>
                         <input type="text"
                                id="@Model.Id"
                                name="@Model.Name"
                                value="@Model.Val"
-                               class="form-control"
-                               style="width:110px"
-                               onchange="filter(this)"
+                               class="form-control tableFilter calendarFilter"
                                aria-describedby="btn@(Model.Id)" />
                     </div>
-                    @this.Block("Scripts",
-                        @<script>
-                            $(function () {
-                                var availableDate = [@Html.Raw((string)ViewData[Model.Id])];
-
-                                $('#@Model.Id').datepicker({
-                                    format: "dd-mm-yy",
-                                    endDate: "today",
-                                    todayBtn: "linked",
-                                    clearBtn: true,
-                                    language: "es",
-                                    daysOfWeekHighlighted: "0,6",
-                                    todayHighlight: true,
-                                    beforeShowDay: function (date) {
-                                        ymd = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
-                                        if ($.inArray(ymd, availableDate) !== -1) {
-                                            return "green";
-                                        } else {
-                                            return false;
-                                        }
-                                    }
-                                });
-                            });
-                        </script>)
                 }
                 else
                 {
                     Model.List = ViewData[Model.Id] as MultiSelectList;
                     <select id="@Model.Id"
                             title="@Model.Name"
-                            class="selectpicker form-control show-tick"
+                            class="selectpicker form-control show-tick tableFilter dropdownFilter"
                             data-width="150px"
                             data-size="4"
                             multiple
                             data-max-options="@Model.MaxOptions"
-                            onchange="filter(this)"
                             data-live-search="@Model.LiveSearch"
                             asp-items="Model.List"></select>
                 }
             </div>
             <div id="@Model.Id"
-                 class="col-1 sorting@(Model.Srt == Model.Id ? Model.Asc ? "_asc" : "_desc" : "")"
-                 onclick="filter(this)"
-                 onmouseover="">
+                 class="col-1 sorting@(Model.Srt == Model.Id ? Model.Asc ? "_asc" : "_desc" : "") tableFilter sortingFilter">
                 &emsp;
             </div>
         </div>
         break;
     case FilterType.checkbox:
         <label class="checkbox-inline">
-            <input onchange="filter(this)"
+            <input class="tableFilter checkboxFilter"
                    id="@Model.Name"
                    type="checkbox"
                    data-toggle="toggle"
@@ -93,10 +64,8 @@
         break;
     case FilterType.sort:
     default:
-        <div class="filter-sort sorting@(Model.Srt == Model.Id ? Model.Asc ? "_asc" : "_desc" : "")"
-             id="@Model.Id"
-             onclick="filter(this)"
-             onmouseover="">
+        <div class="filter-sort sorting@(Model.Srt == Model.Id ? Model.Asc ? "_asc" : "_desc" : "") tableFilter sortingFilter"
+             id="@Model.Id">
             @Model.Name
         </div>
         break;

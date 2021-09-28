@@ -7,6 +7,7 @@ using BiblioMit.Models.Entities.Digest;
 using BiblioMit.Models.Entities.Environmental;
 using BiblioMit.Models.Entities.Environmental.Plancton;
 using BiblioMit.Models.Entities.Ads;
+using BiblioMit.Models.Entities.Variables;
 
 namespace BiblioMit.Data
 {
@@ -197,7 +198,20 @@ namespace BiblioMit.Data
                 d.Property(p => p.SernapescaDeclarationId).IsRequired();
                 d.Property(p => p.Date).IsRequired();
             });
+            builder.Entity<Variable>(d =>
+            {
+                d.HasOne(p => p.Psmb)
+                .WithMany(p => p.Variables)
+                .HasForeignKey(i => i.PsmbId)
+                .OnDelete(DeleteBehavior.Restrict);
+                d.HasOne(p => p.VariableType)
+                .WithMany(p => p.Variables)
+                .HasForeignKey(i => i.VariableTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
+            });
         }
+        public DbSet<VariableType> VariableTypes { get; set; }
+        public DbSet<Variable> Variables { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Banner> Banners { get; set; }
         public DbSet<Btn> Btns { get; set; }

@@ -1,5 +1,8 @@
-﻿@{
+﻿@model string 
+@{
     ViewData["Title"] = Localizer["Environmental Upload Errors"].Value;
 }
 
-<iframe title="error log" src="/api/static/html/PullRecords.html" style="width:inherit; height:-webkit-fill-available;"></iframe>
+<partial name="_Pg" />
+
+@Html.Raw(Model)

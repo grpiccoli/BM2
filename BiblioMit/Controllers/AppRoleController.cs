@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authorization;
+using BiblioMit.Data;
 
 namespace BiblioMit.Controllers
 {
-    [Authorize(Policy = "Usuarios")]
+    [Authorize(Policy = nameof(UserClaims.Users))]
     public class AppRoleController : Controller
     {
         private readonly RoleManager<ApplicationRole> _roleManager;
@@ -35,7 +36,8 @@ namespace BiblioMit.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles ="Editor,Administrator")]
+        [Authorize(Roles = nameof(RoleData.Editor))]
+        [Authorize(Roles = nameof(RoleData.Administrator))]
         public async Task<PartialViewResult> AddEditAppRole(string id)
         {
             AppRoleViewModel model = new();
@@ -52,7 +54,8 @@ namespace BiblioMit.Controllers
             return PartialView("_AddEditAppRole", model);
         }
         [HttpPost]
-        [Authorize(Roles = "Editor,Administrator")]
+        [Authorize(Roles = nameof(RoleData.Editor))]
+        [Authorize(Roles = nameof(RoleData.Administrator))]
         [ValidateAntiForgeryToken]
         [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> AddEditAppRole(string id, AppRoleViewModel model)
@@ -80,7 +83,7 @@ namespace BiblioMit.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = nameof(RoleData.Administrator))]
         public async Task<IActionResult> DeleteAppRole(string id)
         {
             string name = string.Empty;
@@ -96,7 +99,7 @@ namespace BiblioMit.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = nameof(RoleData.Administrator))]
         [ValidateAntiForgeryToken]
         [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> DeleteAppRole(string id, IFormCollection form)

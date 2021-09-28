@@ -38,15 +38,26 @@
                     </div>
                 </div>
                 <div class="col-12">
-                    <select id="variable" class="choice" multiple></select>
+                    <select class="choice" id="psmb" multiple>
+                        <option value="">@Localizer["Areas"]</option>
+                    </select>
                 </div>
                 <div class="col-12">
-                    <select class="choice" id="psmb" multiple></select>
+                    <select id="variable" class="choice" multiple>
+                        <option value="">@Localizer["Variables"]</option>
+                    </select>
+                </div>
+                <div class="col-12 @(User.Identity.IsAuthenticated ? "" : "d-none")">
+                    <select id="variables" class="choice" multiple>
+                        <option value="">@Localizer["Custom variables"]</option>
+                    </select>
                 </div>
                 <div id="semaforo" class="col @(User.Identity.IsAuthenticated ? "" : "d-none")">
                     <div class="row">
                         <div class="col-12">
-                            <select class="choice" id="tl" multiple></select>
+                            <select class="choice" id="tl" multiple>
+                                <option value="">@Localizer["RAG project"]</option>
+                            </select>
                         </div>
                         <div class="col-12">
                             <button id="infobtn" class="btn btn-sm">
@@ -59,7 +70,22 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-8">
+        <div class="col-1">
+            <h2>@Localizer["Config"]</h2>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="pin-switch" checked>
+                <label class="form-check-label" for="flexSwitchCheckDefault">Info Pins</label>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="polygon-switch" checked>
+                <label class="form-check-label" for="flexSwitchCheckDefault">Polygons</label>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="stat-switch" checked>
+                <label class="form-check-label" for="flexSwitchCheckDefault">Stats</label>
+            </div>
+        </div>
+        <div class="col-11 col-md-7">
             <h2>@Localizer["Map"]</h2>
             <div class="w-100" id="map"></div>
         </div>

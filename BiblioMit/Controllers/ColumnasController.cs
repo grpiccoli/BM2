@@ -62,8 +62,8 @@ namespace BiblioMit.Controllers
 
             var regs = _context.Registries.Include(r => r.InputFile).Include(r => r.Headers);
 
-            var two2five = User.Claims.Any(c => c.Value == "per" || c.Value == "sernapesca");
-            var one = User.Claims.Any(c => c.Value == "intemit");
+            var two2five = User.Claims.Any(c => c.Value == UserClaims.Digest.ToString() );
+            var one = User.Claims.Any(c => c.Value == UserClaims.PSMB.ToString() );
 
             if(one && two2five)
             {

@@ -1,13 +1,16 @@
 ﻿@{
     ViewData["Title"] = Localizer["Responses"];
-}
-@section Styles{
-    <style>
-        footer {
-            background: transparent !important;
-            opacity: 0.5;
-        }
-    </style>
+    BiblioMit.Models.VM.CSPTag.StyleSrcElem.Add("https://www.gstatic.com/");
+    BiblioMit.Models.VM.CSPTag.ScriptSrcElem.Add("https://www.gstatic.com/");
+    BiblioMit.Models.VM.CSPTag.ConnectSrc.Add("https://www.gstatic.com/");
+    BiblioMit.Models.VM.CSPTag.StyleSrc.Add("'unsafe-inline'");
+    BiblioMit.Models.VM.CSPTag.StyleSrcElem.Add("'unsafe-inline'");
+    BiblioMit.Models.VM.CSPTag.ScriptSrcElem.Add("'unsafe-inline'");
+
+    BiblioMit.Models.VM.CSPTag.ImgSrc.Add("https://ssl.gstatic.com/");
+    BiblioMit.Models.VM.CSPTag.ImgSrc.Add("https://www.gstatic.com/");
+    BiblioMit.Models.VM.CSPTag.ImgSrc.Add("https://lh3.googleusercontent.com/");
+    BiblioMit.Models.VM.CSPTag.AccessControlUrls.Add("https://www.gstatic.com/");
 }
 
 @model string

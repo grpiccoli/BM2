@@ -6,6 +6,10 @@ body {
     font: 14px/1 Arial, sans-serif;
 }*/
 
+body{
+    overflow:hidden;
+}
+
 .scrolltable {
     overflow-x: scroll;
     height: 100%;

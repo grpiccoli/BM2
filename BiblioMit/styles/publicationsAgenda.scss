@@ -1,0 +1,22 @@
+﻿#estado option {
+    font-weight: bold;
+
+    &:nth-child(1) {
+        color: #48763d;
+    }
+
+    &:nth-child(2) {
+        color: #57708f;
+    }
+
+    &:nth-child(3) {
+        color: #8a6d3b;
+    }
+
+    &:nth-child(4) {
+        color: #b14442;
+    }
+}
+button.stat {
+    height: 45px;
+}

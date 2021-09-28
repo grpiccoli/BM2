@@ -32,7 +32,8 @@
   "include": [ "scripts/*" ],
   "exclude": [
     "node_modules",
-    "wwwroot"
+    "wwwroot",
+    "*.js"
   ],
   "compileOnSave": true
 }

@@ -19,8 +19,13 @@ namespace BiblioMit.Models.VM
         public static HashSet<string> FrameSrc { get; } = new HashSet<string>();
         public static Dictionary<string, string> Files { get; } = new Dictionary<string, string>();
         public static bool UpgradeInsecureRequests { get; set; } = true;
+        public static HashSet<string> AccessControlUrls { get; } = new HashSet<string>();
         public static string GetString(HostString baseUrl)
         {
+            if (StyleSrcElem.Contains("'unsafe-inline'"))
+                StyleSrcElem.RemoveWhere(s => s.StartsWith("'nonce-", System.StringComparison.Ordinal));
+            if (ScriptSrcElem.Contains("'unsafe-inline'"))
+                ScriptSrcElem.RemoveWhere(s => s.StartsWith("'nonce-", System.StringComparison.Ordinal));
             var blockmixed = BlockAllMixedContent ? "block-all-mixed-content;" : string.Empty;
             var upgradeinsecure = UpgradeInsecureRequests ? "upgrade-insecure-requests;" : string.Empty;
             return $"base-uri 'self' {string.Join(" ", BaseUri)} ; " +
@@ -36,6 +41,10 @@ namespace BiblioMit.Models.VM
                 $"style-src-elem 'self' https://fonts.googleapis.com/ {string.Join(" ", StyleSrcElem)} ; " +
                 $"font-src 'self' data: https://fonts.googleapis.com/ https://fonts.gstatic.com/ {string.Join(" ", FontSrc)} ; " +
                 $"{upgradeinsecure}";
+        }
+        public static string GetAccessControlString()
+        {
+            return string.Join(" ", AccessControlUrls);
         }
         public static void Clear()
         {

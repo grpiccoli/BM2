@@ -117,13 +117,40 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Area (ha)" xml:space="preserve">
+    <value>Área (Ha)</value>
+  </data>
   <data name="Centres" xml:space="preserve">
     <value>Centros</value>
+  </data>
+  <data name="Code" xml:space="preserve">
+    <value>Código</value>
+  </data>
+  <data name="Commune" xml:space="preserve">
+    <value>Comuna</value>
+  </data>
+  <data name="Company" xml:space="preserve">
+    <value>Compañía</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>Detalles</value>
   </data>
   <data name="Filter" xml:space="preserve">
     <value>Filtrar</value>
   </data>
   <data name="Filter by Commune, Province and/or Region" xml:space="preserve">
     <value>Filtrar por comuna, provincia y/o región</value>
+  </data>
+  <data name="Locality" xml:space="preserve">
+    <value>Localidad</value>
+  </data>
+  <data name="Province" xml:space="preserve">
+    <value>Provincia</value>
+  </data>
+  <data name="Region" xml:space="preserve">
+    <value>Región</value>
+  </data>
+  <data name="Sources" xml:space="preserve">
+    <value>Fuentes</value>
   </data>
 </root>

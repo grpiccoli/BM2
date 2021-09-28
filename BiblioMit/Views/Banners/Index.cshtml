@@ -1,4 +1,7 @@
 ﻿@using BiblioMit.Controllers
+@using BiblioMit.Models.Entities.Ads
+@using BiblioMit.Extensions
+
 @model Carousel
 
 @{
@@ -6,9 +9,14 @@
     ViewData["footer-text"] = "text-light";
     ViewData["navbar-bg"] = "";
     ViewData["footer-logo"] = "~/epic_light_hor.svg";
+    BiblioMit.Models.VM.CSPTag.StyleSrcElem.Add("'unsafe-inline'");
+    BiblioMit.Models.VM.CSPTag.ScriptSrcElem.Add("'unsafe-inline'");
+    BiblioMit.Models.VM.CSPTag.StyleSrc.Add("'unsafe-inline'");
 }
 
-<partial name="_Libs" model='new List<string> { "banners" }' />
+<partial name="_LibsPg" model='new List<string> { "@popperjs/core", "tippy.js", "banners" }' />
+
+<partial name="_BannersEdit" />
 
 @section Styles{
     <style>@Html.Raw(string.Join(string.Empty, Model.Styles))</style>
@@ -16,7 +24,7 @@
 
 @section Headers{
     <!-- Carousel wrapper -->
-    <div id="introCarousel" class="carousel slide carousel-fade shadow-2-strong" data-bs-ride="carousel" data-interval="false">
+    <div id="introCarousel" class="carousel slide carousel-fade shadow-2-strong" data-bs-ride="carousel" data-bs-interval="false">
         <!-- Indicators -->
         <div class="carousel-indicators">
             @Html.Raw(string.Join(string.Empty, Model.Indicators))

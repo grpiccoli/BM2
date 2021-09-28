@@ -1,4 +1,9 @@
-﻿<partial name="_Libs" model='new List<string> { "fine-uploader" }' />
+﻿@{ 
+    var scriptNonce = Hash.Nonce();
+    BiblioMit.Models.VM.CSPTag.ScriptSrcElem.Add($"'nonce-{scriptNonce}'");
+}
+
+<partial name="_Libs" model='new List<string> { "fine-uploader" }' />
 
 @this.Blocks("Styles", @<script type="text/template" id="qq-template-manual-trigger">
                  <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Arroje archivos aquí">
@@ -67,13 +72,16 @@
     .qq-upload-list{
         max-height:400px;
     }
-    #trigger-upload {
-        color: white;
-        background-color: #00ABC7;
-        font-size: 14px;
-        padding: 7px 20px;
-        background-image: none;
-    }
+        #MessageUploaderError {
+            color:red;
+        }
+        #trigger-upload {
+            color: white;
+            background-color: #00ABC7;
+            font-size: 14px;
+            padding: 7px 20px;
+            background-image: none;
+        }
     #fine-uploader-manual-trigger .qq-upload-button {
         margin-right: 15px;
     }
@@ -86,7 +94,7 @@
 </style>)
 <div id="fine-uploader-manual-trigger"></div>
 @this.Block("Scripts",
-@<script>
+@<script nonce="@scriptNonce">
     $(document).ready(function () {
         var token = $('input:hidden[name="__RequestVerificationToken"]').val();
         var manualUploader = new qq.FineUploader({

@@ -14,8 +14,8 @@
 </div>
 
 <form id="form" asp-action="Agenda" method="get" class="form-inline">
-    <div class="col-12 col-md-4">
-        <select id="fondos" name="fund" class="selectpicker form-control w-100" multiple data-live-search="true" 
+    <div class="input-group mb-3">
+        <select id="fondos" name="fund" class="selectpicker form-control" multiple data-live-search="true" 
                 tabindex="-98" data-actions-box="true" value="@ViewData["fund"]" title="Seleccionar Fondos …"
                 data-selected-text-format="count > 4" data-size="5">
             <optgroup label="Fondos CONICYT &mdash; Comisión Nacional de Investigación Científica y Tecnológica">
@@ -38,27 +38,23 @@
                 }
             </optgroup>
         </select>
-    </div>
-    <div class="input-group col-12 col-md-8">
         <select id="estado" name="stt" class="selectpicker form-control show-tick" tabindex="-98" value="@ViewData["stt"]" title="Elegir estado de concurso …">
-            <option style="font-weight:bold; color:#48763d" selected="@((string)ViewData["stt"] == "abierto")" 
+            <option selected="@((string)ViewData["stt"] == "abierto")" 
                     class="alert alert-success" data-icon="far fa-edit" value="abierto">Abiertos</option>
-            <option style="font-weight:bold;color:#57708f" selected="@((string)ViewData["stt"] == "evaluacion")" 
+            <option selected="@((string)ViewData["stt"] == "evaluacion")" 
                     class="alert alert-info" data-icon="far fa-eye fa-fw" value="evaluacion">En evaluaci&oacute;n</option>
-            <option style="font-weight:bold;color:#8a6d3b" selected="@((string)ViewData["stt"] == "adjudicado")" 
+            <option selected="@((string)ViewData["stt"] == "adjudicado")" 
                     class="alert alert-warning" data-icon="fas fa-award" value="adjudicado">Adjudicados</option>
-            <option style="font-weight:bold;color:#b14442" selected="@((string)ViewData["stt"] == "proximo")" 
+            <option selected="@((string)ViewData["stt"] == "proximo")" 
                     class="alert alert-danger" data-icon="fa fa-calendar" value="proximo">Pr&oacute;ximos</option>
         </select>
-        <div class="input-group-btn">
-            <button type="submit" value="Buscar" class="btn btn-primary btn-block" onclick="return empty();"><i class="fas fa-search"></i>  Buscar</button>
-        </div>
+        <button type="submit" value="Buscar" class="btn btn-primary btn-block" onclick="return empty();"><i class="fas fa-search"></i>  Buscar</button>
     </div>
 </form>
 
 @if ((ViewData["fund"] as string[]).Count() > 0)
 {
-    <button type="button" class="stat btn btn-block btn-link" style="height:45px">
+    <button type="button" class="stat btn btn-block btn-link">
         <i class="fa fa-globe"></i> <strong>@String.Format("{0:n0}", Model.Count())</strong> Resultados en <strong>@((ViewData["fund"] as string[]).Count())</strong> Reps.
     </button>
 }

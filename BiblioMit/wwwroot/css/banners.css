@@ -27,3 +27,7 @@ footer {
 
 body {
   overflow: hidden; }
+
+a.btn-banner {
+  color: inherit;
+  border-color: inherit; }

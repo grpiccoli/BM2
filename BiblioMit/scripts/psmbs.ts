@@ -75,26 +75,28 @@ var markers: any = {};
 var companies: any = {};
 var psmbs: any = {};
 var markerCluster: any;
+var data = document.getElementById("map-holder").dataset;
 var bnds: google.maps.LatLngBounds = new google.maps.LatLngBounds();
 var showInfo = function (_e: any) {
     var id = this.zIndex;
+    var area = polygons[id] != null ? Area(polygons[id].getPath().getArray()) : "";
     var head = `<h4>${tableInfo[id].code} ${tableInfo[id].name}</h4>
-<table><tr><th>Código</th><td align=""right"">${tableInfo[id].code}</td></tr>
-<tr><th>Compañía</th><td align=""right"">${tableInfo[id].businessName}</td></tr>
+<table><tr><th>${data.code}</th><td align=""right"">${tableInfo[id].code}</td></tr>
+<tr><th>${data.company}</th><td align=""right"">${tableInfo[id].businessName}</td></tr>
 <tr><th>RUT</th><td align=""right"">${tableInfo[id].rut}</td></tr>
-<tr><th>Localidad</th><td align=""right"">${tableInfo[id].name}</td></tr>
-<tr><th>Comuna</th><td align=""right"">${tableInfo[id].comuna}</td></tr>
-<tr><th>Provincia</th><td align=""right"">${tableInfo[id].provincia}</td></tr>
-<tr><th>Región</th><td align=""right"">${tableInfo[id].region}</td></tr></tr>
-<tr><th>Área (Ha)</th><td align=""right"">`;
-    var tail = `</td></tr><tr><a href=""/Centres/Details/${id}"">Detalles</a></tr>
-<tr><th>Fuentes</th><td></td></tr><tr><td>Sernapesca</td>
+<tr><th>${data.locality}</th><td align=""right"">${tableInfo[id].name}</td></tr>
+<tr><th>${data.commune}</th><td align=""right"">${tableInfo[id].comuna}</td></tr>
+<tr><th>${data.province}</th><td align=""right"">${tableInfo[id].provincia}</td></tr>
+<tr><th>${data.region}</th><td align=""right"">${tableInfo[id].region}</td></tr></tr>
+<tr><th>${data.area}</th><td align=""right"">`;
+    var tail = `</td></tr><tr><a href=""/Centres/Details/${id}"">${data.details}</a></tr>
+<tr><th>${data.sources}</th><td></td></tr><tr><td>Sernapesca</td>
 <td align=""right""><a target=""_blank"" href=""https://www.sernapesca.cl""><img src=""../images/ico/sernapesca.svg"" height=""20"" /></a></td></tr>
 <tr><td>PER Mitilidos</td>
 <td align=""right""><a target=""_blank"" href=""https://www.mejillondechile.cl""><img src=""../images/ico/mejillondechile.min.png"" height=""20"" /></a></td></tr>
 <tr><td>Subpesca</td>
 <td align=""right""><a target=""_blank"" href=""https://www.subpesca.cl""><img src=""../images/ico/subpesca.png"" height=""20"" /></a></td></tr>`;
-    infowindow.setContent(head + Area(polygons[id].getPath().getArray()) + tail);
+    infowindow.setContent(head + area + tail);
     infowindow.open(map, this);
 }
 var addListenerOnPolygon = function (e: any) {

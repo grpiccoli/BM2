@@ -3,7 +3,7 @@
 @using BiblioMit.Authorization
 @using BiblioMit.Controllers
 @using Microsoft.AspNetCore.Authorization
-
+@using BiblioMit.Models.Entities.Centres
 @{
     ViewData["Title"] = "Contactos";
 }
@@ -41,13 +41,13 @@
 </form>
 
 <table class="table">
-    <thead style="font-size:12px">
+    <thead>
         <tr>
             <th class="hidden-xs">
                 Tipo
             </th>
             <th class="hidden-xs">
-                @Html.DisplayNameFor(model => model.ConsessionOrResearch.Company.BusinessName) / @Html.DisplayNameFor(model => model.ConsessionOrResearch.Company.Id)
+                @Html.DisplayNameFor(model => model.ConsessionOrResearch.Company.BusinessName) / @Html.DisplayNameFor(model => model.ConsessionOrResearch.CompanyId)
             </th>
             <th class="hidden-xs">
                 Centro o Concesi&oacute;n
@@ -70,41 +70,43 @@
             <th class="hidden-xs"></th>
         </tr>
     </thead>
-    <tbody style="font-size:11px">
+    <tbody>
         @foreach (var item in Model)
         {
+            var acr = "bibliomit";
+            var rut = item.ConsessionOrResearch.Company?.GetRUT();
+            var companyId = item.ConsessionOrResearch.CompanyId;
+            var url = "#";
+            var type = item.ConsessionOrResearch?.Discriminator;
+            var businessName = item.ConsessionOrResearch.Company.BusinessName;
+            var ext = "svg";
+            if (!string.IsNullOrWhiteSpace(item.ConsessionOrResearch.Company?.Acronym))
+                acr = item.ConsessionOrResearch.Company.Acronym;
+            if (type == PsmbType.ResearchCentre)
+                url = ((ResearchCentre)item.ConsessionOrResearch).Url.ToString();
+            if (acr == "AMICHILE" || acr == "INPESCA")
+                ext = "min.png";
             <tr>
                 <td class="hidden-xs">
-                    @if (item.ConsessionOrResearch.Name == null)
-                    {
-                        @("Centro de cultivo");
-                    }
-                    else
-                    {
-                        @("Institución");
-                    }
+                    @type.ToString()
                 </td>
                 <td class="hidden-xs">
                     <div class="img-with-text float-left">
-                        <a asp-controller="Companies" asp-action="Details" asp-route-id="@item.ConsessionOrResearch.CompanyId">
-                            @{ var acr = string.IsNullOrWhiteSpace(item.ConsessionOrResearch.Company.Acronym) ? "bibliomit" : item.ConsessionOrResearch.Company.Acronym; }
-                            <img src="~/images/ico/@(acr).svg" height="50" />
-                            @*<span style="font-size:48px;" class="bib-@item.ConsessionOrResearch.Company.Acronym">
-                                    <span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span><span class="path6"></span>
-                                </span>*@
+                        <a asp-controller="Companies" asp-action="Details" asp-route-id="@companyId">
+                            <img src="~/images/ico/@acr.@ext" height="50" />
                             <p>
                                 <small>
-                                    @item.ConsessionOrResearch.Company.Acronym
+                                    @acr
                                 </small>
                             </p>
                         </a>
                     </div>
                     <div class="float-left">
-                        @Html.DisplayFor(modelItem => item.ConsessionOrResearch.Company.BusinessName)
+                        @businessName
                         <br />
-                        @Html.DisplayFor(modelItem => item.ConsessionOrResearch.Company.Id)-@item.ConsessionOrResearch.Company.Id.RUTGetDigit()
+                        @rut
                         <br />
-                        <a asp-controller="Companies" asp-action="Details" asp-route-id="@item.ConsessionOrResearch.CompanyId">
+                        <a asp-controller="Companies" asp-action="Details" asp-route-id="@companyId">
                             <small>
                                 Detalles
                             </small>
@@ -112,15 +114,15 @@
                     </div>
                 </td>
                 <td class="hidden-xs">
-                    @if (item.ConsessionOrResearch.Name == null)
+                    @if (type == PsmbType.ResearchCentre)
                     {
-                        @Html.DisplayFor(modelItem => item.ConsessionOrResearch.Id)
+                        <a target="_blank" rel="noopener" href="@url">
+                            @Html.DisplayFor(modelItem => item.ConsessionOrResearch.Name)
+                        </a>
                     }
                     else
                     {
-                        <a target="_blank" rel="noopener" href="@Html.DisplayFor(modelItem => ((BiblioMit.Models.Entities.Centres.ResearchCentre)item.ConsessionOrResearch).Url)">
-                            @Html.DisplayFor(modelItem => item.ConsessionOrResearch.Name)
-                        </a>
+                        @Html.DisplayFor(modelItem => item.ConsessionOrResearchId)
                     }
                     <br />
                     <a asp-controller="Centres" asp-action="Details" asp-route-id="@item.ConsessionOrResearchId">
@@ -134,9 +136,9 @@
                 </td>
                 <td>
                     <div class="hidden-lg hidden-md hidden-sm">
-                        <div class="img-with-text float-left text-end pr-1" style="width:35vw">
-                            <a style="font-size:small" asp-controller="Companies" asp-action="Details" asp-route-id="@item.ConsessionOrResearch.Company.Id">
-                                <span style="font-size:64px;" class="bib-@item.ConsessionOrResearch.Company.Acronym">
+                        <div class="details-row img-with-text float-left text-end pr-1">
+                            <a asp-controller="Companies" asp-action="Details" asp-route-id="@companyId">
+                                <span class="bibicon bib-@acr">
                                     <span class="path1"></span>
                                     <span class="path2"></span>
                                     <span class="path3"></span>
@@ -147,18 +149,18 @@
                             </a>
                             <p>
                                 <small>
-                                    <a target="_blank" rel="noopener" 
-                                       href="@Html.DisplayFor(modelItem => ((BiblioMit.Models.Entities.Centres.ResearchCentre)item.ConsessionOrResearch).Url)">
+                                    <a target="_blank" rel="noopener"
+                                       href="@url">
                                         <strong>@Html.DisplayFor(modelItem => item.ConsessionOrResearch.Name)</strong>
                                     </a><br />
-                                    <a target="_blank" rel="noopener" 
+                                    <a target="_blank" rel="noopener"
                                        href="https://www.google.com/maps/search/?api=1&query=@item.ConsessionOrResearch.Address">
-                                    @Html.DisplayFor(modelItem => item.ConsessionOrResearch.Address)
+                                        @Html.DisplayFor(modelItem => item.ConsessionOrResearch.Address)
                                     </a>
                                 </small>
                             </p>
                         </div>
-                        <div class="float-left" style="width:45vw;">
+                        <div class="float-left w-45w">
                             <p class="mb-0">
                                 <strong>@Html.DisplayFor(modelItem => item.Name) @Html.DisplayFor(modelItem => item.Last)</strong>
                                 <br />
@@ -183,7 +185,7 @@
                 <td class="hidden-xs" title="Horario: @Html.DisplayFor(modelItem => item.OpenHr) - @Html.DisplayFor(modelItem => item.CloseHr) Hrs">
                     <a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=@item.ConsessionOrResearch.Address">@Html.DisplayFor(modelItem => item.ConsessionOrResearch.Address)</a>
                 </td>
-                @if (User.IsInRole("Manager"))
+                @if (User.IsInRole(BiblioMit.Data.RoleData.Administrator.ToString()))
                 {
                     <td>
                         @Html.DisplayFor(modelItem => item.Status)
@@ -191,13 +193,13 @@
                 }
                 <td class="hidden-xs">
                     @if (AuthorizationService.AuthorizeAsync(User,
-                                                      item, ContactOperations.Update).GetAwaiter().GetResult().Succeeded)
+                                                     item, ContactOperations.Update).GetAwaiter().GetResult().Succeeded)
                     {
                         <a asp-action="Edit" asp-route-id="@item.Id">Editar</a><text> | </text>
                     }
                     <a asp-action="Details" asp-route-id="@item.Id">Detalles</a>
                     @if (AuthorizationService.AuthorizeAsync(User,
-                                                        item, ContactOperations.Delete).GetAwaiter().GetResult().Succeeded)
+                                                       item, ContactOperations.Delete).GetAwaiter().GetResult().Succeeded)
                     {
                         <text> | </text>
                         <a asp-action="Delete" asp-route-id="@item.Id">Eliminar</a>

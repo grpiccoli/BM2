@@ -12,6 +12,10 @@ using BiblioMit.Blazor;
 using BiblioMit.Extensions;
 using Microsoft.Extensions.Localization;
 using BiblioMit.Models.VM;
+using System.IO;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using BiblioMit.Models.VM.AmbientalVM;
 
 namespace BiblioMit.Controllers
 {
@@ -21,36 +25,52 @@ namespace BiblioMit.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IStringLocalizer<AmbientalController> _localizer;
         private readonly string _dateFormat;
+        private readonly IWebHostEnvironment _environment;
         public AmbientalController(
             ApplicationDbContext context,
+            IWebHostEnvironment environment,
             IStringLocalizer<AmbientalController> localizer)
         {
             _localizer = localizer;
             _context = context;
+            _environment = environment;
             _dateFormat = "yyyy-MM-dd";
+        }
+        [HttpGet]
+        public IActionResult GetContent([Bind("Name,Code,Commune,Province,Area,Lang")]Content model)
+        {
+            return PartialView("_GetContent", model);
         }
         [HttpGet]
         public IActionResult PullPlankton()
         {
-            return View();
+            var file = Path.Combine(_environment.ContentRootPath, "html", "PullRecords.html");
+            var htmlString = System.IO.File.ReadAllLines(file);
+            return View("PullPlankton", string.Join("",htmlString));
         }
         private IQueryable<ChoicesItem> CuencaChoices()
         {
             var singlabel = _localizer["Catchment Area"] + " ";
-            return _context.CatchmentAreas.Select(c => new ChoicesItemSelected
+            return _context.CatchmentAreas
+                .AsNoTracking()
+                .Select(c => new ChoicesItemSelected
             {
                 Value = c.Id,
                 Label = singlabel + c.Name,
                 Selected = c.Id == 1
             });
         }
-        private IQueryable<ChoicesItem> CommuneChoices() => _context.CatchmentAreas.SelectMany(c => c.Communes
+        private IQueryable<ChoicesItem> CommuneChoices() => _context.CatchmentAreas
+            .AsNoTracking()
+            .SelectMany(c => c.Communes
             .Select(com => new ChoicesItem
             {
                 Value = com.Id,
                 Label = com.Name + " " + c.Name
             }));
-        private IQueryable<ChoicesItem> PsmbChoices() => _context.CatchmentAreas.SelectMany(c => c.Communes
+        private IQueryable<ChoicesItem> PsmbChoices() => _context.CatchmentAreas
+            .AsNoTracking()
+            .SelectMany(c => c.Communes
         .SelectMany(com => com.Psmbs.Where(p => p.PolygonId.HasValue && p.PlanktonAssays.Any())
         .Select(p => new ChoicesItem
         {
@@ -59,12 +79,10 @@ namespace BiblioMit.Controllers
         })));
         private IQueryable<ChoicesItem> PublicAreaChoices() => CuencaChoices().Union(CommuneChoices());
         private IQueryable<ChoicesItem> PrivateAreaChoices() => PublicAreaChoices().Union(PsmbChoices());
-        [AllowAnonymous]
         [HttpGet]
         public IActionResult PublicAreasList() => Json(PublicAreaChoices());
         [HttpGet]
         public IActionResult PrivateAreasList() => Json(PrivateAreaChoices());
-        [AllowAnonymous]
         [HttpGet]
         public IActionResult CuencaList()
         {
@@ -72,30 +90,33 @@ namespace BiblioMit.Controllers
             return Json(new ChoicesGroup
             {
                     Label = _localizer["Catchment Areas"],
-                    Choices = _context.CatchmentAreas.Select(c => new ChoicesItem
+                    Choices = _context.CatchmentAreas
+                    .AsNoTracking()
+                    .Select(c => new ChoicesItem
                     {
                         Value = c.Id,
                         Label = singlabel + c.Name
                     })
                 });
         }
-        [AllowAnonymous]
         [HttpGet]
         public IActionResult RegionList() => Json(new ChoicesGroup
             {
                 Label = _localizer["Regions"],
                 Choices = _context.Regions
+            .AsNoTracking()
                     .Select(com => new ChoicesItem
                     {
                         Value = com.Id,
                         Label = com.Name
                     })
             });
-        [AllowAnonymous]
         [HttpGet]
         public IActionResult ProvinciaList() => Json(Provincia());
         private IQueryable<ChoicesGroup> Provincia() =>
-            _context.Regions.Select(c => new ChoicesGroup
+            _context.Regions
+            .AsNoTracking()
+            .Select(c => new ChoicesGroup
             {
                 Label = c.Name,
                 Choices = c.Provinces
@@ -105,7 +126,6 @@ namespace BiblioMit.Controllers
                         Label = com.Name + ", " + c.Name
                     })
             });
-        [AllowAnonymous]
         [HttpGet]
         public IActionResult ComunaList()
         {
@@ -113,7 +133,9 @@ namespace BiblioMit.Controllers
             return Json(Comuna(singlabel));
         }
         private IQueryable<ChoicesGroup> Comuna(string singlabel) =>
-            _context.CatchmentAreas.Select(c => new ChoicesGroup
+            _context.CatchmentAreas
+            .AsNoTracking()
+            .Select(c => new ChoicesGroup
             {
                 Label = singlabel + c.Name,
                 Choices = c.Communes
@@ -125,6 +147,7 @@ namespace BiblioMit.Controllers
             });
         [HttpGet]
         public IActionResult PsmbList() => Json(_context.Communes
+            .AsNoTracking()
                 .Where(c => c.CatchmentAreaId.HasValue)
                 .Select(c => new ChoicesGroup
                 {
@@ -147,6 +170,7 @@ namespace BiblioMit.Controllers
         }
         [HttpGet]
         public IActionResult ProvinciaResearchList() => Json(_context.Regions
+            .AsNoTracking()
             .Select(c => new ChoicesGroup
             {
                 Label = c.Name,
@@ -160,6 +184,7 @@ namespace BiblioMit.Controllers
             }));
         [HttpGet]
         public IActionResult ComunaResearchList() => Json(_context.Provinces
+            .AsNoTracking()
             .Select(c => new ChoicesGroup
             {
                 Label = c.Name,
@@ -173,7 +198,8 @@ namespace BiblioMit.Controllers
             }));
         [HttpGet]
         public IActionResult FarmData() => Json(_context.PsmbAreas
-            .Where(c => c.PolygonId.HasValue && c.CommuneId.HasValue && c.CompanyId.HasValue)
+            .AsNoTracking()
+            .Where(c => c.PolygonId.HasValue && c.CommuneId.HasValue)
             .Select(c => new GMapPolygonCentre
             {
                 Id = c.Id,
@@ -182,8 +208,8 @@ namespace BiblioMit.Controllers
                 ComunaId = c.CommuneId.Value,
                 Provincia = c.Commune.Province.Name,
                 Code = c.Code,
-                BusinessName = c.Company.BusinessName ?? "",
-                Rut = c.CompanyId.Value,
+                //BusinessName = c.Company.BusinessName ?? "",
+                //Rut = c.CompanyId.Value,
                 Position = c.Polygon
                         .Vertices.Select(o => new GMapCoordinate
                         {
@@ -193,6 +219,7 @@ namespace BiblioMit.Controllers
             }));
         [HttpGet]
         public IActionResult ResearchData() => Json(_context.ResearchCentres
+            .AsNoTracking()
                     .Where(c => c.PolygonId.HasValue && c.CommuneId.HasValue)
                     .Select(c => new GMapPolygonCentre
                     {
@@ -213,6 +240,7 @@ namespace BiblioMit.Controllers
                     }));
         [HttpGet]
         public IActionResult FarmList() => Json(_context.Farms
+            .AsNoTracking()
                     .Where(p => p.PolygonId.HasValue)
                     .Select(p => new ChoicesItem
                     {
@@ -221,6 +249,7 @@ namespace BiblioMit.Controllers
                     }));
         [HttpGet]
         public IActionResult CompanyList() => Json(_context.Companies
+            .AsNoTracking()
                     .Where(p => p.Id > 900_000 && p.Psmbs.Any(f => f.Discriminator == Models.Entities.Centres.PsmbType.Farm && f.PolygonId.HasValue))
                     .Select(p => new ChoicesItem
                     {
@@ -229,6 +258,7 @@ namespace BiblioMit.Controllers
                     }));
         [HttpGet]
         public IActionResult ResearchList() => Json(_context.ResearchCentres
+            .AsNoTracking()
                     .Where(p => p.PolygonId.HasValue)
                     .Select(p => new ChoicesItem
                     {
@@ -237,6 +267,7 @@ namespace BiblioMit.Controllers
                     }));
         [HttpGet]
         public IActionResult InstitutionList() => Json(_context.Companies
+            .AsNoTracking()
                     .Where(p => p.Psmbs.Any(p => p.Discriminator == Models.Entities.Centres.PsmbType.ResearchCentre))
                     .Select(p => new ChoicesItem
                     {
@@ -252,7 +283,9 @@ namespace BiblioMit.Controllers
             return Json(new ChoicesGroup
             {
                 Label = _localizer["Phylogenetic Groups (Cel/mL)"],
-                Choices = _context.PhylogeneticGroups.Select(p => new ChoicesItem
+                Choices = _context.PhylogeneticGroups
+                .AsNoTracking()
+                .Select(p => new ChoicesItem
                 {
                     Value = "f" + p.Id,
                     Label = p.Name + group
@@ -266,7 +299,9 @@ namespace BiblioMit.Controllers
             return Json(new ChoicesGroup
             {
                 Label = _localizer["Genera (Cel/mL)"],
-                Choices = _context.GenusPhytoplanktons.Select(p => new ChoicesItem
+                Choices = _context.GenusPhytoplanktons
+                .AsNoTracking()
+                .Select(p => new ChoicesItem
                 {
                     Value = "g" + p.Id,
                     Label = p.Name + genus
@@ -281,6 +316,7 @@ namespace BiblioMit.Controllers
             {
                 Label = _localizer["Species (Cel/mL)"],
                 Choices = _context.SpeciesPhytoplanktons
+                .AsNoTracking()
                 .Select(p => new ChoicesItem
                 {
                     Value = "s" + p.Id,
@@ -629,7 +665,9 @@ namespace BiblioMit.Controllers
         public JsonResult CuencaData()
         {
             var title = _localizer["Catchment Area"] + " ";
-            return Json(_context.CatchmentAreas.Select(c => new GMapPolygon
+            return Json(_context.CatchmentAreas
+                .AsNoTracking()
+                .Select(c => new GMapPolygon
                {
                    Id = c.Id,
                    Name = title + c.Name,
@@ -646,6 +684,7 @@ namespace BiblioMit.Controllers
         {
             var title = _localizer["Commune"] + " ";
             return Json(_context.Communes
+                .AsNoTracking()
                 .Where(com => com.CatchmentAreaId.HasValue)
                 .Select(com => new GMapMultiPolygon
                 {
@@ -677,6 +716,7 @@ namespace BiblioMit.Controllers
                                  });
         [HttpGet]
         public JsonResult PsmbData() => Json(SelectPsmbs(_context.PsmbAreas
+                    .AsNoTracking()
                     .Where(c => c.Commune.CatchmentAreaId.HasValue && c.PolygonId.HasValue && c.PlanktonAssays.Any())));
         [HttpGet]
         public IActionResult BuscarInformes(int id, string start, string end)
@@ -774,11 +814,56 @@ namespace BiblioMit.Controllers
         [HttpGet]
         public IActionResult Graph()
         {
-            ViewData["start"] = _context.PlanktonAssays.Min(e => e.SamplingDate)
+            ViewData["start"] = _context.PlanktonAssays
+                .AsNoTracking()
+                .Min(e => e.SamplingDate)
                 .ToString(_dateFormat, CultureInfo.InvariantCulture);
-            ViewData["end"] = _context.PlanktonAssays.Max(e => e.SamplingDate)
+            ViewData["end"] = _context.PlanktonAssays
+                .AsNoTracking()
+                .Max(e => e.SamplingDate)
                 .ToString(_dateFormat, CultureInfo.InvariantCulture);
             return View();
+        }
+        [HttpGet]
+        public IActionResult GetPhotos()
+        {
+            var photos = _context.Photos
+                            .Include(p => p.Individual)
+                                .ThenInclude(i => i.Sampling)
+                            .AsNoTracking()
+                            .ToList();
+
+            List<NanoGalleryElement> gallery = photos.Select(photo => new NanoGalleryElement
+            {
+                Src =  $"Photos/GetImg?f={photo.Key}&d=DB",
+                Srct = $"Photos/GetImg?f={photo.Key}&d=DB/Thumbs",
+                Title = photo.Comment,
+                Id = $"{photo.IndividualId}{photo.Id}",
+                AlbumId = photo.IndividualId.ToString(CultureInfo.InvariantCulture)
+            }).ToList();
+
+            gallery.AddRange(photos.Select(p => p.Individual)
+            .Select(i => new NanoGalleryElement
+            {
+                Src = $"Photos/GetImg?f={i.Photos.First().Key}&d=DB",
+                Srct = $"Photos/GetImg?f={i.Photos.First().Key}&d=DB/Thumbs",
+                Title = i.Id.ToString(CultureInfo.InvariantCulture),
+                Id = i.Id.ToString(CultureInfo.InvariantCulture),
+                AlbumId = i.SamplingId.ToString(CultureInfo.InvariantCulture),
+                Kind = "album"
+            }));
+
+            gallery.AddRange(photos.Select(p => p.Individual.Sampling)
+            .Select(s => new NanoGalleryElement
+            {
+                Src = $"Photos/GetImg?f={s.Individuals.First().Photos.First().Key}&d=DB",
+                Srct = $"Photos/GetImg?f={s.Individuals.First().Photos.First().Key}&d=DB/Thumbs",
+                Title = s.Id.ToString(CultureInfo.InvariantCulture),
+                Id = s.Id.ToString(CultureInfo.InvariantCulture),
+                Kind = "album"
+            }));
+
+            return Json(gallery);
         }
     }
 }

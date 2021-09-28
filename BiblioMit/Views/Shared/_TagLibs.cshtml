@@ -69,14 +69,14 @@
                 var href = $"{Context.Request.Scheme}://{url}/{l.Library}/{file}";
                 var ext = System.IO.Path.GetExtension(file);
                 string hash;
-                if (!BiblioMit.Models.VM.CSPTag.Files.ContainsKey(f))
+                if (!BiblioMit.Models.VM.CSPTag.Files.ContainsKey(href))
                 {
-                    hash = Hash.Get512(f);
-                    BiblioMit.Models.VM.CSPTag.Files.Add(f,hash);
+                    hash = Hash.Get512(new Uri(href));
+                    BiblioMit.Models.VM.CSPTag.Files.Add(href,hash);
                 }
                 else
                 {
-                    hash = BiblioMit.Models.VM.CSPTag.Files[f];
+                    hash = BiblioMit.Models.VM.CSPTag.Files[href];
                 }
                 switch (ext)
                 {
@@ -86,11 +86,12 @@
                         break;
                     case ".js":
                         this.Block(script, @<script src="@href" crossorigin="anonymous" integrity="@hash" asp-fallback-src="@f" ></script>);
-                        BiblioMit.Models.VM.CSPTag.ScriptSrcElem.Add($"'{hash}'");
+                        BiblioMit.Models.VM.CSPTag.ScriptSrcElem.Add(href);
                         break;
                     case ".woff2":
                     case ".woff":
                     case ".ttf":
+                        //font/@ext.TrimStart('.')
                         this.Block(style, @<link href="@href" rel="preload" as="font" type="font/@ext.TrimStart('.')" crossorigin="anonymous" />);
                         BiblioMit.Models.VM.CSPTag.FontSrc.Add(href);
                         break;

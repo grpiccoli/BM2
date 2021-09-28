@@ -32,7 +32,7 @@ namespace BiblioMit.Services
         {
             _logger.LogInformation(
                 _localizer["Plankton Service running is working."]);
-
+            var time = TimeToNextSaturdayMidnight();
             //_timer = new Timer(FetchAssays, null, TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(-1));
             _timer = new Timer(FetchAssays, null, TimeToNextSaturdayMidnight(), TimeSpan.FromMilliseconds(-1));
 

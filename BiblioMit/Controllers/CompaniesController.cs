@@ -12,7 +12,7 @@ using BiblioMit.Extensions;
 
 namespace BiblioMit.Controllers
 {
-    [Authorize(Policy = "Instituciones")]
+    [Authorize(Policy = nameof(UserClaims.Institutions))]
     public class CompaniesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -23,7 +23,9 @@ namespace BiblioMit.Controllers
         }
 
         // GET: Companies
-        [Authorize(Roles = "Administrador,Editor,Invitado")]
+        [Authorize(Roles = nameof(RoleData.Administrator))]
+        [Authorize(Roles = nameof(RoleData.Editor))]
+        [Authorize(Roles = nameof(RoleData.Guest))]
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -60,7 +62,7 @@ namespace BiblioMit.Controllers
         }
 
         // GET: Companies/Create
-        [Authorize(Roles = "Administrador")]
+        [Authorize(Roles = nameof(RoleData.Administrator))]
         [HttpGet]
         public IActionResult Create()
         {
@@ -73,7 +75,7 @@ namespace BiblioMit.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
-        [Authorize(Roles = "Administrador")]
+        [Authorize(Roles = nameof(RoleData.Administrator))]
         public async Task<IActionResult> Create([Bind("Id,BsnssName,Acronym")] CompanyViewModel company)
         {
             if (company == null) return NotFound();
@@ -97,7 +99,8 @@ namespace BiblioMit.Controllers
         }
 
         // GET: Companies/Edit/5
-        [Authorize(Roles = "Administrador,Editor")]
+        [Authorize(Roles = nameof(RoleData.Administrator))]
+        [Authorize(Roles = nameof(RoleData.Editor))]
         [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
@@ -125,7 +128,8 @@ namespace BiblioMit.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
-        [Authorize(Roles = "Administrador,Editor")]
+        [Authorize(Roles = nameof(RoleData.Administrator))]
+        [Authorize(Roles = nameof(RoleData.Editor))]
         public async Task<IActionResult> Edit(int id, [Bind("Id,BsnssName,Acronym")] Company company)
         {
             if (company == null || id != company.Id)
@@ -157,7 +161,7 @@ namespace BiblioMit.Controllers
         }
 
         // GET: Companies/Delete/5
-        [Authorize(Roles = "Administrador")]
+        [Authorize(Roles = nameof(RoleData.Administrator))]
         [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
@@ -180,7 +184,7 @@ namespace BiblioMit.Controllers
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
-        [Authorize(Roles = "Administrador")]
+        [Authorize(Roles = nameof(RoleData.Administrator))]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var company = await _context.Companies.SingleOrDefaultAsync(m => m.Id == id).ConfigureAwait(false);

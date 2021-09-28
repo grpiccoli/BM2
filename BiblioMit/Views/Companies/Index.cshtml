@@ -32,7 +32,7 @@
                     @Html.DisplayFor(modelItem => item.BusinessName)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.GetRUT())
+                    @item.GetRUT()
                 </td>
                 <td>
                     <a href="@Url.Action("Index", "Centres", null, null)">@Html.DisplayFor(modelItem => item.Psmbs.Count)</a>

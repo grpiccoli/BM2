@@ -1,0 +1,5 @@
+﻿#btn-img-edit {
+  position: absolute;
+  top: calc(50% - 90px);
+  left: 25%;
+  z-index: 9; }

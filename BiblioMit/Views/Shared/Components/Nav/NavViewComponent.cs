@@ -227,6 +227,9 @@ namespace BiblioMit.Views.Components.Nav
                             {
                                 Controller = "Home",
                                 Action = "Flowpaper",
+                                Parameters = new Dictionary<string, string>{
+                                    { "n", "gallery" }
+                                },
                                 Name = _localizer["Histopathology Gallery"],
                                 Icon = "fas fa-disease"
                             }
@@ -434,8 +437,7 @@ namespace BiblioMit.Views.Components.Nav
                 var services = new NavDDwnVM
                 {
                     Logo = "fas fa-concierge-bell",
-                    Title = _localizer["Services"],
-                    Sections = new Collection<Section>()
+                    Title = _localizer["Services"]
                 };
                 if (client || webmaster)
                 {
@@ -548,17 +550,18 @@ namespace BiblioMit.Views.Components.Nav
     {
         public string Logo { get; set; }
         public string Title { get; set; }
-        public Collection<Section> Sections { get; internal set; } = new Collection<Section>();
+        public Collection<Section> Sections { get; internal set; } = new();
     }
     public class Section
     {
         public string Name { get; set; }
-        public Collection<Link> Links { get; internal set; } = new Collection<Link>();
+        public Collection<Link> Links { get; internal set; } = new();
     }
     public class Link
     {
         public string Controller { get; set; }
         public string Action { get; set; }
+        public Dictionary<string, string> Parameters { get; internal set; } = new();
         public string Icon { get; set; }
         public string Name { get; set; }
     }

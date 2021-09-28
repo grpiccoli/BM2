@@ -9,11 +9,11 @@
             <input asp-for="Id" class="d-none" hidden="hidden" />
             <div class="form-group col-sm-12 center">
                 <label asp-for="Price"></label>
-                <input class="form-control" asp-format="{0:C}" asp-for="Price" disabled="disabled" />
+                <input class="form-control" asp-format="{0}" asp-for="Price" disabled="disabled" />
             </div>
             <div class="form-group col-sm-12 center">
                 <label asp-for="PeriodDate"></label>
-                <input class="form-control" asp-format="{0:MMMM YYYYY}" asp-for="PeriodDate" disabled="disabled" />
+                <input class="form-control" asp-for="PeriodDate" disabled="disabled" />
             </div>
             <div class="form-group col-sm-12 center m-0">
                 <button type="submit" class="btn btn-primary">

@@ -36,20 +36,12 @@ namespace BiblioMit.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            ViewData["comunas"] = _context.Communes
-                .Select(c => new ContactCommune
-                { 
-                    Id = c.Id,
-                    Commune = c.Name,
-                    Province = c.Province.Name
-                });
-
             IQueryable<Contact> contacts = _context.Contacts
-                .Include(c => c.ConsessionOrResearch);
+                .Include(c => c.ConsessionOrResearch)
+                    .ThenInclude(c => c.Company);
 
             IQueryCollection q = Request.Query;
             string[] tmp = q["c"];
-            ViewData["c"] = tmp;
 
             foreach (var c in tmp)
             {
@@ -57,8 +49,8 @@ namespace BiblioMit.Controllers
                     contacts = contacts.Where(o => o.ConsessionOrResearch.CommuneId.Value == r);
             }
 
-            var isAuthorized = User.IsInRole("Administrador") && 
-                               User.HasClaim("Contactos","Contactos");
+            var isAuthorized = User.IsInRole(RoleData.Administrator.ToString()) && 
+                               User.HasClaim(UserClaims.Contacts.ToString(), UserClaims.Contacts.ToString());
 
             var currentUserId = _userManager.GetUserId(User);
 
@@ -69,7 +61,18 @@ namespace BiblioMit.Controllers
                 contacts = contacts.Where(c => c.Status == ContactStatus.Approved
                                             || c.OwnerId == currentUserId);
             }
-            return View(await contacts.ToListAsync().ConfigureAwait(false));
+            var modelAsync = contacts.ToListAsync();
+
+            ViewData["c"] = tmp;
+            ViewData["comunas"] = _context.Communes
+            .Select(c => new ContactCommune
+            {
+                Id = c.Id,
+                Commune = c.Name,
+                Province = c.Province.Name
+            });
+
+            return View(await modelAsync.ConfigureAwait(false));
         }
 
         // GET: Contacts/Details/5

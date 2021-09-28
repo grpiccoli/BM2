@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Create";
+    BiblioMit.Models.VM.CSPTag.StyleSrc.Add("'unsafe-inline'");
 }
 
 <div class="container body-content">
@@ -28,7 +29,7 @@
                     <label>Subir imagen</label>
                     <br />
                     <label class="btn btn-default btn-file">
-                        Cargar <input asp-for="ImageUpload" typeof="file" style="display:none" />
+                        Cargar <input asp-for="ImageUpload" typeof="file" class="d-none" />
                     </label>
                 </div>
                 <button type="submit" id="newFormBtn" class="btn btn-submitPost">Crear Foro</button>

@@ -12,7 +12,16 @@
         <select id="company" class="choice form-control" multiple></select>
     </div>
 </div>
-<div class="row">
+<div id="map-holder" class="row" 
+     data-code="@Localizer["Code"]" 
+     data-company="@Localizer["Company"]"
+     data-locality="@Localizer["Locality"]"
+     data-commune="@Localizer["Commune"]"
+     data-province="@Localizer["Province"]"
+     data-region="@Localizer["Region"]"
+     data-area="@Localizer["Area (ha)"]"
+     data-details="@Localizer["Details"]"
+     data-sources="@Localizer["Sources"]">
     <div class="col">
         <div class="w-100" id="map" style="min-height:400px;"></div>
     </div>

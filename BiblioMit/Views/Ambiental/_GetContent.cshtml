@@ -1,0 +1,57 @@
+﻿@model BiblioMit.Models.VM.AmbientalVM.Content
+
+<h4>@Model.Name</h4>
+<table class="table">
+    <tr>
+        <th scope="row">@Localizer["Code"]</th>
+        <td align="right">@Model.Code</td>
+    </tr>
+    @if(!string.IsNullOrWhiteSpace(Model.Commune)){
+        <tr>
+            <th scope="row">@Localizer["Commune"]</th>
+            <td align="right">@Model.Commune</td>
+        </tr>
+    }
+    @if(!string.IsNullOrWhiteSpace(Model.Province)){
+        <tr>
+            <th scope="row">@Localizer["Province"]</th>
+            <td align="right">@Model.Province</td>
+        </tr>
+    }
+    <tr>
+        <th scope="row">@Localizer["Region"]</th>
+        <td align="right">Los Lagos</td>
+    </tr>
+    <tr>
+        <th scope="row">@Localizer["Area (Ha)"]</th>
+        <td align="right">@Model.Area</td>
+    </tr>
+    <tr>
+        <th scope="row">@Localizer["Sources"]</th>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Sernapesca</td>
+        <td align="right">
+            <a target="_blank" href="https://www.sernapesca.cl" rel="noopener">
+                <img src="~/images/ico/sernapesca.svg" height="20" />
+            </a>
+        </td>
+    </tr>
+    <tr>
+        <td>PER Mitílidos</td>
+        <td align="right">
+            <a target="_blank" href="https://www.mejillondechile.cl" rel="noopener">
+                <img src="~/images/ico/mejillondechile.min.png" height="20" />
+            </a>
+        </td>
+    </tr>
+    <tr>
+        <td>Subpesca</td>
+        <td align="right">
+            <a target="_blank" href="https://www.subpesca.cl" rel="noopener">
+                <img src="../images/ico/subpesca.png" height="20" />
+            </a>
+        </td>
+    </tr>
+</table>

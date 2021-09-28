@@ -129,6 +129,9 @@
   <data name="Analysis" xml:space="preserve">
     <value>Análisis</value>
   </data>
+  <data name="Areas" xml:space="preserve">
+    <value>Áreas</value>
+  </data>
   <data name="Ave Larvae per Species" xml:space="preserve">
     <value>Prom Larvas por Especie</value>
   </data>
@@ -137,6 +140,9 @@
   </data>
   <data name="Chart" xml:space="preserve">
     <value>Gráfico</value>
+  </data>
+  <data name="Custom variables" xml:space="preserve">
+    <value>Variables Personalizadas</value>
   </data>
   <data name="Environmental Platform" xml:space="preserve">
     <value>Plataforma Ambiental</value>
@@ -153,6 +159,9 @@
   <data name="Parameters" xml:space="preserve">
     <value>Parámetros</value>
   </data>
+  <data name="RAG project" xml:space="preserve">
+    <value>Proyecto Semáforo</value>
+  </data>
   <data name="Rep. Stg." xml:space="preserve">
     <value>Est. Rep.</value>
   </data>
@@ -167,5 +176,8 @@
   </data>
   <data name="to" xml:space="preserve">
     <value>a</value>
+  </data>
+  <data name="Variables" xml:space="preserve">
+    <value>Variables</value>
   </data>
 </root>

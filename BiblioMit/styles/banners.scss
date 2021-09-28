@@ -6,22 +6,18 @@
 .carousel-item.active {
     height: 100vh;
 }
-
 footer {
     background: linear-gradient(transparent,black) !important;
     opacity:0.5;
 }
-
 .carousel-item {
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center center;
 }
-
 #introCarousel {
     margin-top: -$navbar-height;
 }
-
 /* Height for devices larger than 576px */
 @media (min-width: 992px) {
     .navbar {
@@ -33,7 +29,10 @@ footer {
         }
     }
 }
-
 body {
     overflow:hidden;
+}
+a.btn-banner{
+    color:inherit;
+    border-color:inherit;
 }

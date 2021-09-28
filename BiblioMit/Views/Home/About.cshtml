@@ -3,7 +3,7 @@
     ViewData["Message"] = Localizer["Technological Management Platform for Mussel Farming Sector"].Value;
 }
 
-<partial name="_LibsPg" model='new List<string> { "nanogallery2" }' />
+<partial name="_Pg" />
 <partial name="_YouTube" />
 <partial name="_NanoGallery2" />
 
@@ -138,7 +138,13 @@
                 <div class="mask">
                     <div class="d-flex justify-content-center align-items-center h-100">
                         <div class="text-white text-center">
-                            <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/Xx-qk-a4-fA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                            <iframe id="about-player"
+                                    type="text/html"
+                                    width="560" height="315" 
+                                    src="https://www.youtube-nocookie.com/embed/Xx-qk-a4-fA" 
+                                    title="YouTube video player" frameborder="0" 
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen></iframe>
                         </div>
                     </div>
                 </div>

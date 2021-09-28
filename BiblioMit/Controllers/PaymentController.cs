@@ -31,7 +31,7 @@ namespace BiblioMit.Controllers
         {
             var model = new Payment
             {
-                Id = 1,
+                Id = 0,
                 Price = 100000,
                 PeriodDate = DateTime.Now
             };
@@ -45,7 +45,7 @@ namespace BiblioMit.Controllers
             var email = string.Empty;
             if(Id == 0)
             {
-                payment.Id = 1;
+                payment.Id = DateTime.Now.Millisecond;
                 payment.Price = 100000;
                 var user = await _userManager.FindByNameAsync(User.Identity.Name).ConfigureAwait(false);
                 email = user.Email;

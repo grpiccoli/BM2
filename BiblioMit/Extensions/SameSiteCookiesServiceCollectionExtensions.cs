@@ -58,14 +58,15 @@ namespace Microsoft.Extensions.DependencyInjection
 
         private static void CheckSameSite(HttpContext httpContext, CookieOptions options)
         {
-            if (options.SameSite == SameSiteMode.None)
+            var userAgent = httpContext.Request.Headers["User-Agent"].ToString();
+            if (DisallowsSameSiteNone(userAgent))
             {
-                var userAgent = httpContext.Request.Headers["User-Agent"].ToString();
-
-                if (DisallowsSameSiteNone(userAgent))
-                {
-                    options.SameSite = Unspecified;
-                }
+                options.SameSite = Unspecified;
+            }
+            else
+            {
+                options.Secure = true;
+                options.SameSite = SameSiteMode.None;
             }
         }
 

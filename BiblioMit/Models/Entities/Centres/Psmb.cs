@@ -1,5 +1,6 @@
 ﻿using BiblioMit.Extensions;
 using BiblioMit.Models.Entities.Centres;
+using BiblioMit.Models.Entities.Variables;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -80,6 +81,7 @@ namespace BiblioMit.Models
         //BED FARM
         [Display(Name = "Samplings")]
         public virtual ICollection<Sampling> Samplings { get; } = new List<Sampling>();
+        public virtual ICollection<Variable> Variables { get; } = new List<Variable>();
         public string GetFullName() => $"{Code}, {Name}, {Commune.GetFullName()}";
     }
 }

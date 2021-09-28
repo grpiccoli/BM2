@@ -21,38 +21,26 @@ using System.IO;
 using BiblioMit.Extensions;
 using BiblioMit.Models.Entities.Histopathology;
 using System.Net;
+using Newtonsoft.Json;
+using System.Runtime.Serialization;
 
 namespace BiblioMit.Controllers
 {
     [Authorize]
     public class PhotosController : Controller
     {
-        //private static readonly char[] InvalidFilenameChars = Path.GetInvalidFileNameChars();
         private readonly ApplicationDbContext _context;
-        //private readonly string _accessKey;
-        //private readonly string _secretKey;
-        //private readonly string _bucket;
 
         public PhotosController(ApplicationDbContext context)
         {
             _context = context;
-            //_accessKey = configuration.GetValue<string>("S3_Id");
-            //_secretKey = configuration.GetValue<string>("S3_KEY");
-            //_accessKey = configuration["Authentication:AWS:S3:Id"];
-            //_secretKey = configuration["Authentication:AWS:S3:Key"];
-            //_bucket = "mytilidb";
         }
 
         [AllowAnonymous]
         [HttpGet]
         public IActionResult Gallery()
         {
-            //var url = $"~/colecci-n-virtual/index.html";
-            //if (Url.IsLocalUrl(url))
-                //return Redirect(url);
-                return View();
-            //else
-            //    return RedirectToAction("Index", "Home");
+            return View();
         }
         [HttpGet]
         public IActionResult GetImg(string f, string d)
@@ -64,75 +52,11 @@ namespace BiblioMit.Controllers
 
             return PhysicalFile(full, "image/jpg");
         }
-
-        // GET: Photos
         [HttpGet]
-        public async Task <IActionResult> Index()
+        public IActionResult Index()
         {
-            var photos = await _context.Photos
-                            .Include(p => p.Individual)
-                            .OrderBy(p => p.Individual.SamplingId)
-                            .AsNoTracking()
-                            .ToListAsync().ConfigureAwait(false);
-
-            //var client = new AmazonS3Client(_accessKey, _secretKey, Amazon.RegionEndpoint.SAEast1);
-
-            var photosView = new List<UploadPhotoViewModel>();
-
-            for (int i = 0; i < photos.Count; i++)
-            {
-                var url = new Uri (Url.Action("GetImg", "Photos",
-                    new { f = photos[i].Key, d = "DB", th = false },
-                    HttpContext.Request.Scheme));
-                //var url = client.GetPreSignedURL(new GetPreSignedUrlRequest
-                //{
-                //    BucketName = _bucket,
-                //    Key = photos[i].Key,
-                //    Expires = DateTime.UtcNow.AddMinutes(30)
-                //});
-
-                //var thumb = client.GetPreSignedURL(new GetPreSignedUrlRequest
-                //{
-                //    BucketName = _bucket+"resized",
-                //    Key = "resized-"+photos[i].Key,
-                //    Expires = DateTime.UtcNow.AddMinutes(30)
-                //});
-
-                var thumb = Url.Action("GetImg", "Photos",
-                new { f = photos[i].Key, d = Path.Combine("DB", "Thumbs"), th = true },
-                HttpContext.Request.Scheme);
-
-                var feature = HttpContext.Features.Get<IRequestCultureFeature>();
-                var lang = feature.RequestCulture.Culture.TwoLetterISOLanguageName.ToUpperInvariant();
-
-                string comment;
-
-                //try
-                //{
-                //    comment = (lang == "es") ? photos[i].Comment : await nodeServices.InvokeAsync<string>("./wwwroot/js/translate.js", photos[i].Comment, lang);
-                //}
-                //catch
-                //{
-                comment = photos[i].Comment;
-                //}
-
-                photosView.Add(new UploadPhotoViewModel
-                {
-                    IndividualId = photos[i].IndividualId,
-                    Comment = comment,
-                    SampleId = photos[i].Individual.SamplingId,
-                    Url = url,
-                    Thumb = thumb,
-                    Magnification = photos[i].Magnification,
-                    PhId = photos[i].Id
-                });
-            }
-
-            var grouped = photosView.GroupBy(t => t.SampleId);
-
-            return View(grouped);
+            return View();
         }
-
         // GET: Photos/Details/5
         [HttpGet]
         public async Task<IActionResult> Details(int? id)
@@ -326,5 +250,18 @@ namespace BiblioMit.Controllers
         {
             return _context.Photos.Any(e => e.Id == id);
         }
+    }
+    public class NanoGalleryElement
+    {
+        public string Src { get; set; }
+        public string Srct { get; set; }
+        public string Title { get; set; }
+        public string Id { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        [DataMember(EmitDefaultValue = false)]
+        public string AlbumId { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        [DataMember(EmitDefaultValue = false)]
+        public string Kind { get; set; }
     }
 }
