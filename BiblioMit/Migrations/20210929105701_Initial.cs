@@ -80,19 +80,6 @@ namespace BiblioMit.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Banners",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    MaskAngle = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Banners", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Companies",
                 columns: table => new
                 {
@@ -271,6 +258,20 @@ namespace BiblioMit.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "VariableTypes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Units = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VariableTypes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -386,6 +387,26 @@ namespace BiblioMit.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Banners",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MaskAngle = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Banners", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Banners_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Entries",
                 columns: table => new
                 {
@@ -412,72 +433,6 @@ namespace BiblioMit.Migrations
                         name: "FK_Entries_AspNetUsers_ApplicationUserId",
                         column: x => x.ApplicationUserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Captions",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Subtitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Position = table.Column<int>(type: "int", nullable: false),
-                    Lang = table.Column<int>(type: "int", nullable: false),
-                    BannerId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Captions", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Captions_Banners_BannerId",
-                        column: x => x.BannerId,
-                        principalTable: "Banners",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Imgs",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Size = table.Column<int>(type: "int", nullable: false),
-                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BannerId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Imgs", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Imgs_Banners_BannerId",
-                        column: x => x.BannerId,
-                        principalTable: "Banners",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Rgbs",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    R = table.Column<int>(type: "int", nullable: false),
-                    G = table.Column<int>(type: "int", nullable: false),
-                    B = table.Column<int>(type: "int", nullable: false),
-                    BannerId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Rgbs", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Rgbs_Banners_BannerId",
-                        column: x => x.BannerId,
-                        principalTable: "Banners",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -559,22 +514,91 @@ namespace BiblioMit.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Btns",
+                name: "Captions",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Uri = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CaptionId = table.Column<int>(type: "int", nullable: true)
+                    Subtitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Color = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Position = table.Column<int>(type: "int", nullable: false),
+                    Lang = table.Column<int>(type: "int", nullable: false),
+                    BannerId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Btns", x => x.Id);
+                    table.PrimaryKey("PK_Captions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Btns_Captions_CaptionId",
-                        column: x => x.CaptionId,
-                        principalTable: "Captions",
+                        name: "FK_Captions_Banners_BannerId",
+                        column: x => x.BannerId,
+                        principalTable: "Banners",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Imgs",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Size = table.Column<int>(type: "int", nullable: false),
+                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BannerId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Imgs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Imgs_Banners_BannerId",
+                        column: x => x.BannerId,
+                        principalTable: "Banners",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Payments",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Price = table.Column<int>(type: "int", nullable: false),
+                    PaidDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PeriodDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    BannerId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Payments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Payments_Banners_BannerId",
+                        column: x => x.BannerId,
+                        principalTable: "Banners",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Rgbs",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    R = table.Column<int>(type: "int", nullable: false),
+                    G = table.Column<int>(type: "int", nullable: false),
+                    B = table.Column<int>(type: "int", nullable: false),
+                    BannerId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Rgbs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Rgbs_Banners_BannerId",
+                        column: x => x.BannerId,
+                        principalTable: "Banners",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -647,6 +671,27 @@ namespace BiblioMit.Migrations
                         principalTable: "GenusPhytoplanktons",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Btns",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Uri = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CaptionId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Btns", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Btns_Captions_CaptionId",
+                        column: x => x.CaptionId,
+                        principalTable: "Captions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -1141,6 +1186,34 @@ namespace BiblioMit.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Variables",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PsmbId = table.Column<int>(type: "int", nullable: false),
+                    VariableTypeId = table.Column<int>(type: "int", nullable: false),
+                    Value = table.Column<int>(type: "int", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Variables", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Variables_Psmbs_PsmbId",
+                        column: x => x.PsmbId,
+                        principalTable: "Psmbs",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Variables_VariableTypes_VariableTypeId",
+                        column: x => x.VariableTypeId,
+                        principalTable: "VariableTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Larvas",
                 columns: table => new
                 {
@@ -1429,6 +1502,11 @@ namespace BiblioMit.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Banners_ApplicationUserId",
+                table: "Banners",
+                column: "ApplicationUserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Btns_CaptionId",
                 table: "Btns",
                 column: "CaptionId");
@@ -1543,6 +1621,11 @@ namespace BiblioMit.Migrations
                 name: "IX_Localities_RegionId",
                 table: "Localities",
                 column: "RegionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Payments_BannerId",
+                table: "Payments",
+                column: "BannerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Phones_Number",
@@ -1776,6 +1859,16 @@ namespace BiblioMit.Migrations
                 table: "Valves",
                 column: "IndividualId");
 
+            migrationBuilder.CreateIndex(
+                name: "IX_Variables_PsmbId",
+                table: "Variables",
+                column: "PsmbId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Variables_VariableTypeId",
+                table: "Variables",
+                column: "VariableTypeId");
+
             migrationBuilder.AddForeignKey(
                 name: "FK_PlanktonAssays_Psmbs_PsmbId",
                 table: "PlanktonAssays",
@@ -1861,6 +1954,9 @@ namespace BiblioMit.Migrations
                 name: "Larvas");
 
             migrationBuilder.DropTable(
+                name: "Payments");
+
+            migrationBuilder.DropTable(
                 name: "Photos");
 
             migrationBuilder.DropTable(
@@ -1883,6 +1979,9 @@ namespace BiblioMit.Migrations
 
             migrationBuilder.DropTable(
                 name: "Tallas");
+
+            migrationBuilder.DropTable(
+                name: "Variables");
 
             migrationBuilder.DropTable(
                 name: "AreaCodes");
@@ -1928,6 +2027,9 @@ namespace BiblioMit.Migrations
 
             migrationBuilder.DropTable(
                 name: "SpecieSeeds");
+
+            migrationBuilder.DropTable(
+                name: "VariableTypes");
 
             migrationBuilder.DropTable(
                 name: "Banners");

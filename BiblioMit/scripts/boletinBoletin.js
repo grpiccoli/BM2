@@ -7,6 +7,7 @@ var loaderStop = () => {
 }
 loaderStart();
 var params = document.getElementById("js-parameters").dataset;
+document.getElementById("dtconf").onchange = function () {this.submit();}
 //gráfico provincias
 var chart = AmCharts.makeChart("chart-provincias", {
     "type": "pie",

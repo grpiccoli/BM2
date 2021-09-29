@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BiblioMit.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210924050930_Color")]
-    partial class Color
+    [Migration("20210929105701_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -627,6 +627,52 @@ namespace BiblioMit.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("PlanktonUsers");
+                });
+
+            modelBuilder.Entity("BiblioMit.Models.Entities.Variables.Variable", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PsmbId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Value")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VariableTypeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PsmbId");
+
+                    b.HasIndex("VariableTypeId");
+
+                    b.ToTable("Variables");
+                });
+
+            modelBuilder.Entity("BiblioMit.Models.Entities.Variables.VariableType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Units")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("VariableTypes");
                 });
 
             modelBuilder.Entity("BiblioMit.Models.Entry", b =>
@@ -2004,6 +2050,25 @@ namespace BiblioMit.Migrations
                     b.Navigation("Group");
                 });
 
+            modelBuilder.Entity("BiblioMit.Models.Entities.Variables.Variable", b =>
+                {
+                    b.HasOne("BiblioMit.Models.Psmb", "Psmb")
+                        .WithMany("Variables")
+                        .HasForeignKey("PsmbId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("BiblioMit.Models.Entities.Variables.VariableType", "VariableType")
+                        .WithMany("Variables")
+                        .HasForeignKey("VariableTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Psmb");
+
+                    b.Navigation("VariableType");
+                });
+
             modelBuilder.Entity("BiblioMit.Models.Entry", b =>
                 {
                     b.HasOne("BiblioMit.Models.ApplicationUser", "ApplicationUser")
@@ -2547,6 +2612,11 @@ namespace BiblioMit.Migrations
                     b.Navigation("Assays");
                 });
 
+            modelBuilder.Entity("BiblioMit.Models.Entities.Variables.VariableType", b =>
+                {
+                    b.Navigation("Variables");
+                });
+
             modelBuilder.Entity("BiblioMit.Models.Forum", b =>
                 {
                     b.Navigation("Posts");
@@ -2628,6 +2698,8 @@ namespace BiblioMit.Migrations
                     b.Navigation("PlanktonAssays");
 
                     b.Navigation("Samplings");
+
+                    b.Navigation("Variables");
                 });
 
             modelBuilder.Entity("BiblioMit.Models.Registry", b =>

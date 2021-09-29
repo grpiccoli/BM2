@@ -850,22 +850,30 @@ namespace BiblioMit.Controllers
             var minplank = _context.PlanktonAssays
                 .AsNoTracking()
                 .Min(e => e.SamplingDate);
-            var mincustom = _context.Variables
-                .AsNoTracking()
-                .Min(e => e.Date);
             var maxplank = _context.PlanktonAssays
                 .AsNoTracking()
                 .Max(e => e.SamplingDate);
-            var maxcustom = _context.Variables
-                .AsNoTracking()
-                .Max(e => e.Date);
-            var plankNewer = minplank > mincustom;
-            ViewData["start"] = plankNewer ?
-                mincustom.ToString(_dateFormat, CultureInfo.InvariantCulture)
-                : minplank.ToString(_dateFormat, CultureInfo.InvariantCulture);
-            ViewData["end"] = plankNewer ?
-                maxplank.ToString(_dateFormat, CultureInfo.InvariantCulture):
-                maxcustom.ToString(_dateFormat, CultureInfo.InvariantCulture);
+            if (_context.Variables.Any())
+            {
+                var mincustom = _context.Variables
+                    .AsNoTracking()
+                    .Min(e => e.Date);
+                var maxcustom = _context.Variables
+                    .AsNoTracking()
+                    .Max(e => e.Date);
+                var plankNewer = minplank > mincustom;
+                ViewData["start"] = plankNewer ?
+                    mincustom.ToString(_dateFormat, CultureInfo.InvariantCulture)
+                    : minplank.ToString(_dateFormat, CultureInfo.InvariantCulture);
+                ViewData["end"] = plankNewer ?
+                    maxplank.ToString(_dateFormat, CultureInfo.InvariantCulture) :
+                    maxcustom.ToString(_dateFormat, CultureInfo.InvariantCulture);
+            }
+            else
+            {
+                ViewData["start"] = minplank;
+                ViewData["end"] = maxplank;
+            }
             return View();
         }
         [HttpGet]

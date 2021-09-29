@@ -127,7 +127,7 @@
     new { tipo = "TP", year = "YR", start = "STR", end = "END" }, Context.Request.Scheme))"
      data-urlgetattr="@Html.Raw(Url.Action("GetAttr","Boletin",
     new { tp = "TP", lg = Localizer["en"].Value }, Context.Request.Scheme))"
-     data-disclaimer0="@Localizer["It is one of the objectives of the National Fisheries and Aquaculture Service to promote public access to information regarding the scope of its competences. In the context of the implementation of the \"Mitílidos Regional Strategic Program\", supported by CORFO, the line of action is \"to generate productive bulletins to facilitate access to the industry, to the information currently in the field of public sector\". In this sense it is necessary to point out the following:<br/><strong>a)</strong> The Productive Bulletin contains information of a general nature that does not address specific circumstances related to specific persons or bodies.<br/><strong>b)</strong> The Productive Bulletin is supported by the information provided by the owners of the centers of crops and processing plants, therefore, this information is of a declarative nature, and does not compromise any responsibility of the service for its content and dissemination.<br/><strong>c)</strong> The Production Bulletin contains information of a preliminary nature, therefore, it may be modified as long as its publication in the official yearbook is pending.<br/><strong>d)</strong> Additionally, Sernapesca is not responsible for the problems caused by technical errors, nor can it guarantee that this report is issued free of errors."]"
+     data-disclaimer0="@Localizer["It is one of the objectives of the National Fisheries and Aquaculture Service to promote public access to information regarding the scope of its competences. In the context of the implementation of the &quot;Mitílidos Regional Strategic Program&quot;, supported by CORFO, the line of action is &quot;to generate productive bulletins to facilitate access to the industry, to the information currently in the field of public sector&quot;. In this sense it is necessary to point out the following:<br/><strong>a)</strong> The Productive Bulletin contains information of a general nature that does not address specific circumstances related to specific persons or bodies.<br/><strong>b)</strong> The Productive Bulletin is supported by the information provided by the owners of the centers of crops and processing plants, therefore, this information is of a declarative nature, and does not compromise any responsibility of the service for its content and dissemination.<br/><strong>c)</strong> The Production Bulletin contains information of a preliminary nature, therefore, it may be modified as long as its publication in the official yearbook is pending.<br/><strong>d)</strong> Additionally, Sernapesca is not responsible for the problems caused by technical errors, nor can it guarantee that this report is issued free of errors."]"
      data-disclaimer1="@Localizer["The mission of Intemit is to increase the competitiveness of Chilean mussel farming, strengthening its value chain from the supply, generating synergies of multidisciplinary-scientific-technological cooperation, through applied research, products and services, with emphasis on the development of solutions, to the main environmental and productive problems of the mitilicultor sector, to provide relevant information that allows making public-private decisions. In this sense it is necessary to point out the following:<br /><strong> a) </strong> The environmental data correspond to a segment of the biooceanographic data that Intemit manages according to the agreements for the use of the information signed by the holders of the area and intemit for the use and administration of the data associated with the bivalve mollusk program.<br /><strong> b) </strong> The environmental data is shown as reported without modification.<br /><strong> c) </strong> Additionally, Intemit is not responsible for problems caused by technical errors, nor can it guarantee that this report is issued free of errors."]"
      ></div>
 <div class="container-fluid">
@@ -141,70 +141,76 @@
             </div>
             <ul class="nav nav-tabs nav-justified mb-3" id="ex1" role="tablist">
                 <li role="presentation" class="nav-item">
-                    <a class="nav-link active"
-                       id="ex3-tab-1"
-                       data-toggle="tab"
-                       href="#ex3-tabs-1"
-                       role="tab"
-                       aria-controls="ex3-tabs-1"
-                       aria-selected="true">
+                    <button class="nav-link active"
+                            id="ex3-tab-1"
+                            data-bs-toggle="tab"
+                            data-bs-target="#ex3-tabs-1"
+                            type="button"
+                            role="tab"
+                            aria-controls="ex3-tabs-1"
+                            aria-selected="true">
                         @Localizer["Seeds"]
-                    </a>
+                    </button>
                 </li>
                 <li role="presentation" class="nav-item">
-                    <a class="nav-link"
+                    <button class="nav-link"
                        id="ex3-tab-2"
-                       data-toggle="tab"
-                       href="#ex3-tabs-2"
+                       data-bs-toggle="tab"
+                       data-bs-target="#ex3-tabs-2"
+                            type="button"
                        role="tab"
                        aria-controls="ex3-tabs-2"
                        aria-selected="false">
                         @Localizer["Harvest"]
-                    </a>
+                    </button>
                 </li>
                 <li role="presentation" class="nav-item">
-                    <a class="nav-link"
+                    <button class="nav-link"
                        id="ex3-tab-2"
-                       data-toggle="tab"
-                       href="#ex3-tabs-2"
+                       data-bs-toggle="tab"
+                       data-bs-target="#ex3-tabs-2"
+                            type="button"
                        role="tab"
                        aria-controls="ex3-tabs-2"
                        aria-selected="false">
                         @Localizer["Supply"]
-                    </a>
+                    </button>
                 </li>
                 <li role="presentation" class="nav-item">
-                    <a class="nav-link"
+                    <button class="nav-link"
                        id="ex3-tab-2"
-                       data-toggle="tab"
-                       href="#ex3-tabs-2"
+                       data-bs-toggle="tab"
+                       data-bs-target="#ex3-tabs-2"
+                            type="button"
                        role="tab"
                        aria-controls="ex3-tabs-2"
                        aria-selected="false">
                         @Localizer["Production"]
-                    </a>
+                    </button>
                 </li>
                 <li role="presentation" class="nav-item">
-                    <a class="nav-link"
+                    <button class="nav-link"
                        id="ex3-tab-2"
-                       data-toggle="tab"
-                       href="#ex3-tabs-2"
+                       data-bs-toggle="tab"
+                       data-bs-target="#ex3-tabs-2"
+                            type="button"
                        role="tab"
                        aria-controls="ex3-tabs-2"
                        aria-selected="false">
                         @Localizer["Temperature"]
-                    </a>
+                    </button>
                 </li>
                 <li role="presentation" class="nav-item">
-                    <a class="nav-link"
+                    <button class="nav-link"
                        id="ex3-tab-2"
-                       data-toggle="tab"
-                       href="#ex3-tabs-2"
+                       data-bs-toggle="tab"
+                       data-bs-target="#ex3-tabs-2"
+                            type="button"
                        role="tab"
                        aria-controls="ex3-tabs-2"
                        aria-selected="false">
                         @Localizer["Salinity"]
-                    </a>
+                    </button>
                 </li>
                 <li role="presentation" class="nav-item">
                     <a class="nav-link" id="downloadModal" data-toggle="modal"
@@ -226,20 +232,26 @@
     <div class="row">
         <div id="config-panel" class="col-auto p-0">
             <nav class="nav nav-pills flex-column" aria-orientation="vertical">
-                <a id="dates" href="#config" role="tab" data-toggle="tab"
+                <button id="dates" data-bs-target="#config" role="tab" type="button" data-bs-toggle="tab"
                    class="nav-link nav-item active" aria-expanded="true" name="Fechas">
                     @Localizer["Dates"]
-                </a>
-                <a id="provinces" href="#Provincias" aria-expanded="false" role="tab" data-toggle="tab" class="prod nav-link nav-item" name="Provincias">@Localizer["Provinces"]</a>
-                <a id="comunes" href="#Comunas" aria-expanded="false" role="tab" data-toggle="tab" class="nav-link nav-item" name="Comunas">@Localizer["Communes"]</a>
-                <a id="months" href="#Meses" aria-expanded="false" role="tab" data-toggle="tab" class="nav-link nav-item" name="Meses">@Localizer["Months"]</a>
-                <a id="table" href="#Tabla" aria-expanded="false" role="tab" data-toggle="tab" class="nav-link nav-item" name="Tabla">@Localizer["Table"]</a>
+                </button>
+                <button 
+                        id="provinces" 
+                        data-bs-target="#Provincias" aria-expanded="false"                             type="button"
+ role="tab" data-bs-toggle="tab" class="prod nav-link nav-item" name="Provincias">@Localizer["Provinces"]</button>
+                <button id="comunes" data-bs-target="#Comunas" aria-expanded="false"                            type="button"
+ role="tab" data-bs-toggle="tab" class="nav-link nav-item" name="Comunas">@Localizer["Communes"]</button>
+                <button id="months" data-bs-target="#Meses" aria-expanded="false"                             type="button"
+role="tab" data-bs-toggle="tab" class="nav-link nav-item" name="Meses">@Localizer["Months"]</button>
+                <button id="table" data-bs-target="#Tabla" aria-expanded="false"                            type="button"
+ role="tab" data-bs-toggle="tab" class="nav-link nav-item" name="Tabla">@Localizer["Table"]</button>
             </nav>
         </div>
         <div class="col-12 col-md">
             <div class="tab-content container-fluid h-100">
                 <div id="config" class="tab-pane active form-horizontal" role="tabpanel">
-                    <form id="dtconf" onchange="this.submit();">
+                    <form id="dtconf">
                         @*<div class="form-group">
                                 <label class="col-12 col-md-6 col-lg-4">@Localizer["Choose year"]</label>
                                 <div class="col-12 col-md-6 col-lg-4">
