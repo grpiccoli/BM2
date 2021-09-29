@@ -115,27 +115,6 @@ namespace BiblioMit.Views.Components.Nav
                                 Icon = "fas fa-microscope"
                             }
                         }
-                    },
-                    new Section
-                    {
-                        Name = _localizer["Configuration"],
-                        Links = new Collection<Link>
-                        {
-                            new Link
-                            {
-                                Controller = "VariableTypes",
-                                Action = "Index",
-                                Name = _localizer["Variable Types"],
-                                Icon = "fas fa-water"
-                            },
-                            new Link
-                            {
-                                Controller = "Variables",
-                                Action = "Index",
-                                Name = _localizer["Custom Variables"],
-                                Icon = "fas fa-industry"
-                            }
-                        }
                     }
                 }
             };
@@ -380,6 +359,27 @@ namespace BiblioMit.Views.Components.Nav
                             Icon = "fas fa-exclamation-triangle"
                         }
                     }
+                });
+                producers.Sections.Add(new Section
+                {
+                    Name = _localizer["Configuration"],
+                    Links = new Collection<Link>
+                        {
+                            new Link
+                            {
+                                Controller = "VariableTypes",
+                                Action = "Index",
+                                Name = _localizer["Variable Types"],
+                                Icon = "fas fa-water"
+                            },
+                            new Link
+                            {
+                                Controller = "Variables",
+                                Action = "Index",
+                                Name = _localizer["Custom Variables"],
+                                Icon = "fas fa-industry"
+                            }
+                        }
                 });
             }
 
