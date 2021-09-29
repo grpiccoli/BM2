@@ -1,4 +1,6 @@
-﻿namespace BiblioMit.Models.Entities.Variables
+﻿using System;
+
+namespace BiblioMit.Models.Entities.Variables
 {
     public class Variable
     {
@@ -8,5 +10,6 @@
         public int VariableTypeId { get; set; }
         public virtual VariableType VariableType { get; set; }
         public int Value { get; set; }
+        public DateTime Date { get; set; }
     }
 }

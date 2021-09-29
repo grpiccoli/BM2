@@ -27,6 +27,7 @@
     <PackageReference Condition="'$(OS)' == 'Windows_NT'" Include="BuildWebCompiler" Version="1.12.405" />
     <PackageReference Include="CoreCLR-NCalc" Version="2.2.92" />
     <PackageReference Include="DocumentFormat.OpenXml" Version="2.13.1" />
+    <PackageReference Include="EntityFramework" Version="6.4.4" />
     <PackageReference Include="EPPlus" Version="5.7.5" />
     <PackageReference Include="Google.Apis.AnalyticsReporting.v4" Version="1.55.0.2197" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.36" />

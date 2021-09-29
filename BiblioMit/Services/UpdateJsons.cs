@@ -45,6 +45,7 @@ namespace BiblioMit.Services
             WriteJson(nameof(_ambiental.OceanVarList));
             WriteJson(nameof(_ambiental.CuencaList));
             WriteJson(nameof(_ambiental.ComunaList));
+            WriteJson(nameof(_ambiental.CustomVarList));
             WriteJson(nameof(_ambiental.TLList));
 
             WriteJson(nameof(_ambiental.RegionList));

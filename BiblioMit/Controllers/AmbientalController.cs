@@ -100,6 +100,18 @@ namespace BiblioMit.Controllers
                 });
         }
         [HttpGet]
+        public IActionResult CustomVarList() => Json(new ChoicesGroup
+        {
+            Label = _localizer["Custom Variables"],
+            Choices = _context.VariableTypes
+            .AsNoTracking()
+                    .Select(com => new ChoicesItem
+                    {
+                        Value = com.Id,
+                        Label = com.Name + " (" + com.Units + ")"
+                    })
+        });
+        [HttpGet]
         public IActionResult RegionList() => Json(new ChoicesGroup
             {
                 Label = _localizer["Regions"],
@@ -723,7 +735,7 @@ namespace BiblioMit.Controllers
         {
             int order = id / 99_996 + 24_998 / 24_999;
             var i = Convert.ToDateTime(start, CultureInfo.InvariantCulture);
-            var f = Convert.ToDateTime(end, CultureInfo.InvariantCulture);
+            var f = Convert.ToDateTime(end, CultureInfo.InvariantCulture).AddDays(1);
             var plankton = _context.PlanktonAssays.Where(p => p.SamplingDate >= i && p.SamplingDate <= f);
             plankton = order switch
             {
@@ -733,18 +745,37 @@ namespace BiblioMit.Controllers
             };
             return Json(plankton.Select(p => new { p.Id, SamplingDate = p.SamplingDate.ToShortDateString(), p.Temperature, p.Oxigen, p.Ph, p.Salinity }));
         }
+        [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" })]
+        [HttpGet]
+        public IActionResult CustomData(int area, int typeid, DateTime start, DateTime end)
+        {
+            end = end.AddDays(1);
+            return Json(_context.Variables
+            .AsNoTracking()
+            .Where(v => v.VariableTypeId == typeid && v.PsmbId == area && v.Date >= start && v.Date <= end)
+        .GroupBy(e => e.Date)
+        .OrderBy(g => g.Key)
+        .Select(g => new AmData
+        {
+            Date = g.Key.ToString(_dateFormat, CultureInfo.InvariantCulture),
+            Value = g.Average(p => p.Value)
+        }));
+        }
         [AllowAnonymous]
         [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" })]
         [HttpGet]
         public IActionResult Data(int area, char type, int id, DateTime start, DateTime end)
         {
+            end = end.AddDays(1);
             int order = 0;
             if (area > 3) order++;
             if (area > 100000) order++;
 
             if (!(type == 'v' && id != 4))
             {
-                var phyto = _context.Phytoplanktons.Where(e => e.PlanktonAssay.SamplingDate >= start && e.PlanktonAssay.SamplingDate <= end);
+                var phyto = _context.Phytoplanktons
+                                .AsNoTracking()
+                    .Where(e => e.PlanktonAssay.SamplingDate >= start && e.PlanktonAssay.SamplingDate <= end);
                 phyto = type switch
                 {
                     'f' => phyto
@@ -772,7 +803,9 @@ namespace BiblioMit.Controllers
             }
             else
             {
-                var assays = _context.PlanktonAssays.Where(e => e.SamplingDate >= start && e.SamplingDate <= end);
+                var assays = _context.PlanktonAssays
+                    .AsNoTracking()
+                    .Where(e => e.SamplingDate >= start && e.SamplingDate <= end);
                 assays = order switch
                 {
                     0 => assays.Where(e => e.Psmb.Commune.CatchmentAreaId == area),
@@ -814,14 +847,25 @@ namespace BiblioMit.Controllers
         [HttpGet]
         public IActionResult Graph()
         {
-            ViewData["start"] = _context.PlanktonAssays
+            var minplank = _context.PlanktonAssays
                 .AsNoTracking()
-                .Min(e => e.SamplingDate)
-                .ToString(_dateFormat, CultureInfo.InvariantCulture);
-            ViewData["end"] = _context.PlanktonAssays
+                .Min(e => e.SamplingDate);
+            var mincustom = _context.Variables
                 .AsNoTracking()
-                .Max(e => e.SamplingDate)
-                .ToString(_dateFormat, CultureInfo.InvariantCulture);
+                .Min(e => e.Date);
+            var maxplank = _context.PlanktonAssays
+                .AsNoTracking()
+                .Max(e => e.SamplingDate);
+            var maxcustom = _context.Variables
+                .AsNoTracking()
+                .Max(e => e.Date);
+            var plankNewer = minplank > mincustom;
+            ViewData["start"] = plankNewer ?
+                mincustom.ToString(_dateFormat, CultureInfo.InvariantCulture)
+                : minplank.ToString(_dateFormat, CultureInfo.InvariantCulture);
+            ViewData["end"] = plankNewer ?
+                maxplank.ToString(_dateFormat, CultureInfo.InvariantCulture):
+                maxcustom.ToString(_dateFormat, CultureInfo.InvariantCulture);
             return View();
         }
         [HttpGet]

@@ -8,6 +8,12 @@
     ]
   },
   {
+    "outputFileName": "wwwroot/js/rgb2hex.min.js",
+    "inputFiles": [
+      "wwwroot/js/rgb2hex.js"
+    ]
+  },
+  {
     "outputFileName": "wwwroot/js/FlowPaperViewer.js",
     "inputFiles": [
       "scripts/flowpaper/FlowPaperViewer.js"

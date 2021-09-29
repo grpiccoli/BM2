@@ -64,9 +64,9 @@ var variables = new Choices(evariable, choiceOps);
 //semaforo
 var etl = document.getElementById('tl');
 var tl = new Choices(etl, choiceOps);
-//variables
-var evariables = document.getElementById('variables');
-var customs = new Choices(evariables, choiceOps);
+//custom variables
+var customvar = document.getElementById('variables');
+var customvars = new Choices(customvar, choiceOps);
 //define info
 var map = new google.maps.Map(document.getElementById('map'), {
     mapTypeId: 'terrain'
@@ -77,6 +77,7 @@ var infowindow = new google.maps.InfoWindow({
 var tableInfo: any = [];
 var polygons: any = {};
 var stats: any = {};
+var circles: any = {};
 var bnds: google.maps.LatLngBounds = new google.maps.LatLngBounds();
 var markers: any = [];
 var clusters: any;
@@ -199,13 +200,13 @@ var fetchData = async function (url: string, tag: string, name: string) {
             .then(data => data.json())
             .then(j => {
                 var counter = 0;
-                var tmpstats: any = {};
                 chart.data.forEach((c: any) => {
                     if (counter < j.length && c.date === j[counter].date) {
                         c[tag] = j[counter].value;
                         counter++;
                         if (counter == j.length) {
-                            stats[vartag][psmbid] = j[counter].value;
+                            if (stats[vartag] == null) stats[vartag] = {};
+                            stats[vartag][psmbid] = j[counter - 1].value;
                         }
                     }
                 });
@@ -224,37 +225,65 @@ var generatefetchData = async function(v: any, p: any, sd: any, ed: any) {
     var tag = `${v.value}_${p.value}`;
     var name = `${v.label} ${p.label}`;
     var url = `/ambiental/data?area=${p.value}&type=${v.value.charAt(0)}&id=${v.value.substring(1)}&start=${sd}&end=${ed}`;
-    return fetchData(url, tag, name);
+    return await fetchData(url, tag, name);
 }
+var green = [0, 128, 0];
+var red = [255, 0, 0];
 //interface to fetch collections to server and load them into graph
-var loadData = async function(e: any, isPsmb: boolean) {
-    var arr = isPsmb ? variables.getValue() : psmb.getValue();
+//between 5000 and 30000
+var circlemax = 20000;
+var circlemin = 5000;
+var loadData = async function (e: any, isPsmb: boolean) {
+    var arr = isPsmb ? variables.getValue().concat(customvars.getValue()) : psmb.getValue();
     if (arr.length === 0) return;
     loaderStart();
     var sd = $('#start').val(), ed = $('#end').val();
     var promises = isPsmb ?
         arr.map((v: any) => generatefetchData(v, e.detail, sd, ed)) :
         arr.map((p: any) => generatefetchData(e.detail, p, sd, ed));
-    Promise.all(promises).then(_ => {
+    return Promise.all(promises).then(_ => {
         chart.invalidateData();
-        stats.forEach((s:any) => {
-            var max = Math.max(...s);
-            var min = Math.min(...s);
-            s.forEach((p:any) => {
-                var marker = markers.find((m:any) => m.zIndex == p);
-                new google.maps.Circle({
-                    strokeColor: "#FF0000",
+    });
+}
+var redrawCircles = function () {
+    removeCircles();
+    var variable = variables.getValue(true).slice(-1)[0];
+    var selectedpsmbs = psmb.getValue(true);
+    if (variable != undefined && selectedpsmbs.length && Object.keys(stats).length) {
+        var psmbStats = stats[variable];
+        var min: any;
+        var max: any;
+        var selectpsmbStats: any = {};
+        if (psmbStats != undefined) {
+            selectedpsmbs.forEach((p: any) => {
+                min = (min === undefined || psmbStats[p] < min) ? psmbStats[p] : min;
+                max = (max === undefined || psmbStats[p] > max) ? psmbStats[p] : max;
+                selectpsmbStats[p] = psmbStats[p];
+            });
+            Object.entries(selectpsmbStats).forEach(([k, v]: any) => {
+                var marker = markers.find((m: any) => m.zIndex == k);
+                var weight = min == max ? 1 : (v - min) / (max - min);
+                var color = pickHex(red, green, weight);
+                var rad = circlemin + (circlemax - circlemin) * weight;
+                circles[k] = new google.maps.Circle({
+                    strokeColor: "#" + color,
                     strokeOpacity: 0.8,
-                    strokeWeight: 2,
-                    fillColor: "#FF0000",
+                    strokeWeight: 0.1,
+                    fillColor: "#" + color,
                     fillOpacity: 0.35,
-                    map,
+                    map: map,
                     center: marker.position,
-                    radius: ,
+                    radius: rad
+                });
+                google.maps.event.addListener(circles[k], 'mouseover', function () {
+                    this.getMap().getDiv().setAttribute('title', `${v}`);
+                });
+                google.maps.event.addListener(circles[k], 'mouseout', function () {
+                    this.getMap().getDiv().removeAttribute('title');
                 });
             });
-        });
-    });
+        }
+    }
 }
 //passive support
 var supportsPassiveOption = false;
@@ -270,18 +299,66 @@ try {
     window.removeEventListener('testPassiveEventSupport', noop, opts);
 } catch (e) { }
 var passive = supportsPassiveOption ? { passive: true } : false;
+//remove circle
+var removeCircle = function(i: string) {
+    var circle = circles[i];
+    // remove event listers
+    google.maps.event.clearListeners(circle, 'click_handler_name');
+    google.maps.event.clearListeners(circle, 'drag_handler_name');
+    google.maps.event.clearListeners(circle, 'mouseover');
+    google.maps.event.clearListeners(circle, 'mouseout');
+    circle.setRadius(0);
+    // if polygon:
+    // polygon_shape.setPath([]); 
+    circle.setMap(null);
+    delete circles[i];
+}
+var removeCircles = () => {
+    Object.keys(circles).forEach((k: any) => removeCircle(k));
+}
+var removeSeries = function (tag:string) {
+    chart.series.values.forEach((v: any, i: number) => {
+        if (v.dataFields.valueY === tag) {
+            delete chart.exporting.dataFields[tag];
+            chart.series.removeIndex(i).dispose();
+        }
+    });
+}
+//custom variable choice listeners
+customvar.addEventListener('addItem', async (e: any) => {
+    var arr = psmb.getValue();
+    if (arr.length === 0) return;
+    loaderStart();
+    var sd = $('#start').val(), ed = $('#end').val();
+    var promises = arr.map(async (p: any) => {
+        var tag = `${e.detail.value}_${p.value}`;
+        var name = `${e.detail.label} ${p.label}`;
+        var url = `/ambiental/customdata?area=${p.value}&typeid=${e.detail.value}&start=${sd}&end=${ed}`;
+        return await fetchData(url, tag, name);
+    });
+    Promise.all(promises).then(_ => {
+        chart.invalidateData();
+        redrawCircles();
+    });
+}, passive);
+customvar.addEventListener('removeItem', (event: any) => {
+    psmb.getValue(true).forEach((e: any) => {
+        var tag = `${event.detail.value}_${e}`;
+        removeSeries(tag);
+    });
+    redrawCircles();
+}, passive);
 //variable choice listeners
-evariable.addEventListener('addItem', (e: any) => loadData(e, false), passive);
+evariable.addEventListener('addItem', async (e: any) => {
+    await loadData(e, false);
+    redrawCircles();
+}, passive);
 evariable.addEventListener('removeItem', (event: any) => {
     psmb.getValue(true).forEach((e: any) => {
         var tag = `${event.detail.value}_${e}`;
-        chart.series.values.forEach((v: any, i: number) => {
-            if (v.dataFields.valueY === tag) {
-                delete chart.exporting.dataFields[tag];
-                chart.series.removeIndex(i).dispose();
-            }
-        });
+        removeSeries(tag);
     });
+    redrawCircles();
 }, passive);
 //trigger map click on selection
 var clickMap = function(e: any) {
@@ -289,21 +366,18 @@ var clickMap = function(e: any) {
         google.maps.event.trigger(polygons[e.detail.value], 'click', {});
 }
 //psmb choice listeners
-epsmb.addEventListener('addItem', (e: any) => {
-    loadData(e, true);
+epsmb.addEventListener('addItem', async (e: any) => {
+    await loadData(e, true);
     clickMap(e);
+    redrawCircles();
 }, passive);
 epsmb.addEventListener('removeItem', (event: any) => {
     variables.getValue(true).forEach((e: any) => {
         var tag = `${e}_${event.detail.value}`;
-        chart.series.values.forEach((v: any, i: number) => {
-            if (v.dataFields.valueY === tag) {
-                delete chart.exporting.dataFields[tag];
-                chart.series.removeIndex(i).dispose();
-            }
-        });
+        removeSeries(tag);
     });
     clickMap(event);
+    redrawCircles();
 }, passive);
 //get lists of choices
 var getList = async function(name: string) {
@@ -347,8 +421,10 @@ var init = async function () {
         .then(m => markers = markers.concat(m));
     var comunalist = getList('comuna');
     var groupvarlist = getList('groupvar');
+    var customvarlist = getList('customvar');
     var variablechoicesInit = Promise.all([oceanvarlist]).then(r => { variables.setChoices([r[0]]); return true; });
     var psmbchoicesInit = Promise.all([cuencalist]).then(r => { psmb.setChoices([r[0]]); return true; });
+    var customvarInit = Promise.all([customvarlist]).then(r => { customvars.setChoices([r[0]]); return true; });
     let buildchart = Promise.all([variablechoicesInit, psmbchoicesInit, cuencadata]).then(r => {
         variables.setChoiceByValue('v0');
         psmb.setChoiceByValue(1);
@@ -442,7 +518,7 @@ var init = async function () {
                 }
             });
         }, passive);
-        Promise.all([buildchart, psmbchoices, variablechoices, tlchoices, clusters]).then(_ => {
+        Promise.all([buildchart, psmbchoices, variablechoices, tlchoices, clusters, customvarInit]).then(_ => {
             chart.events.on('validated', loaderStop);
             loaderStop();
         });
@@ -456,7 +532,7 @@ var init = async function () {
             return true;
         });
         clusters = Promise.all([cuencadata, comunadata]).then(_ => new MarkerClusterer(map, markers, { imagePath: '/images/markers/m' }));
-        Promise.all([buildchart, psmbchoices, variablechoices, clusters]).then(_ => {
+        Promise.all([buildchart, psmbchoices, variablechoices, clusters, customvarInit]).then(_ => {
             chart.events.on('validated', loaderStop);
             loaderStop();
         });
@@ -572,11 +648,11 @@ document.getElementById("polygon-switch").addEventListener('change', async funct
 });
 document.getElementById("stat-switch").addEventListener('change', async function () {
     if ((<HTMLInputElement>this).checked) {
-        Object.values(stats).forEach((m: any) => {
+        Object.values(circles).forEach((m: any) => {
             m.setMap(map);
         });
     } else {
-        Object.values(stats).forEach((m: any) => {
+        Object.values(circles).forEach((m: any) => {
             m.setMap(null);
         });
     }

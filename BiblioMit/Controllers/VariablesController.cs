@@ -62,7 +62,7 @@ namespace BiblioMit.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,PsmbId,VariableTypeId,Value")] Variable variable)
+        public async Task<IActionResult> Create([Bind("Id,PsmbId,VariableTypeId,Value,Date")] Variable variable)
         {
             if (ModelState.IsValid)
             {
@@ -99,7 +99,7 @@ namespace BiblioMit.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,PsmbId,VariableTypeId,Value")] Variable variable)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,PsmbId,VariableTypeId,Value,Date")] Variable variable)
         {
             if (id != variable?.Id)
             {
