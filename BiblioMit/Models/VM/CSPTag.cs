@@ -31,12 +31,12 @@ namespace BiblioMit.Models.VM
             return $"base-uri 'self' {string.Join(" ", BaseUri)} ; " +
                 $"{blockmixed}" +
                 $"default-src 'self' {string.Join(" ", DefaultSrc)} ; " +
-                $"connect-src 'self' ws://{baseUrl} https://fonts.googleapis.com/ https://fonts.gstatic.com/ {string.Join(" ", ConnectSrc)} ; " +
+                $"connect-src 'self' ws://{baseUrl} https://fonts.googleapis.com/ https://fonts.gstatic.com/ https://www.google-analytics.com/ {string.Join(" ", ConnectSrc)} ; " +
                 $"frame-src 'self' {string.Join(" ", FrameSrc)} ; " +
                 $"img-src data: blob: 'self' {string.Join(" ", ImgSrc)} ; " +
                 $"object-src 'none' {string.Join(" ", ObjectSrc)} ; " +
                 $"script-src 'self' {string.Join(" ", ScriptSrc)} ; " +
-                $"script-src-elem 'self' {string.Join(" ", ScriptSrcElem)} ; " +
+                $"script-src-elem 'self' https://connect.facebook.net/ {string.Join(" ", ScriptSrcElem)} ; " +
                 $"style-src 'self' {string.Join(" ", StyleSrc)} ; " +
                 $"style-src-elem 'self' https://fonts.googleapis.com/ {string.Join(" ", StyleSrcElem)} ; " +
                 $"font-src 'self' data: https://fonts.googleapis.com/ https://fonts.gstatic.com/ {string.Join(" ", FontSrc)} ; " +
