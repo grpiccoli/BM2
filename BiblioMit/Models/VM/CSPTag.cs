@@ -22,7 +22,7 @@ namespace BiblioMit.Models.VM
         public static HashSet<string> AccessControlUrls { get; } = new HashSet<string>();
         public static string GetString(HostString baseUrl)
         {
-            StyleSrcElem.Add("'sha256-yChqzBduCCi4o4xdbXRXh4U/t1rP4UUUMJt+rB+ylUI='");
+            StyleSrcElem.Add("'unsafe-inline'");
             StyleSrcElem.Add("https://fonts.googleapis.com/");
             FontSrc.Add("https://fonts.gstatic.com/");
             FontSrc.Add("https://fonts.googleapis.com/");
@@ -32,6 +32,7 @@ namespace BiblioMit.Models.VM
             ConnectSrc.Add("https://fonts.gstatic.com/");
             ConnectSrc.Add("https://www.google-analytics.com/");
             FrameSrc.Add("https://www.facebook.com/");
+            FrameSrc.Add("https://web.facebook.com/");
             if (StyleSrcElem.Contains("'unsafe-inline'"))
                 StyleSrcElem.RemoveWhere(s => s.StartsWith("'nonce-", System.StringComparison.Ordinal) || s.StartsWith("'sha", System.StringComparison.Ordinal));
             if (ScriptSrcElem.Contains("'unsafe-inline'"))
