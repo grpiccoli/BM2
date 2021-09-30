@@ -150,6 +150,9 @@
   <data name="help table for traffic light analysis" xml:space="preserve">
     <value>tabla de ayuda semáforo</value>
   </data>
+  <data name="Info Pins" xml:space="preserve">
+    <value>Pines de Información</value>
+  </data>
   <data name="Larvae" xml:space="preserve">
     <value>Larvas</value>
   </data>
@@ -158,6 +161,9 @@
   </data>
   <data name="Parameters" xml:space="preserve">
     <value>Parámetros</value>
+  </data>
+  <data name="Polygons" xml:space="preserve">
+    <value>Polígonos</value>
   </data>
   <data name="RAG project" xml:space="preserve">
     <value>Proyecto Semáforo</value>
@@ -173,6 +179,9 @@
   </data>
   <data name="Species" xml:space="preserve">
     <value>Especies</value>
+  </data>
+  <data name="Stats" xml:space="preserve">
+    <value>Estadísticas</value>
   </data>
   <data name="to" xml:space="preserve">
     <value>a</value>
