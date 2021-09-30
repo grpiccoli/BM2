@@ -249,24 +249,6 @@
     <None Remove="styles\flowpaper\flowpaper.css" />
     <None Remove="styles\flowpaper\popover-theme.css" />
     <None Remove="styles\flowpaper\popover.css" />
-    <None Remove="styles\scripts\boletinBoletin.js" />
-    <None Remove="styles\scripts\clock.js" />
-    <None Remove="styles\scripts\entriesCreate.js" />
-    <None Remove="styles\scripts\flowpaper\flowpaper.js" />
-    <None Remove="styles\scripts\flowpaper\flowpaperLoader.js" />
-    <None Remove="styles\scripts\flowpaper\flowpaper_handlers.js" />
-    <None Remove="styles\scripts\flowpaper\jquery.extensions.min.js" />
-    <None Remove="styles\scripts\flowpaper\jquery.min.js" />
-    <None Remove="styles\scripts\flowpaper\three.min.js" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <TypeScriptCompile Remove="styles\scripts\entry.ts" />
-    <TypeScriptCompile Remove="styles\scripts\parseNumber.ts" />
-    <TypeScriptCompile Remove="styles\scripts\piechart.ts" />
-    <TypeScriptCompile Remove="styles\scripts\progress.ts" />
-    <TypeScriptCompile Remove="styles\scripts\sendDisabledSelects.ts" />
-    <TypeScriptCompile Remove="styles\scripts\translate.ts" />
   </ItemGroup>
   
   <ItemGroup>
@@ -337,36 +319,6 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
-    <Content Include="styles\scripts\entry.ts" />
-    <Content Include="styles\scripts\flowpaper\flowpaper.js">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Include="styles\scripts\flowpaper\flowpaperLoader.js">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Include="styles\scripts\flowpaper\flowpaper_handlers.js">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Include="styles\scripts\flowpaper\jquery.extensions.min.js">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Include="styles\scripts\flowpaper\jquery.min.js">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Include="styles\scripts\flowpaper\three.min.js">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Include="styles\scripts\parseNumber.ts" />
-    <Content Include="styles\scripts\piechart.ts" />
-    <Content Include="styles\scripts\progress.ts" />
-    <Content Include="styles\scripts\sendDisabledSelects.ts" />
-    <Content Include="styles\scripts\translate.ts" />
   </ItemGroup>
   
   <ItemGroup>
@@ -378,9 +330,6 @@
     <TypeScriptCompile Include="scripts\flowpaper\footerChange.js" />
     <TypeScriptCompile Include="scripts\photosIndex.js" />
     <TypeScriptCompile Include="scripts\validate-localization.ts" />
-    <TypeScriptCompile Include="styles\scripts\boletinBoletin.js" />
-    <TypeScriptCompile Include="styles\scripts\clock.js" />
-    <TypeScriptCompile Include="styles\scripts\entriesCreate.js" />
   </ItemGroup>
   
   <!--<ItemGroup>
@@ -404,7 +353,6 @@
 	<Folder Include="html\" />
 	<Folder Include="Pages\Shared\" />
 	<Folder Include="scripts\types_old\" />
-	<Folder Include="styles\scripts\types_old\" />
     <Folder Include="wwwroot\images\markers\" />
   </ItemGroup>
 
@@ -475,10 +423,6 @@
 
   <ItemGroup>
     <TypeScriptCompile Update="scripts\chat.ts">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </TypeScriptCompile>
-    <TypeScriptCompile Update="styles\scripts\chat.ts">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </TypeScriptCompile>

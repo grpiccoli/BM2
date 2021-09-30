@@ -871,8 +871,8 @@ namespace BiblioMit.Controllers
             }
             else
             {
-                ViewData["start"] = minplank;
-                ViewData["end"] = maxplank;
+                ViewData["start"] = minplank.ToString(_dateFormat, CultureInfo.InvariantCulture);
+                ViewData["end"] = maxplank.ToString(_dateFormat, CultureInfo.InvariantCulture);
             }
             return View();
         }
