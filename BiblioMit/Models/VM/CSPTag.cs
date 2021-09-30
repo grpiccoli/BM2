@@ -32,13 +32,13 @@ namespace BiblioMit.Models.VM
                 $"{blockmixed}" +
                 $"default-src 'self' {string.Join(" ", DefaultSrc)} ; " +
                 $"connect-src 'self' ws://{baseUrl} https://fonts.googleapis.com/ https://fonts.gstatic.com/ https://www.google-analytics.com/ {string.Join(" ", ConnectSrc)} ; " +
-                $"frame-src 'self' {string.Join(" ", FrameSrc)} ; " +
+                $"frame-src 'self' https://www.facebook.com/ {string.Join(" ", FrameSrc)} ; " +
                 $"img-src data: blob: 'self' {string.Join(" ", ImgSrc)} ; " +
                 $"object-src 'none' {string.Join(" ", ObjectSrc)} ; " +
                 $"script-src 'self' {string.Join(" ", ScriptSrc)} ; " +
                 $"script-src-elem 'self' https://connect.facebook.net/ {string.Join(" ", ScriptSrcElem)} ; " +
                 $"style-src 'self' {string.Join(" ", StyleSrc)} ; " +
-                $"style-src-elem 'self' https://fonts.googleapis.com/ {string.Join(" ", StyleSrcElem)} ; " +
+                $"style-src-elem 'self' https://fonts.googleapis.com/ 'sha256-yChqzBduCCi4o4xdbXRXh4U/t1rP4UUUMJt+rB+ylUI=' {string.Join(" ", StyleSrcElem)} ; " +
                 $"font-src 'self' data: https://fonts.googleapis.com/ https://fonts.gstatic.com/ {string.Join(" ", FontSrc)} ; " +
                 $"{upgradeinsecure}";
         }
