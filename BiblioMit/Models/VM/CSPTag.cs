@@ -22,24 +22,34 @@ namespace BiblioMit.Models.VM
         public static HashSet<string> AccessControlUrls { get; } = new HashSet<string>();
         public static string GetString(HostString baseUrl)
         {
+            StyleSrcElem.Add("'sha256-yChqzBduCCi4o4xdbXRXh4U/t1rP4UUUMJt+rB+ylUI='");
+            StyleSrcElem.Add("https://fonts.googleapis.com/");
+            FontSrc.Add("https://fonts.gstatic.com/");
+            FontSrc.Add("https://fonts.googleapis.com/");
+            ScriptSrcElem.Add("https://connect.facebook.net/");
+            ScriptSrcElem.Add("https://fonts.googleapis.com/");
+            ConnectSrc.Add("https://fonts.googleapis.com/");
+            ConnectSrc.Add("https://fonts.gstatic.com/");
+            ConnectSrc.Add("https://www.google-analytics.com/");
+            FrameSrc.Add("https://www.facebook.com/");
             if (StyleSrcElem.Contains("'unsafe-inline'"))
-                StyleSrcElem.RemoveWhere(s => s.StartsWith("'nonce-", System.StringComparison.Ordinal));
+                StyleSrcElem.RemoveWhere(s => s.StartsWith("'nonce-", System.StringComparison.Ordinal) || s.StartsWith("'sha", System.StringComparison.Ordinal));
             if (ScriptSrcElem.Contains("'unsafe-inline'"))
-                ScriptSrcElem.RemoveWhere(s => s.StartsWith("'nonce-", System.StringComparison.Ordinal));
+                ScriptSrcElem.RemoveWhere(s => s.StartsWith("'nonce-", System.StringComparison.Ordinal) || s.StartsWith("'sha", System.StringComparison.Ordinal));
             var blockmixed = BlockAllMixedContent ? "block-all-mixed-content;" : string.Empty;
             var upgradeinsecure = UpgradeInsecureRequests ? "upgrade-insecure-requests;" : string.Empty;
             return $"base-uri 'self' {string.Join(" ", BaseUri)} ; " +
                 $"{blockmixed}" +
                 $"default-src 'self' {string.Join(" ", DefaultSrc)} ; " +
-                $"connect-src 'self' ws://{baseUrl} https://fonts.googleapis.com/ https://fonts.gstatic.com/ https://www.google-analytics.com/ {string.Join(" ", ConnectSrc)} ; " +
-                $"frame-src 'self' https://www.facebook.com/ {string.Join(" ", FrameSrc)} ; " +
+                $"connect-src 'self' ws://{baseUrl} {string.Join(" ", ConnectSrc)} ; " +
+                $"frame-src 'self' {string.Join(" ", FrameSrc)} ; " +
                 $"img-src data: blob: 'self' {string.Join(" ", ImgSrc)} ; " +
                 $"object-src 'none' {string.Join(" ", ObjectSrc)} ; " +
                 $"script-src 'self' {string.Join(" ", ScriptSrc)} ; " +
-                $"script-src-elem 'self' https://connect.facebook.net/ {string.Join(" ", ScriptSrcElem)} ; " +
+                $"script-src-elem 'self' {string.Join(" ", ScriptSrcElem)} ; " +
                 $"style-src 'self' {string.Join(" ", StyleSrc)} ; " +
-                $"style-src-elem 'self' https://fonts.googleapis.com/ 'sha256-yChqzBduCCi4o4xdbXRXh4U/t1rP4UUUMJt+rB+ylUI=' {string.Join(" ", StyleSrcElem)} ; " +
-                $"font-src 'self' data: https://fonts.googleapis.com/ https://fonts.gstatic.com/ {string.Join(" ", FontSrc)} ; " +
+                $"style-src-elem 'self' {string.Join(" ", StyleSrcElem)} ; " +
+                $"font-src 'self' data: {string.Join(" ", FontSrc)} ; " +
                 $"{upgradeinsecure}";
         }
         public static string GetAccessControlString()
