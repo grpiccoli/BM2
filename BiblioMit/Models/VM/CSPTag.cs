@@ -31,6 +31,7 @@ namespace BiblioMit.Models.VM
             ConnectSrc.Add("https://fonts.googleapis.com/");
             ConnectSrc.Add("https://fonts.gstatic.com/");
             ConnectSrc.Add("https://www.google-analytics.com/");
+            ConnectSrc.Add("https://www.facebook.com/");
             FrameSrc.Add("https://www.facebook.com/");
             FrameSrc.Add("https://web.facebook.com/");
             if (StyleSrcElem.Contains("'unsafe-inline'"))

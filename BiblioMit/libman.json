@@ -91,11 +91,11 @@
       ]
     },
     {
-      "library": "bootstrap@5.1.0",
+      "library": "bootstrap@5.1.1",
       "destination": "wwwroot/lib/bootstrap",
       "files": [
         "dist/css/bootstrap.min.css",
-        "dist/js/bootstrap.bundle.min.js"
+        "dist/js/bootstrap.min.js"
       ]
     },
     {
@@ -238,11 +238,6 @@
         "dist/css/font/ngy2_icon_font.woff2",
         "dist/css/font/ngy2_icon_font.woff"
       ]
-    },
-    {
-      "library": "@popperjs/core@2.9.3",
-      "destination": "wwwroot/lib/@popperjs/core",
-      "files": [ "dist/umd/popper.min.js" ]
     },
     {
       "provider": "unpkg",
