@@ -60,9 +60,13 @@ namespace BiblioMit
             services.AddScoped<IPuppet, PuppetService>();
             services.AddHostedService<PlanktonBackground>();
             services.AddScoped<IPlanktonService, PlanktonService>();
-            services.AddHostedService<SeedBackground>();
-            services.AddScoped<ISeed, SeedService>();
-            services.AddScoped<IUpdateJsons, UpdateJsons>();
+            bool seed = Configuration.GetValue<bool>("seed");
+            if (seed)
+            {
+                services.AddHostedService<SeedBackground>();
+                services.AddScoped<ISeed, SeedService>();
+                services.AddScoped<IUpdateJsons, UpdateJsons>();
+            }
             services.AddScoped<INodeService, NodeService>();
             services.AddScoped<IBannerService, BannerService>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
